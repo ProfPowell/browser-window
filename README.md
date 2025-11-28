@@ -1,6 +1,6 @@
-# @zingsoft/browser-window
+# @ProfPowell/browser-window
 
-A Safari-style browser window web component for demos and tutorials. Features source code viewing, fullscreen expand mode, CodePen export, and full theming support.
+A Safari-style browser window web component for demos and tutorials. Features source code viewing, full-screen expand mode, CodePen export, and full theming support.
 
 Based on [@zachleat/browser-window](https://github.com/zachleat/browser-window) with significant enhancements.
 
