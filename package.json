@@ -1,0 +1,44 @@
+{
+  "name": "@ProfPowell/browser-window",
+  "version": "1.0.0",
+  "description": "A Safari-style browser window web component for demos and tutorials",
+  "type": "module",
+  "main": "dist/browser-window.js",
+  "module": "dist/browser-window.js",
+  "types": "dist/browser-window.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/browser-window.d.ts",
+      "import": "./dist/browser-window.js",
+      "default": "./dist/browser-window.js"
+    }
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "build": "npm run build:js && npm run build:types",
+    "build:js": "esbuild src/browser-window.js --bundle --format=esm --outfile=dist/browser-window.js && esbuild src/browser-window.js --bundle --format=esm --minify --outfile=dist/browser-window.min.js",
+    "build:types": "tsc",
+    "dev": "python3 -m http.server 3456",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "web-component",
+    "browser-window",
+    "demo",
+    "tutorial",
+    "custom-element"
+  ],
+  "author": "ProfPowell",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ProfPowell/browser-window.git"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.0",
+    "typescript": "^5.3.0"
+  }
+}
