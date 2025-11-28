@@ -9,17 +9,17 @@ Based on [@zachleat/browser-window](https://github.com/zachleat/browser-window) 
 ### npm
 
 ```bash
-npm install @zingsoft/browser-window
+npm install @profpowell/browser-window
 ```
 
 ```javascript
-import '@zingsoft/browser-window';
+import '@profpowell/browser-window';
 ```
 
 ### CDN
 
 ```html
-<script type="module" src="https://unpkg.com/@zingsoft/browser-window"></script>
+<script type="module" src="https://unpkg.com/@profpowell/browser-window"></script>
 ```
 
 ### Direct Download

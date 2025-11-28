@@ -1,5 +1,5 @@
 {
-  "name": "@ProfPowell/browser-window",
+  "name": "@profpowell/browser-window",
   "version": "1.0.0",
   "description": "A Safari-style browser window web component for demos and tutorials",
   "type": "module",
