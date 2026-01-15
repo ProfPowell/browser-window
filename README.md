@@ -1,6 +1,8 @@
 # @ProfPowell/browser-window
 
-A Safari-style browser window web component for demos and tutorials. Features source code viewing, full-screen expand mode, CodePen export, and full theming support.
+A Safari-style browser window web component for demos and tutorials. Features source code viewing, full-screen expand mode, CodePen export, automatic theme detection, and full theming support.
+
+**[View Documentation](https://profpowell.github.io/browser-window/)** | **[Live Demos](https://profpowell.github.io/browser-window/demos.html)** | **[API Reference](https://profpowell.github.io/browser-window/api.html)**
 
 Based on [@zachleat/browser-window](https://github.com/zachleat/browser-window) with significant enhancements.
 
@@ -19,7 +21,11 @@ import '@profpowell/browser-window';
 ### CDN
 
 ```html
+<!-- unpkg -->
 <script type="module" src="https://unpkg.com/@profpowell/browser-window"></script>
+
+<!-- jsdelivr -->
+<script type="module" src="https://cdn.jsdelivr.net/npm/@profpowell/browser-window"></script>
 ```
 
 ### Direct Download
@@ -50,8 +56,26 @@ import '@profpowell/browser-window';
 
 ### Dark Mode
 
+The component automatically respects your system's `prefers-color-scheme` preference. You can also explicitly set the mode:
+
 ```html
-<browser-window mode="dark" src="demo.html" shadow>
+<!-- Follows system preference (default) -->
+<browser-window src="demo.html"></browser-window>
+
+<!-- Always light -->
+<browser-window mode="light" src="demo.html"></browser-window>
+
+<!-- Always dark -->
+<browser-window mode="dark" src="demo.html" shadow></browser-window>
+```
+
+### Resizable
+
+The component is resizable by default. Drag the bottom-right corner to resize:
+
+```html
+<!-- Set initial size with CSS -->
+<browser-window src="demo.html" style="height: 400px; width: 600px;">
 </browser-window>
 ```
 
@@ -62,7 +86,7 @@ import '@profpowell/browser-window';
 | `url` | string | `''` | URL to display in the address bar |
 | `title` | string | hostname from url | Title shown in the URL bar |
 | `src` | string | `''` | Path to HTML file to load in iframe (enables source viewing) |
-| `mode` | `'light'` \| `'dark'` | `'light'` | Color scheme |
+| `mode` | `'light'` \| `'dark'` | auto | Color scheme. Omit to follow system preference |
 | `shadow` | boolean | `false` | Add drop shadow to the window |
 
 ## Features
@@ -83,6 +107,17 @@ When `src` is set, a share button provides:
 
 ### Download
 Direct download link for the source HTML file.
+
+### Automatic Theme Detection
+The component automatically follows your operating system's light/dark mode preference using `prefers-color-scheme`. Set the `mode` attribute to override this behavior.
+
+### Resizable Container
+Drag the bottom-right corner to resize the component. The content area (iframe or source view) automatically adjusts to fill the available space. Resizing is disabled when maximized.
+
+### Mobile-Friendly
+- Touch-friendly control buttons with proper hit targets (44px minimum)
+- Responsive layout that adapts to narrow screens
+- URL bar text truncates gracefully on small screens
 
 ## CSS Custom Properties
 
@@ -127,6 +162,7 @@ browser-window.purple-theme {
 - `role="dialog"` and `aria-modal` when maximized
 - Respects `prefers-reduced-motion` for animations
 - Escape key closes maximized view and menus
+- Touch targets meet WCAG 2.1 minimum size requirements
 
 ## Browser Support
 
@@ -144,9 +180,36 @@ npm install
 # Start development server
 npm run dev
 
+# Run linter
+npm run lint
+
+# Run tests
+npm test
+
 # Build for production
 npm run build
+
+# Generate custom elements manifest
+npm run analyze
 ```
+
+## Scripts
+
+| Script | Description |
+|--------|-------------|
+| `npm run dev` | Start local dev server on port 3456 |
+| `npm run build` | Build for production (JS + types) |
+| `npm run lint` | Run ESLint |
+| `npm run lint:fix` | Run ESLint with auto-fix |
+| `npm run format` | Format code with Prettier |
+| `npm run test` | Run test suite |
+| `npm run test:watch` | Run tests in watch mode |
+| `npm run analyze` | Generate custom-elements.json manifest |
+
+## Related Projects
+
+- **[&lt;code-block&gt;](https://github.com/ProfPowell/code-block)** - Syntax-highlighted code block web component with copy button
+- **[@zachleat/browser-window](https://github.com/zachleat/browser-window)** - The original component this project is based on
 
 ## License
 
