@@ -1,0 +1,377 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>API Documentation - browser-window</title>
+    <meta name="description" content="Complete API documentation for the browser-window web component." />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <nav class="nav">
+      <div class="nav-container">
+        <a href="index.html" class="nav-logo">&lt;browser-window&gt;</a>
+        <div class="nav-links">
+          <a href="index.html" class="nav-link">Home</a>
+          <a href="demos.html" class="nav-link">Demos</a>
+          <a href="api.html" class="nav-link active">API</a>
+          <a href="https://github.com/ProfPowell/browser-window" class="nav-link nav-github" target="_blank" rel="noopener">
+            GitHub
+          </a>
+        </div>
+      </div>
+    </nav>
+
+    <main>
+      <section class="demos-intro">
+        <h1>API Documentation</h1>
+        <p>Complete reference for the &lt;browser-window&gt; component</p>
+      </section>
+
+      <section class="api-section">
+        <h2>Attributes</h2>
+        <p>Configure the component behavior using these HTML attributes.</p>
+
+        <table class="api-table">
+          <thead>
+            <tr>
+              <th>Attribute</th>
+              <th>Type</th>
+              <th>Default</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>url</code></td>
+              <td>string</td>
+              <td><code>''</code></td>
+              <td>URL to display in the address bar. The hostname is extracted and shown as the title if no <code>title</code> attribute is set.</td>
+            </tr>
+            <tr>
+              <td><code>title</code></td>
+              <td>string</td>
+              <td>hostname from url</td>
+              <td>Title shown in the URL bar. Overrides the automatically extracted hostname.</td>
+            </tr>
+            <tr>
+              <td><code>src</code></td>
+              <td>string</td>
+              <td><code>''</code></td>
+              <td>Path to an HTML file to load in an iframe. When set, enables source viewing, sharing, and CodePen export features.</td>
+            </tr>
+            <tr>
+              <td><code>mode</code></td>
+              <td><code>'light'</code> | <code>'dark'</code></td>
+              <td>auto</td>
+              <td>Color scheme for the component. When omitted, automatically follows system preference via <code>prefers-color-scheme</code>.</td>
+            </tr>
+            <tr>
+              <td><code>shadow</code></td>
+              <td>boolean</td>
+              <td><code>false</code></td>
+              <td>When present, adds a drop shadow around the browser window frame.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>Attribute Examples</h3>
+        <code-block language="html">&lt;!-- Basic usage with URL --&gt;
+&lt;browser-window url="https://example.com"&gt;
+  &lt;img src="screenshot.png" alt="Screenshot"&gt;
+&lt;/browser-window&gt;
+
+&lt;!-- Load external HTML with source viewing --&gt;
+&lt;browser-window
+  src="demo.html"
+  url="https://example.com/demo"
+  title="My Demo"
+  shadow&gt;
+&lt;/browser-window&gt;
+
+&lt;!-- Force dark mode --&gt;
+&lt;browser-window mode="dark" src="demo.html"&gt;&lt;/browser-window&gt;</code-block>
+      </section>
+
+      <section class="api-section">
+        <h2>Slots</h2>
+        <p>Use slots to provide custom content inside the browser window.</p>
+
+        <table class="api-table">
+          <thead>
+            <tr>
+              <th>Slot</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>(default)</code></td>
+              <td>The default slot accepts any content to display inside the browser window. Used when the <code>src</code> attribute is not set. Content automatically fills the available space.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>Slot Examples</h3>
+        <code-block language="html">&lt;!-- Image content --&gt;
+&lt;browser-window url="https://example.com"&gt;
+  &lt;img src="app-screenshot.png" alt="App screenshot"&gt;
+&lt;/browser-window&gt;
+
+&lt;!-- Custom HTML content --&gt;
+&lt;browser-window url="https://myapp.com" title="Dashboard"&gt;
+  &lt;div style="padding: 2rem; background: #f0f9ff;"&gt;
+    &lt;h2&gt;Welcome to the Dashboard&lt;/h2&gt;
+    &lt;p&gt;Your custom content here.&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/browser-window&gt;</code-block>
+      </section>
+
+      <section class="api-section">
+        <h2>CSS Custom Properties</h2>
+        <p>Customize the appearance using CSS custom properties. Set these on the <code>browser-window</code> element or a parent container.</p>
+
+        <table class="api-table">
+          <thead>
+            <tr>
+              <th>Property</th>
+              <th>Default</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>--browser-window-bg</code></td>
+              <td><code>#ffffff</code></td>
+              <td>Background color of the entire component</td>
+            </tr>
+            <tr>
+              <td><code>--browser-window-header-bg</code></td>
+              <td><code>#f6f8fa</code></td>
+              <td>Background color of the header/toolbar area</td>
+            </tr>
+            <tr>
+              <td><code>--browser-window-border-color</code></td>
+              <td><code>#d1d5da</code></td>
+              <td>Border color for the window frame</td>
+            </tr>
+            <tr>
+              <td><code>--browser-window-border-radius</code></td>
+              <td><code>8px</code></td>
+              <td>Border radius of the window corners</td>
+            </tr>
+            <tr>
+              <td><code>--browser-window-text-color</code></td>
+              <td><code>#24292e</code></td>
+              <td>Primary text color</td>
+            </tr>
+            <tr>
+              <td><code>--browser-window-text-muted</code></td>
+              <td><code>#586069</code></td>
+              <td>Muted/secondary text color</td>
+            </tr>
+            <tr>
+              <td><code>--browser-window-url-bg</code></td>
+              <td><code>#ffffff</code></td>
+              <td>Background color of the URL bar</td>
+            </tr>
+            <tr>
+              <td><code>--browser-window-shadow</code></td>
+              <td><code>0 4px 12px rgba(0,0,0,0.15)</code></td>
+              <td>Box shadow when <code>shadow</code> attribute is set</td>
+            </tr>
+            <tr>
+              <td><code>--browser-window-close-color</code></td>
+              <td><code>#ff5f57</code></td>
+              <td>Color of the close (red) button</td>
+            </tr>
+            <tr>
+              <td><code>--browser-window-minimize-color</code></td>
+              <td><code>#febc2e</code></td>
+              <td>Color of the minimize (yellow) button</td>
+            </tr>
+            <tr>
+              <td><code>--browser-window-maximize-color</code></td>
+              <td><code>#28c840</code></td>
+              <td>Color of the maximize (green) button</td>
+            </tr>
+            <tr>
+              <td><code>--browser-window-accent-color</code></td>
+              <td><code>#2563eb</code></td>
+              <td>Accent color for interactive elements</td>
+            </tr>
+            <tr>
+              <td><code>--browser-window-hover-bg</code></td>
+              <td><code>#f3f4f6</code></td>
+              <td>Background color on hover for buttons</td>
+            </tr>
+            <tr>
+              <td><code>--browser-window-content-bg</code></td>
+              <td><code>#ffffff</code></td>
+              <td>Background color of the content area</td>
+            </tr>
+            <tr>
+              <td><code>--browser-window-font-family</code></td>
+              <td>System fonts</td>
+              <td>Font family for text content</td>
+            </tr>
+            <tr>
+              <td><code>--browser-window-mono-font</code></td>
+              <td>Monospace fonts</td>
+              <td>Font family for code/monospace content</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>Theming Example</h3>
+        <code-block language="css">/* Custom purple theme */
+browser-window.purple-theme {
+  --browser-window-accent-color: #8b5cf6;
+  --browser-window-header-bg: #faf5ff;
+  --browser-window-border-color: #c4b5fd;
+}
+
+/* Custom dark theme override */
+browser-window.custom-dark {
+  --browser-window-bg: #1a1a2e;
+  --browser-window-header-bg: #16213e;
+  --browser-window-content-bg: #1a1a2e;
+  --browser-window-text-color: #eee;
+  --browser-window-border-color: #0f3460;
+}</code-block>
+      </section>
+
+      <section class="api-section">
+        <h2>CSS Parts</h2>
+        <p>Style internal elements using the <code>::part()</code> selector.</p>
+
+        <table class="api-table">
+          <thead>
+            <tr>
+              <th>Part</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>header</code></td>
+              <td>The browser header/toolbar containing controls and URL bar</td>
+            </tr>
+            <tr>
+              <td><code>content</code></td>
+              <td>The content area containing the iframe or slotted content</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>CSS Parts Example</h3>
+        <code-block language="css">/* Style the header */
+browser-window::part(header) {
+  padding: 1rem;
+}
+
+/* Style the content area */
+browser-window::part(content) {
+  padding: 1rem;
+  min-height: 300px;
+}</code-block>
+      </section>
+
+      <section class="api-section">
+        <h2>Keyboard Shortcuts</h2>
+        <p>The component supports keyboard navigation for accessibility.</p>
+
+        <table class="api-table">
+          <thead>
+            <tr>
+              <th>Key</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>Escape</code></td>
+              <td>Close maximized view or close open menus</td>
+            </tr>
+            <tr>
+              <td><code>Tab</code></td>
+              <td>Navigate between interactive elements</td>
+            </tr>
+            <tr>
+              <td><code>Enter</code> / <code>Space</code></td>
+              <td>Activate focused button</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="api-section">
+        <h2>Features Reference</h2>
+
+        <h3>Source Code Viewing</h3>
+        <p>When the <code>src</code> attribute is set, a code icon (<code>&lt;/&gt;</code>) appears in the URL bar. Clicking it toggles between the rendered content and syntax-highlighted source code. The source view includes a "Copy" button to copy the code to clipboard.</p>
+
+        <h3>Maximize Mode</h3>
+        <p>Enter maximize mode by:</p>
+        <ul>
+          <li>Double-clicking the title bar</li>
+          <li>Clicking the green maximize button</li>
+        </ul>
+        <p>Exit maximize mode by:</p>
+        <ul>
+          <li>Pressing <code>Escape</code></li>
+          <li>Clicking the backdrop overlay</li>
+          <li>Clicking the green button again</li>
+        </ul>
+        <p>When maximized, the component displays as a centered modal with a backdrop and proper ARIA attributes (<code>role="dialog"</code>, <code>aria-modal="true"</code>).</p>
+
+        <h3>Share Menu</h3>
+        <p>When <code>src</code> is set, a share button provides:</p>
+        <ul>
+          <li><strong>Share...</strong> - Uses the native Web Share API (on supported devices)</li>
+          <li><strong>Open in CodePen</strong> - Exports the demo to CodePen with HTML, CSS, and JS properly separated</li>
+        </ul>
+
+        <h3>Download</h3>
+        <p>A download button appears when <code>src</code> is set, allowing direct download of the source HTML file.</p>
+
+        <h3>Resizable</h3>
+        <p>The component can be resized by dragging the bottom-right corner. Set initial dimensions using CSS:</p>
+        <code-block language="html">&lt;browser-window src="demo.html" style="height: 400px; width: 600px;"&gt;
+&lt;/browser-window&gt;</code-block>
+      </section>
+
+      <section class="api-section">
+        <h2>Browser Support</h2>
+        <p>Works in all modern browsers that support Web Components:</p>
+        <ul>
+          <li>Chrome/Edge 67+</li>
+          <li>Firefox 63+</li>
+          <li>Safari 10.1+</li>
+        </ul>
+      </section>
+
+      <section class="api-section">
+        <h2>Accessibility</h2>
+        <p>The component is built with accessibility in mind:</p>
+        <ul>
+          <li>Full keyboard navigation with visible focus indicators</li>
+          <li>ARIA labels on all interactive elements</li>
+          <li><code>role="dialog"</code> and <code>aria-modal</code> when maximized</li>
+          <li>Respects <code>prefers-reduced-motion</code> for animations</li>
+          <li>Touch targets meet WCAG 2.1 minimum size requirements (44px)</li>
+        </ul>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>
+        MIT License &middot;
+        Based on <a href="https://github.com/zachleat/browser-window" target="_blank" rel="noopener">@zachleat/browser-window</a> &middot;
+        Code highlighting by <a href="https://github.com/ProfPowell/code-block" target="_blank" rel="noopener">&lt;code-block&gt;</a>
+      </p>
+    </footer>
+
+    <script type="module" src="https://cdn.jsdelivr.net/gh/ProfPowell/code-block@v2.0.1/dist/code-block.min.js"></script>
+  </body>
+</html>

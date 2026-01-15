@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Demos - browser-window</title>
+    <meta name="description" content="Interactive demos showcasing the browser-window web component features." />
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      /* Demo-specific styles */
+      .fill-content {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+        text-align: center;
+      }
+
+      .light-fill {
+        background: #f1f5f9;
+        color: #1e293b;
+      }
+
+      .dark-fill {
+        background: #1e293b;
+        color: #f1f5f9;
+      }
+
+      .blue-fill {
+        background: #2563eb;
+        color: white;
+      }
+
+      .card-content {
+        padding: 2rem;
+        background: #f8fafc;
+        min-height: 200px;
+      }
+
+      .card {
+        background: white;
+        border-radius: 8px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+
+      .demo-code {
+        margin-top: 1rem;
+        font-size: 0.875rem;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="nav">
+      <div class="nav-container">
+        <a href="index.html" class="nav-logo">&lt;browser-window&gt;</a>
+        <div class="nav-links">
+          <a href="index.html" class="nav-link">Home</a>
+          <a href="demos.html" class="nav-link active">Demos</a>
+          <a href="api.html" class="nav-link">API</a>
+          <a href="https://github.com/ProfPowell/browser-window" class="nav-link nav-github" target="_blank" rel="noopener">
+            GitHub
+          </a>
+        </div>
+      </div>
+    </nav>
+
+    <main>
+      <section class="demos-intro">
+        <h1>Interactive Demos</h1>
+        <p>Explore all the features of the &lt;browser-window&gt; component</p>
+      </section>
+
+      <section class="demo-section">
+        <h2>Basic Usage with Source Viewing</h2>
+        <p>
+          Load external HTML with the <code>src</code> attribute. Click the <code>&lt;/&gt;</code> icon to view the source code!
+        </p>
+        <browser-window src="flexbox-demo.html" url="https://example.com/flexbox" shadow>
+        </browser-window>
+        <code-block language="html" class="demo-code">&lt;browser-window src="flexbox-demo.html" url="https://example.com/flexbox" shadow&gt;
+&lt;/browser-window&gt;</code-block>
+      </section>
+
+      <section class="demo-section">
+        <h2>Light &amp; Dark Mode</h2>
+        <p>
+          The component automatically follows system theme preference. Use <code>mode="light"</code> or <code>mode="dark"</code> to override.
+        </p>
+        <div class="demo-grid side-by-side">
+          <browser-window mode="light" url="https://example.com" title="Light Mode (forced)">
+            <div class="fill-content light-fill">
+              <p style="margin: 0">This window is always light</p>
+            </div>
+          </browser-window>
+          <browser-window mode="dark" url="https://example.com" title="Dark Mode (forced)">
+            <div class="fill-content dark-fill">
+              <p style="margin: 0">This window is always dark</p>
+            </div>
+          </browser-window>
+        </div>
+        <code-block language="html" class="demo-code">&lt;browser-window mode="light" url="https://example.com" title="Light Mode"&gt;
+  &lt;div class="content"&gt;Always light&lt;/div&gt;
+&lt;/browser-window&gt;
+
+&lt;browser-window mode="dark" url="https://example.com" title="Dark Mode"&gt;
+  &lt;div class="content"&gt;Always dark&lt;/div&gt;
+&lt;/browser-window&gt;</code-block>
+      </section>
+
+      <section class="demo-section">
+        <h2>Resizable</h2>
+        <p>
+          Drag the bottom-right corner to resize. The component respects <code>min-width</code> and <code>min-height</code> constraints.
+        </p>
+        <browser-window url="https://example.com/resize-demo" title="Resize Me!" style="height: 300px">
+          <div class="fill-content blue-fill">
+            <p style="margin: 0; font-size: 1.25rem">Drag the corner to resize!</p>
+          </div>
+        </browser-window>
+        <code-block language="html" class="demo-code">&lt;browser-window url="https://example.com" title="Resize Me!" style="height: 300px"&gt;
+  &lt;div class="content"&gt;Drag the corner to resize!&lt;/div&gt;
+&lt;/browser-window&gt;</code-block>
+      </section>
+
+      <section class="demo-section">
+        <h2>Slotted Content</h2>
+        <p>
+          When no <code>src</code> is provided, use slotted content directly. Great for screenshots or custom HTML.
+        </p>
+        <browser-window url="https://myapp.example.com" title="My App Dashboard" shadow>
+          <div class="card-content">
+            <div class="card">
+              <h3 style="margin: 0 0 0.5rem; color: #1e293b">Dashboard</h3>
+              <p style="margin: 0; color: #64748b; font-size: 0.875rem">
+                Welcome back! Your stats are looking great.
+              </p>
+            </div>
+          </div>
+        </browser-window>
+        <code-block language="html" class="demo-code">&lt;browser-window url="https://myapp.example.com" title="My App Dashboard" shadow&gt;
+  &lt;div class="card-content"&gt;
+    &lt;div class="card"&gt;
+      &lt;h3&gt;Dashboard&lt;/h3&gt;
+      &lt;p&gt;Welcome back! Your stats are looking great.&lt;/p&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/browser-window&gt;</code-block>
+      </section>
+
+      <section class="demo-section">
+        <h2>Maximize Mode</h2>
+        <p>
+          Double-click the header or click the green button to maximize. Press <code>Escape</code> or click the overlay to restore.
+        </p>
+        <browser-window src="example.html" url="https://example.com/fullscreen" title="Try Maximizing!" shadow>
+        </browser-window>
+        <code-block language="html" class="demo-code">&lt;!-- Double-click header or click green button to maximize --&gt;
+&lt;browser-window src="demo.html" url="https://example.com" title="Maximize Me!"&gt;
+&lt;/browser-window&gt;</code-block>
+      </section>
+
+      <section class="demo-section">
+        <h2>Custom Theming</h2>
+        <p>
+          Use CSS custom properties to create custom themes.
+        </p>
+        <style>
+          .purple-theme {
+            --browser-window-accent-color: #8b5cf6;
+            --browser-window-header-bg: #faf5ff;
+            --browser-window-border-color: #c4b5fd;
+            --browser-window-close-color: #f472b6;
+            --browser-window-minimize-color: #a78bfa;
+            --browser-window-maximize-color: #34d399;
+          }
+        </style>
+        <browser-window class="purple-theme" url="https://example.com" title="Purple Theme" shadow>
+          <div class="fill-content" style="background: #f5f3ff; color: #4c1d95;">
+            <p style="margin: 0">Custom purple theme using CSS custom properties</p>
+          </div>
+        </browser-window>
+        <code-block language="html" class="demo-code">.purple-theme {
+  --browser-window-accent-color: #8b5cf6;
+  --browser-window-header-bg: #faf5ff;
+  --browser-window-border-color: #c4b5fd;
+  --browser-window-close-color: #f472b6;
+  --browser-window-minimize-color: #a78bfa;
+  --browser-window-maximize-color: #34d399;
+}
+
+&lt;browser-window class="purple-theme" url="https://example.com"&gt;
+  ...
+&lt;/browser-window&gt;</code-block>
+      </section>
+
+      <section class="demo-section">
+        <h2>All Features</h2>
+        <ul style="display: grid; gap: 0.25rem; padding-left: 1.5rem;">
+          <li>Source code viewing with syntax highlighting</li>
+          <li>Copy source code to clipboard</li>
+          <li>Export to CodePen with one click</li>
+          <li>Native Web Share API support</li>
+          <li>Maximize/fullscreen mode</li>
+          <li>Automatic light/dark theme detection</li>
+          <li>Resizable container</li>
+          <li>Touch-friendly on mobile devices</li>
+          <li>Full keyboard accessibility</li>
+          <li>15+ CSS custom properties for theming</li>
+        </ul>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>
+        MIT License &middot;
+        Based on <a href="https://github.com/zachleat/browser-window" target="_blank" rel="noopener">@zachleat/browser-window</a> &middot;
+        Code highlighting by <a href="https://github.com/ProfPowell/code-block" target="_blank" rel="noopener">&lt;code-block&gt;</a>
+      </p>
+    </footer>
+
+    <script type="module" src="../src/browser-window.js"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/gh/ProfPowell/code-block@v2.0.1/dist/code-block.min.js"></script>
+  </body>
+</html>

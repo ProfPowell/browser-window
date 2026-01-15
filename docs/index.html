@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>browser-window - Safari-style browser window component</title>
+    <meta name="description" content="A Safari-style browser window web component for demos and tutorials. Features source viewing, CodePen export, and full theming support." />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <nav class="nav">
+      <div class="nav-container">
+        <a href="index.html" class="nav-logo">&lt;browser-window&gt;</a>
+        <div class="nav-links">
+          <a href="index.html" class="nav-link active">Home</a>
+          <a href="demos.html" class="nav-link">Demos</a>
+          <a href="api.html" class="nav-link">API</a>
+          <a href="https://github.com/ProfPowell/browser-window" class="nav-link nav-github" target="_blank" rel="noopener">
+            GitHub
+          </a>
+        </div>
+      </div>
+    </nav>
+
+    <main>
+      <section class="hero">
+        <h1>&lt;browser-window&gt;</h1>
+        <p class="hero-subtitle">A Safari-style browser window web component for demos and tutorials</p>
+        <div class="hero-actions">
+          <a href="demos.html" class="btn btn-primary">View Demos</a>
+          <a href="api.html" class="btn btn-secondary">API Docs</a>
+        </div>
+      </section>
+
+      <section class="demo-preview">
+        <browser-window src="example.html" url="https://example.com/demo" shadow>
+        </browser-window>
+      </section>
+
+      <section class="features">
+        <h2>Features</h2>
+        <div class="feature-grid">
+          <div class="feature-card">
+            <h3>Source Viewing</h3>
+            <p>Toggle between rendered content and syntax-highlighted source code with one click.</p>
+          </div>
+          <div class="feature-card">
+            <h3>CodePen Export</h3>
+            <p>Export any demo directly to CodePen with HTML, CSS, and JS properly separated.</p>
+          </div>
+          <div class="feature-card">
+            <h3>Dark Mode</h3>
+            <p>Automatic theme detection with manual override. Follows system preferences.</p>
+          </div>
+          <div class="feature-card">
+            <h3>Resizable</h3>
+            <p>Drag to resize the window. Perfect for demonstrating responsive designs.</p>
+          </div>
+          <div class="feature-card">
+            <h3>Fullscreen Mode</h3>
+            <p>Double-click the header or click the green button to maximize.</p>
+          </div>
+          <div class="feature-card">
+            <h3>Fully Themeable</h3>
+            <p>15+ CSS custom properties for complete visual customization.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="quickstart">
+        <h2>Quick Start</h2>
+
+        <h3>Installation</h3>
+        <div class="code-tabs">
+          <div class="code-tab active" data-tab="npm">npm</div>
+          <div class="code-tab" data-tab="cdn">CDN</div>
+        </div>
+        <code-block language="bash" data-content="npm">npm install @profpowell/browser-window</code-block>
+        <code-block language="html" data-content="cdn" class="hidden">&lt;script type="module" src="https://unpkg.com/@profpowell/browser-window"&gt;&lt;/script&gt;</code-block>
+
+        <h3>Basic Usage</h3>
+        <code-block language="html">&lt;!-- Load external HTML with source viewing --&gt;
+&lt;browser-window
+  src="my-demo.html"
+  url="https://example.com"
+  shadow&gt;
+&lt;/browser-window&gt;
+
+&lt;!-- Or use slotted content directly --&gt;
+&lt;browser-window url="https://example.com" title="My Demo"&gt;
+  &lt;img src="screenshot.png" alt="Demo screenshot"&gt;
+&lt;/browser-window&gt;</code-block>
+
+        <h3>Dark Mode</h3>
+        <code-block language="html">&lt;!-- Follows system preference (default) --&gt;
+&lt;browser-window src="demo.html"&gt;&lt;/browser-window&gt;
+
+&lt;!-- Force light mode --&gt;
+&lt;browser-window mode="light" src="demo.html"&gt;&lt;/browser-window&gt;
+
+&lt;!-- Force dark mode --&gt;
+&lt;browser-window mode="dark" src="demo.html"&gt;&lt;/browser-window&gt;</code-block>
+      </section>
+
+      <section class="cta">
+        <h2>Ready to get started?</h2>
+        <p>Check out the demos to see all features in action, or dive into the API documentation.</p>
+        <div class="cta-actions">
+          <a href="demos.html" class="btn btn-primary">Explore Demos</a>
+          <a href="api.html" class="btn btn-secondary">Read the Docs</a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>
+        MIT License &middot;
+        Based on <a href="https://github.com/zachleat/browser-window" target="_blank" rel="noopener">@zachleat/browser-window</a> &middot;
+        Code highlighting by <a href="https://github.com/ProfPowell/code-block" target="_blank" rel="noopener">&lt;code-block&gt;</a>
+      </p>
+    </footer>
+
+    <script type="module" src="../src/browser-window.js"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/gh/ProfPowell/code-block@v2.0.1/dist/code-block.min.js"></script>
+    <script>
+      // Code tab switching
+      document.querySelectorAll('.code-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          const tabName = tab.dataset.tab;
+          document.querySelectorAll('.code-tab').forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+          document.querySelectorAll('code-block[data-content]').forEach(block => {
+            block.classList.toggle('hidden', block.dataset.content !== tabName);
+          });
+        });
+      });
+    </script>
+  </body>
+</html>
