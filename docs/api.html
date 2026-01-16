@@ -18,6 +18,22 @@
           <a href="https://github.com/ProfPowell/browser-window" class="nav-link nav-github" target="_blank" rel="noopener">
             GitHub
           </a>
+          <button class="theme-toggle" aria-label="Toggle theme">
+            <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+            <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+          </button>
         </div>
       </div>
     </nav>
@@ -127,7 +143,7 @@
 &lt;/browser-window&gt;</code-block>
       </section>
 
-      <section class="api-section">
+      <section id="css-properties" class="api-section">
         <h2>CSS Custom Properties</h2>
         <p>Customize the appearance using CSS custom properties. Set these on the <code>browser-window</code> element or a parent container.</p>
 
@@ -365,13 +381,51 @@ browser-window::part(content) {
     </main>
 
     <footer class="footer">
-      <p>
-        MIT License &middot;
-        Based on <a href="https://github.com/zachleat/browser-window" target="_blank" rel="noopener">@zachleat/browser-window</a> &middot;
-        Code highlighting by <a href="https://github.com/ProfPowell/code-block" target="_blank" rel="noopener">&lt;code-block&gt;</a>
-      </p>
+      <div class="footer-content">
+        <p class="footer-credit">
+          Based on <a href="https://github.com/zachleat/browser-window" target="_blank" rel="noopener">@zachleat/browser-window</a>
+        </p>
+        <p class="footer-links">
+          <a href="https://github.com/ProfPowell/browser-window" target="_blank" rel="noopener">GitHub</a>
+          <span class="footer-separator">&middot;</span>
+          <a href="demos.html">Demos</a>
+          <span class="footer-separator">&middot;</span>
+          <span>MIT License</span>
+        </p>
+      </div>
     </footer>
 
     <script type="module" src="https://cdn.jsdelivr.net/gh/ProfPowell/code-block@v2.0.1/dist/code-block.min.js"></script>
+    <script>
+      // Theme toggle
+      (function() {
+        const toggle = document.querySelector('.theme-toggle');
+        const root = document.documentElement;
+        const storageKey = 'browser-window-theme';
+
+        // Load saved theme
+        const saved = localStorage.getItem(storageKey);
+        if (saved) {
+          root.setAttribute('data-theme', saved);
+        }
+
+        toggle?.addEventListener('click', () => {
+          const current = root.getAttribute('data-theme');
+          const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+          let next;
+          if (current === 'dark') {
+            next = 'light';
+          } else if (current === 'light') {
+            next = 'dark';
+          } else {
+            next = prefersDark ? 'light' : 'dark';
+          }
+
+          root.setAttribute('data-theme', next);
+          localStorage.setItem(storageKey, next);
+        });
+      })();
+    </script>
   </body>
 </html>

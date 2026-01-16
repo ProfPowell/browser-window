@@ -18,6 +18,22 @@
           <a href="https://github.com/ProfPowell/browser-window" class="nav-link nav-github" target="_blank" rel="noopener">
             GitHub
           </a>
+          <button class="theme-toggle" aria-label="Toggle theme">
+            <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+            <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+          </button>
         </div>
       </div>
     </nav>
@@ -26,44 +42,43 @@
       <section class="hero">
         <h1>&lt;browser-window&gt;</h1>
         <p class="hero-subtitle">A Safari-style browser window web component for demos and tutorials</p>
+        <div class="demo-preview">
+          <browser-window src="example.html" url="https://example.com/demo" shadow>
+          </browser-window>
+        </div>
         <div class="hero-actions">
           <a href="demos.html" class="btn btn-primary">View Demos</a>
           <a href="api.html" class="btn btn-secondary">API Docs</a>
         </div>
       </section>
 
-      <section class="demo-preview">
-        <browser-window src="example.html" url="https://example.com/demo" shadow>
-        </browser-window>
-      </section>
-
       <section class="features">
         <h2>Features</h2>
         <div class="feature-grid">
-          <div class="feature-card">
+          <a href="demos.html#source-viewing" class="feature-card feature-link">
             <h3>Source Viewing</h3>
             <p>Toggle between rendered content and syntax-highlighted source code with one click.</p>
-          </div>
-          <div class="feature-card">
+          </a>
+          <a href="demos.html#sharing" class="feature-card feature-link">
             <h3>CodePen Export</h3>
             <p>Export any demo directly to CodePen with HTML, CSS, and JS properly separated.</p>
-          </div>
-          <div class="feature-card">
+          </a>
+          <a href="demos.html#dark-mode" class="feature-card feature-link">
             <h3>Dark Mode</h3>
             <p>Automatic theme detection with manual override. Follows system preferences.</p>
-          </div>
-          <div class="feature-card">
+          </a>
+          <a href="demos.html#resize" class="feature-card feature-link">
             <h3>Resizable</h3>
             <p>Drag to resize the window. Perfect for demonstrating responsive designs.</p>
-          </div>
-          <div class="feature-card">
+          </a>
+          <a href="demos.html#maximize" class="feature-card feature-link">
             <h3>Fullscreen Mode</h3>
             <p>Double-click the header or click the green button to maximize.</p>
-          </div>
-          <div class="feature-card">
+          </a>
+          <a href="api.html#css-properties" class="feature-card feature-link">
             <h3>Fully Themeable</h3>
             <p>15+ CSS custom properties for complete visual customization.</p>
-          </div>
+          </a>
         </div>
       </section>
 
@@ -72,34 +87,19 @@
 
         <h3>Installation</h3>
         <div class="code-tabs">
-          <div class="code-tab active" data-tab="npm">npm</div>
-          <div class="code-tab" data-tab="cdn">CDN</div>
+          <div class="code-tab active" data-tab="cdn">CDN</div>
+          <div class="code-tab" data-tab="npm">npm</div>
         </div>
-        <code-block language="bash" data-content="npm">npm install @profpowell/browser-window</code-block>
-        <code-block language="html" data-content="cdn" class="hidden">&lt;script type="module" src="https://unpkg.com/@profpowell/browser-window"&gt;&lt;/script&gt;</code-block>
+        <code-block language="html" data-content="cdn">&lt;script type="module" src="https://cdn.jsdelivr.net/gh/ProfPowell/browser-window@main/dist/browser-window.min.js"&gt;&lt;/script&gt;</code-block>
+        <code-block language="bash" data-content="npm" class="hidden">npm install @profpowell/browser-window</code-block>
 
-        <h3>Basic Usage</h3>
-        <code-block language="html">&lt;!-- Load external HTML with source viewing --&gt;
-&lt;browser-window
-  src="my-demo.html"
-  url="https://example.com"
-  shadow&gt;
-&lt;/browser-window&gt;
-
-&lt;!-- Or use slotted content directly --&gt;
-&lt;browser-window url="https://example.com" title="My Demo"&gt;
-  &lt;img src="screenshot.png" alt="Demo screenshot"&gt;
+        <h3>Usage</h3>
+        <code-block language="html">&lt;browser-window src="demo.html" url="https://example.com" shadow&gt;
 &lt;/browser-window&gt;</code-block>
 
-        <h3>Dark Mode</h3>
-        <code-block language="html">&lt;!-- Follows system preference (default) --&gt;
-&lt;browser-window src="demo.html"&gt;&lt;/browser-window&gt;
-
-&lt;!-- Force light mode --&gt;
-&lt;browser-window mode="light" src="demo.html"&gt;&lt;/browser-window&gt;
-
-&lt;!-- Force dark mode --&gt;
-&lt;browser-window mode="dark" src="demo.html"&gt;&lt;/browser-window&gt;</code-block>
+        <p class="quickstart-cta">
+          See <a href="api.html">API documentation</a> for all attributes and CSS custom properties.
+        </p>
       </section>
 
       <section class="cta">
@@ -110,19 +110,67 @@
           <a href="api.html" class="btn btn-secondary">Read the Docs</a>
         </div>
       </section>
+
+      <section class="related">
+        <h2>Related Components</h2>
+        <div class="related-grid">
+          <a href="https://github.com/ProfPowell/code-block" class="related-card" target="_blank" rel="noopener">
+            <h3>&lt;code-block&gt;</h3>
+            <p>Syntax highlighting web component with copy button and language detection.</p>
+          </a>
+        </div>
+      </section>
     </main>
 
     <footer class="footer">
-      <p>
-        MIT License &middot;
-        Based on <a href="https://github.com/zachleat/browser-window" target="_blank" rel="noopener">@zachleat/browser-window</a> &middot;
-        Code highlighting by <a href="https://github.com/ProfPowell/code-block" target="_blank" rel="noopener">&lt;code-block&gt;</a>
-      </p>
+      <div class="footer-content">
+        <p class="footer-credit">
+          Based on <a href="https://github.com/zachleat/browser-window" target="_blank" rel="noopener">@zachleat/browser-window</a>
+        </p>
+        <p class="footer-links">
+          <a href="https://github.com/ProfPowell/browser-window" target="_blank" rel="noopener">GitHub</a>
+          <span class="footer-separator">&middot;</span>
+          <a href="api.html">API</a>
+          <span class="footer-separator">&middot;</span>
+          <span>MIT License</span>
+        </p>
+      </div>
     </footer>
 
     <script type="module" src="https://cdn.jsdelivr.net/gh/ProfPowell/browser-window@main/dist/browser-window.min.js"></script>
     <script type="module" src="https://cdn.jsdelivr.net/gh/ProfPowell/code-block@v2.0.1/dist/code-block.min.js"></script>
     <script>
+      // Theme toggle
+      (function() {
+        const toggle = document.querySelector('.theme-toggle');
+        const root = document.documentElement;
+        const storageKey = 'browser-window-theme';
+
+        // Load saved theme
+        const saved = localStorage.getItem(storageKey);
+        if (saved) {
+          root.setAttribute('data-theme', saved);
+        }
+
+        toggle?.addEventListener('click', () => {
+          const current = root.getAttribute('data-theme');
+          const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+          let next;
+          if (current === 'dark') {
+            next = 'light';
+          } else if (current === 'light') {
+            next = 'dark';
+          } else {
+            // No explicit theme - toggle opposite of system preference
+            next = prefersDark ? 'light' : 'dark';
+          }
+
+          root.setAttribute('data-theme', next);
+          localStorage.setItem(storageKey, next);
+        });
+      })();
+
       // Code tab switching
       document.querySelectorAll('.code-tab').forEach(tab => {
         tab.addEventListener('click', () => {
