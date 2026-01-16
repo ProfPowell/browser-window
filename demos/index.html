@@ -1,14 +1,200 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<title>Title</title>
-</head>
-<body>
-<h1>Hello &lt;browser-window&gt;</h1>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Browser Window Component Demos</title>
+    <style>
+      :root {
+        --bg: #f8fafc;
+        --text: #1e293b;
+        --muted: #64748b;
+        --border: #e2e8f0;
+      }
 
-<browser-window src="example-to-load.html" url="example-to-load.html"></browser-window>
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #0f172a;
+          --text: #f1f5f9;
+          --muted: #94a3b8;
+          --border: #334155;
+        }
+      }
 
-<script type="module" src="../src/browser-window.js"></script>
-</body>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        line-height: 1.6;
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+        background: var(--bg);
+        color: var(--text);
+      }
+
+      h1 {
+        margin-bottom: 0.5rem;
+      }
+
+      .subtitle {
+        color: var(--muted);
+        margin-bottom: 2rem;
+      }
+
+      h2 {
+        margin-top: 3rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--border);
+      }
+
+      p {
+        color: var(--muted);
+        margin-bottom: 1rem;
+      }
+
+      code {
+        background: var(--border);
+        padding: 0.125rem 0.375rem;
+        border-radius: 4px;
+        font-size: 0.875rem;
+      }
+
+      .demo-grid {
+        display: grid;
+        gap: 2rem;
+        margin: 1.5rem 0;
+      }
+
+      @media (min-width: 768px) {
+        .demo-grid.side-by-side {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+
+      .feature-list {
+        list-style: none;
+        padding: 0;
+        display: grid;
+        gap: 0.5rem;
+      }
+
+      .feature-list li::before {
+        content: '✓ ';
+        color: #22c55e;
+      }
+
+      /* Slotted content that fills container - uses flex stretch from component */
+      .fill-content {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+        text-align: center;
+      }
+
+      .light-fill {
+        background: #e0f2fe;
+        color: #1e293b;
+      }
+
+      .dark-fill {
+        background: #0f172a;
+        color: #f1f5f9;
+      }
+
+      .blue-fill {
+        background: #3b82f6;
+        color: white;
+      }
+
+      .card-content {
+        padding: 2rem;
+        background: #f0f9ff;
+        min-height: 200px;
+      }
+
+      .card {
+        background: white;
+        border-radius: 8px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+    </style>
+  </head>
+  <body>
+    <h1>&lt;browser-window&gt;</h1>
+    <p class="subtitle">A Safari-style browser window component for demos and tutorials</p>
+
+    <h2>Basic Usage</h2>
+    <p>
+      Load external HTML with source viewing, sharing, and CodePen export. Try clicking the
+      <code>&lt;/&gt;</code> icon to view source!
+    </p>
+    <browser-window src="example-to-load.html" url="https://example.com/flexbox" shadow>
+    </browser-window>
+
+    <h2>Light &amp; Dark Mode</h2>
+    <p>
+      The component automatically follows your system theme preference. You can also set
+      <code>mode="light"</code> or <code>mode="dark"</code> to override.
+    </p>
+    <div class="demo-grid side-by-side">
+      <browser-window mode="light" url="https://example.com" title="Light Mode (forced)">
+        <div class="fill-content light-fill">
+          <p style="margin: 0">This window is always light</p>
+        </div>
+      </browser-window>
+      <browser-window mode="dark" url="https://example.com" title="Dark Mode (forced)">
+        <div class="fill-content dark-fill">
+          <p style="margin: 0">This window is always dark</p>
+        </div>
+      </browser-window>
+    </div>
+
+    <h2>Resizable</h2>
+    <p>
+      Drag the bottom-right corner to resize. The component respects
+      <code>min-width</code> and <code>min-height</code> constraints.
+    </p>
+    <browser-window url="https://example.com/resize-demo" title="Resize Me!" style="height: 300px">
+      <div class="fill-content blue-fill">
+        <p style="margin: 0; font-size: 1.25rem">Drag the corner to resize!</p>
+      </div>
+    </browser-window>
+
+    <h2>Slotted Content</h2>
+    <p>
+      When no <code>src</code> is provided, use slotted content directly. Great for screenshots or
+      custom HTML.
+    </p>
+    <browser-window url="https://myapp.example.com" title="My App Dashboard" shadow>
+      <div class="card-content">
+        <div class="card">
+          <h3 style="margin: 0 0 0.5rem; color: #1e293b">Dashboard</h3>
+          <p style="margin: 0; color: #64748b; font-size: 0.875rem">
+            Welcome back! Your stats are looking great.
+          </p>
+        </div>
+      </div>
+    </browser-window>
+
+    <h2>Features</h2>
+    <ul class="feature-list">
+      <li>Source code viewing with syntax highlighting</li>
+      <li>Copy source code to clipboard</li>
+      <li>Export to CodePen with one click</li>
+      <li>Native Web Share API support</li>
+      <li>Maximize/fullscreen mode (double-click header)</li>
+      <li>Automatic light/dark theme detection</li>
+      <li>Resizable container</li>
+      <li>Touch-friendly on mobile devices</li>
+      <li>Full keyboard accessibility</li>
+      <li>15+ CSS custom properties for theming</li>
+    </ul>
+
+    <script type="module" src="../src/browser-window.js"></script>
+  </body>
 </html>

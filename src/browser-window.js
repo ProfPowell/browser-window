@@ -6,7 +6,7 @@
  * @element browser-window
  * @attr {string} url - URL to display in the address bar
  * @attr {string} title - Title shown in the URL bar (defaults to hostname)
- * @attr {string} src - Path to HTML file to load in iframe
+ * @attr {string} src - Path to the HTML file to load in iframe
  * @attr {'light'|'dark'} mode - Color scheme (default: 'light')
  * @attr {boolean} shadow - Whether to show drop shadow
  *
@@ -19,7 +19,16 @@
  * @cssprop [--browser-window-border-radius=8px] - Border radius
  * @cssprop [--browser-window-text-color=#24292e] - Primary text color
  * @cssprop [--browser-window-text-muted=#586069] - Muted text color
+ * @cssprop [--browser-window-url-bg=#ffffff] - URL bar background color
+ * @cssprop [--browser-window-shadow=0 4px 12px rgba(0,0,0,0.15)] - Drop shadow (when shadow attr is set)
+ * @cssprop [--browser-window-close-color=#ff5f57] - Close button color
+ * @cssprop [--browser-window-minimize-color=#febc2e] - Minimize button color
+ * @cssprop [--browser-window-maximize-color=#28c840] - Maximize button color
  * @cssprop [--browser-window-accent-color=#2563eb] - Accent color for active states
+ * @cssprop [--browser-window-hover-bg=#f3f4f6] - Hover background color for buttons
+ * @cssprop [--browser-window-content-bg=#ffffff] - Content area background
+ * @cssprop [--browser-window-font-family=-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif] - Font family
+ * @cssprop [--browser-window-mono-font='Monaco', 'Menlo', 'Ubuntu Mono', monospace] - Monospace font for code
  *
  * @example
  * <browser-window url="https://example.com" title="Demo">
@@ -44,7 +53,7 @@ export class BrowserWindow extends HTMLElement {
     this.render();
     this.attachEventListeners();
 
-    // Fetch source code if src attribute is present
+    // Fetch source code if a src attribute is present
     if (this.src) {
       await this.fetchSourceCode();
     }
@@ -115,12 +124,12 @@ export class BrowserWindow extends HTMLElement {
       this.toggleShareMenu();
     });
 
-    // Double-click on header (outside buttons/URL bar) to maximize
+    // Double-click on the header (outside buttons/URL bar) to maximize
     header?.addEventListener('dblclick', (e) => {
       // Only trigger if clicking directly on the header, not on child elements
       const target = e.target;
-      const isHeaderArea = target.classList.contains('browser-header') ||
-                          target.classList.contains('controls');
+      const isHeaderArea =
+        target.classList.contains('browser-header') || target.classList.contains('controls');
       if (isHeaderArea) {
         this.toggleMaximize();
       }
@@ -279,7 +288,7 @@ export class BrowserWindow extends HTMLElement {
     const shareData = {
       title: this.browserTitle || 'CSS Demo',
       text: `Check out this CSS demo: ${this.browserTitle}`,
-      url: this.src || this.url
+      url: this.src || this.url,
     };
 
     try {
@@ -300,24 +309,24 @@ export class BrowserWindow extends HTMLElement {
 
     // Extract CSS from style tags
     const styles = Array.from(doc.querySelectorAll('style'))
-      .map(style => style.textContent)
+      .map((style) => style.textContent)
       .join('\n\n');
 
     // Extract JavaScript from script tags (excluding module imports)
     const scripts = Array.from(doc.querySelectorAll('script'))
-      .filter(script => !script.src && script.type !== 'module')
-      .map(script => script.textContent)
+      .filter((script) => !script.src && script.type !== 'module')
+      .map((script) => script.textContent)
       .join('\n\n');
 
-    // Extract HTML from body (excluding scripts and styles)
+    // Extract HTML from the document body (excluding scripts and styles)
     const bodyClone = doc.body.cloneNode(true);
-    bodyClone.querySelectorAll('script, style').forEach(el => el.remove());
+    bodyClone.querySelectorAll('script, style').forEach((el) => el.remove());
     const html = bodyClone.innerHTML;
 
     return {
       html: html.trim(),
       css: styles.trim(),
-      js: scripts.trim()
+      js: scripts.trim(),
     };
   }
 
@@ -331,10 +340,10 @@ export class BrowserWindow extends HTMLElement {
       html: parsed.html,
       css: parsed.css,
       js: parsed.js,
-      editors: '110' // Show HTML and CSS editors, hide JS if empty
+      editors: '110', // Show HTML and CSS editors, hide JS if empty
     };
 
-    // Create form and submit to CodePen
+    // Create a temporary form and submit to CodePen to send the data
     const form = document.createElement('form');
     form.action = 'https://codepen.io/pen/define';
     form.method = 'POST';
@@ -422,7 +431,7 @@ export class BrowserWindow extends HTMLElement {
       }
       content.style.display = 'none';
     } else {
-      content.style.display = 'block';
+      content.style.display = '';
     }
   }
 
@@ -430,7 +439,7 @@ export class BrowserWindow extends HTMLElement {
     const maximizeBtn = this.shadowRoot.querySelector('.control-button.maximize');
 
     if (this.isMaximized) {
-      // Remove maximized class to restore original state
+      // Remove maximized class to restore the original state
       this.classList.remove('browser-window-maximized');
       this.removeAttribute('role');
       this.removeAttribute('aria-modal');
@@ -457,7 +466,7 @@ export class BrowserWindow extends HTMLElement {
         this.toggleMinimize();
       }
 
-      // Create overlay backdrop
+      // Create an overlay backdrop
       this.createOverlay();
 
       // Add maximized class for styling
@@ -482,31 +491,30 @@ export class BrowserWindow extends HTMLElement {
   }
 
   render() {
-    const isDark = this.mode === 'dark';
-
     this.shadowRoot.innerHTML = `
       <style>
         :host {
           /* CSS Custom Properties with light mode defaults */
-          --browser-window-bg: ${isDark ? '#1c1c1e' : '#ffffff'};
-          --browser-window-header-bg: ${isDark ? '#2c2c2e' : '#f6f8fa'};
-          --browser-window-border-color: ${isDark ? '#3a3a3c' : '#d1d5da'};
+          --browser-window-bg: #ffffff;
+          --browser-window-header-bg: #f6f8fa;
+          --browser-window-border-color: #d1d5da;
           --browser-window-border-radius: 8px;
-          --browser-window-text-color: ${isDark ? '#e5e5e7' : '#24292e'};
-          --browser-window-text-muted: ${isDark ? '#98989d' : '#586069'};
-          --browser-window-url-bg: ${isDark ? '#1c1c1e' : '#ffffff'};
+          --browser-window-text-color: #24292e;
+          --browser-window-text-muted: #586069;
+          --browser-window-url-bg: #ffffff;
           --browser-window-shadow: ${this.hasShadow ? '0 4px 12px rgba(0, 0, 0, 0.15)' : 'none'};
           --browser-window-close-color: #ff5f57;
           --browser-window-minimize-color: #febc2e;
           --browser-window-maximize-color: #28c840;
           --browser-window-accent-color: #2563eb;
-          --browser-window-hover-bg: ${isDark ? '#3a3a3c' : '#f3f4f6'};
-          --browser-window-active-bg: ${isDark ? '#dbeafe' : '#dbeafe'};
-          --browser-window-content-bg: ${isDark ? '#000000' : '#ffffff'};
+          --browser-window-hover-bg: #f3f4f6;
+          --browser-window-active-bg: #dbeafe;
+          --browser-window-content-bg: #ffffff;
           --browser-window-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
           --browser-window-mono-font: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
 
-          display: block;
+          display: flex;
+          flex-direction: column;
           margin: 1rem 0;
           border-radius: var(--browser-window-border-radius);
           overflow: hidden;
@@ -515,6 +523,50 @@ export class BrowserWindow extends HTMLElement {
           box-shadow: var(--browser-window-shadow);
           transition: all 250ms ease-out;
           font-family: var(--browser-window-font-family);
+
+          /* Resizable container */
+          resize: both;
+          min-width: 280px;
+          min-height: 150px;
+
+        }
+
+        /* Auto dark mode based on system preference (when no mode attribute) */
+        @media (prefers-color-scheme: dark) {
+          :host(:not([mode])) {
+            --browser-window-bg: #1c1c1e;
+            --browser-window-header-bg: #2c2c2e;
+            --browser-window-border-color: #3a3a3c;
+            --browser-window-text-color: #e5e5e7;
+            --browser-window-text-muted: #98989d;
+            --browser-window-url-bg: #1c1c1e;
+            --browser-window-hover-bg: #3a3a3c;
+            --browser-window-content-bg: #000000;
+          }
+        }
+
+        /* Explicit dark mode override */
+        :host([mode="dark"]) {
+          --browser-window-bg: #1c1c1e;
+          --browser-window-header-bg: #2c2c2e;
+          --browser-window-border-color: #3a3a3c;
+          --browser-window-text-color: #e5e5e7;
+          --browser-window-text-muted: #98989d;
+          --browser-window-url-bg: #1c1c1e;
+          --browser-window-hover-bg: #3a3a3c;
+          --browser-window-content-bg: #000000;
+        }
+
+        /* Explicit light mode override (for users on dark system who want light) */
+        :host([mode="light"]) {
+          --browser-window-bg: #ffffff;
+          --browser-window-header-bg: #f6f8fa;
+          --browser-window-border-color: #d1d5da;
+          --browser-window-text-color: #24292e;
+          --browser-window-text-muted: #586069;
+          --browser-window-url-bg: #ffffff;
+          --browser-window-hover-bg: #f3f4f6;
+          --browser-window-content-bg: #ffffff;
         }
 
         :host(.browser-window-maximized) {
@@ -525,6 +577,7 @@ export class BrowserWindow extends HTMLElement {
           height: 90vh !important;
           z-index: 9999 !important;
           margin: 0 !important;
+          resize: none !important;
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -555,25 +608,53 @@ export class BrowserWindow extends HTMLElement {
         }
 
         .control-button {
+          /* Touch target size - transparent background */
+          width: 28px;
+          height: 28px;
+          border-radius: 50%;
+          border: none;
+          background: transparent;
+          cursor: pointer !important;
+          transition: opacity 150ms ease;
+          position: relative;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin: -8px;
+        }
+
+        /* Visual circle via pseudo-element */
+        .control-button::after {
+          content: '';
           width: 12px;
           height: 12px;
           border-radius: 50%;
-          border: none;
-          cursor: pointer !important;
           transition: opacity 150ms ease;
+        }
+
+        /* Larger touch targets on touch devices */
+        @media (pointer: coarse) {
+          .control-button {
+            width: 44px;
+            height: 44px;
+            margin: -16px;
+          }
         }
 
         @media (prefers-reduced-motion: reduce) {
           .control-button {
             transition: none;
           }
+          .control-button::after {
+            transition: none;
+          }
         }
 
-        .control-button:hover {
+        .control-button:hover::after {
           opacity: 0.8;
         }
 
-        .control-button:active {
+        .control-button:active::after {
           opacity: 0.6;
           transform: scale(0.9);
         }
@@ -587,15 +668,15 @@ export class BrowserWindow extends HTMLElement {
           outline: none;
         }
 
-        .control-button.close {
+        .control-button.close::after {
           background: var(--browser-window-close-color);
         }
 
-        .control-button.minimize {
+        .control-button.minimize::after {
           background: var(--browser-window-minimize-color);
         }
 
-        .control-button.maximize {
+        .control-button.maximize::after {
           background: var(--browser-window-maximize-color);
         }
 
@@ -746,18 +827,32 @@ export class BrowserWindow extends HTMLElement {
           background: var(--browser-window-content-bg);
           min-height: 200px;
           padding: 0;
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+        }
+
+        /* Slot fills available space */
+        slot {
+          display: flex;
+          flex-direction: column;
+          flex: 1;
+          min-height: 0;
+        }
+
+        /* Slotted content fills the slot */
+        ::slotted(*) {
+          flex: 1;
+          width: 100%;
+          min-height: 0;
         }
 
         iframe {
           display: block;
           width: 100%;
           border: none;
+          flex: 1;
           min-height: 200px;
-        }
-
-        ::slotted(*) {
-          display: block;
-          width: 100%;
         }
 
         ::slotted(img),
@@ -771,8 +866,12 @@ export class BrowserWindow extends HTMLElement {
           padding: 0;
           background: var(--browser-window-header-bg);
           min-height: 200px;
-          max-height: 600px;
+          /* Constrain source view height to prevent container expansion */
+          max-height: 50vh;
+          flex: 1;
           overflow: auto;
+          display: flex;
+          flex-direction: column;
         }
 
         .source-header {
@@ -883,6 +982,58 @@ export class BrowserWindow extends HTMLElement {
         .retry-button:active {
           transform: scale(0.98);
         }
+
+        /* Responsive: narrow screens */
+        @media (max-width: 480px) {
+          .browser-header {
+            padding: 0.5rem 0.75rem;
+            gap: 0.5rem;
+          }
+
+          .url-bar {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+          }
+
+          .url-text {
+            max-width: 120px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+
+          .view-source-button svg,
+          .share-button svg {
+            width: 14px;
+            height: 14px;
+          }
+        }
+
+        /* Very narrow: hide URL text */
+        @media (max-width: 320px) {
+          .url-text {
+            display: none;
+          }
+
+          .lock-icon {
+            display: none;
+          }
+        }
+
+        /* Touch devices: larger button padding */
+        @media (pointer: coarse) {
+          .view-source-button,
+          .share-button,
+          .download-button {
+            padding: 0.5rem;
+            min-width: 44px;
+            min-height: 44px;
+          }
+
+          .share-menu-item {
+            padding: 0.875rem 1rem;
+          }
+        }
       </style>
       <div class="browser-header" role="toolbar" aria-label="Window controls">
         <div class="controls">
@@ -893,7 +1044,9 @@ export class BrowserWindow extends HTMLElement {
         <div class="url-bar">
           ${this.url.startsWith('https') ? '<span class="lock-icon">🔒</span>' : ''}
           <span class="url-text" title="${this.escapeHtml(this.url)}">${this.escapeHtml(this.browserTitle)}</span>
-          ${this.src ? `
+          ${
+            this.src
+              ? `
             <button class="view-source-button" title="View source code">
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="4,6 2,8 4,10"/>
@@ -909,7 +1062,9 @@ export class BrowserWindow extends HTMLElement {
                 </svg>
               </button>
               <div class="share-menu">
-                ${navigator.share ? `
+                ${
+                  navigator.share
+                    ? `
                   <button class="share-menu-item" onclick="this.getRootNode().host.shareViaWebAPI()">
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                       <circle cx="12" cy="4" r="2"/>
@@ -919,7 +1074,9 @@ export class BrowserWindow extends HTMLElement {
                     </svg>
                     Share...
                   </button>
-                ` : ''}
+                `
+                    : ''
+                }
                 <button class="share-menu-item" onclick="this.getRootNode().host.openInCodePen()">
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
                     <path d="M8 0L0 5v6l8 5 8-5V5L8 0zM7 10.5L2 7.5v-2l5 3v2zm1-3l-5-3L8 2l5 2.5-5 3zm1 3v-2l5-3v2l-5 3z"/>
@@ -934,7 +1091,9 @@ export class BrowserWindow extends HTMLElement {
                 <path d="M2 12v2a1 1 0 001 1h10a1 1 0 001-1v-2"/>
               </svg>
             </a>
-          ` : ''}
+          `
+              : ''
+          }
         </div>
       </div>
       <div class="browser-content">

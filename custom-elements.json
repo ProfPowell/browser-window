@@ -1,0 +1,339 @@
+{
+  "schemaVersion": "1.0.0",
+  "readme": "",
+  "modules": [
+    {
+      "kind": "javascript-module",
+      "path": "src/browser-window.js",
+      "declarations": [
+        {
+          "kind": "class",
+          "description": "Browser Window Web Component\nCreates a Safari-style browser window frame for demonstrations\nBased on",
+          "name": "BrowserWindow",
+          "cssProperties": [
+            {
+              "description": "Background color",
+              "name": "--browser-window-bg",
+              "default": "#ffffff"
+            },
+            {
+              "description": "Header background",
+              "name": "--browser-window-header-bg",
+              "default": "#f6f8fa"
+            },
+            {
+              "description": "Border color",
+              "name": "--browser-window-border-color",
+              "default": "#d1d5da"
+            },
+            {
+              "description": "Border radius",
+              "name": "--browser-window-border-radius",
+              "default": "8px"
+            },
+            {
+              "description": "Primary text color",
+              "name": "--browser-window-text-color",
+              "default": "#24292e"
+            },
+            {
+              "description": "Muted text color",
+              "name": "--browser-window-text-muted",
+              "default": "#586069"
+            },
+            {
+              "description": "URL bar background color",
+              "name": "--browser-window-url-bg",
+              "default": "#ffffff"
+            },
+            {
+              "description": "Drop shadow (when shadow attr is set)",
+              "name": "--browser-window-shadow",
+              "default": "0 4px 12px rgba(0,0,0,0.15)"
+            },
+            {
+              "description": "Close button color",
+              "name": "--browser-window-close-color",
+              "default": "#ff5f57"
+            },
+            {
+              "description": "Minimize button color",
+              "name": "--browser-window-minimize-color",
+              "default": "#febc2e"
+            },
+            {
+              "description": "Maximize button color",
+              "name": "--browser-window-maximize-color",
+              "default": "#28c840"
+            },
+            {
+              "description": "Accent color for active states",
+              "name": "--browser-window-accent-color",
+              "default": "#2563eb"
+            },
+            {
+              "description": "Hover background color for buttons",
+              "name": "--browser-window-hover-bg",
+              "default": "#f3f4f6"
+            },
+            {
+              "description": "Content area background",
+              "name": "--browser-window-content-bg",
+              "default": "#ffffff"
+            },
+            {
+              "description": "Font family",
+              "name": "--browser-window-font-family",
+              "default": "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+            },
+            {
+              "description": "Monospace font for code",
+              "name": "--browser-window-mono-font",
+              "default": "'Monaco', 'Menlo', 'Ubuntu Mono', monospace"
+            }
+          ],
+          "cssParts": [
+            {
+              "description": "The browser header/toolbar",
+              "name": "header"
+            },
+            {
+              "description": "The content area",
+              "name": "content"
+            }
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "url",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "src",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "browserTitle",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "mode",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "hasShadow",
+              "readonly": true
+            },
+            {
+              "kind": "method",
+              "name": "getHostname"
+            },
+            {
+              "kind": "method",
+              "name": "attachEventListeners"
+            },
+            {
+              "kind": "method",
+              "name": "handleIframeError"
+            },
+            {
+              "kind": "method",
+              "name": "retryLoad"
+            },
+            {
+              "kind": "method",
+              "name": "fetchSourceCode"
+            },
+            {
+              "kind": "method",
+              "name": "toggleViewSource"
+            },
+            {
+              "kind": "method",
+              "name": "updateContentView"
+            },
+            {
+              "kind": "method",
+              "name": "copySourceCode"
+            },
+            {
+              "kind": "method",
+              "name": "toggleShareMenu"
+            },
+            {
+              "kind": "method",
+              "name": "handleOutsideClick",
+              "parameters": [
+                {
+                  "name": "e"
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "shareViaWebAPI"
+            },
+            {
+              "kind": "method",
+              "name": "parseHTMLForCodePen"
+            },
+            {
+              "kind": "method",
+              "name": "openInCodePen"
+            },
+            {
+              "kind": "method",
+              "name": "handleClose"
+            },
+            {
+              "kind": "method",
+              "name": "handleKeydown",
+              "parameters": [
+                {
+                  "name": "event"
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "createOverlay"
+            },
+            {
+              "kind": "method",
+              "name": "removeOverlay"
+            },
+            {
+              "kind": "method",
+              "name": "toggleMinimize"
+            },
+            {
+              "kind": "method",
+              "name": "toggleMaximize"
+            },
+            {
+              "kind": "method",
+              "name": "escapeHtml",
+              "parameters": [
+                {
+                  "name": "text"
+                }
+              ]
+            },
+            {
+              "kind": "field",
+              "name": "isMinimized",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "isMaximized",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "overlay",
+              "type": {
+                "text": "null"
+              },
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "showSource",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "sourceCode",
+              "type": {
+                "text": "string"
+              },
+              "default": "''"
+            },
+            {
+              "kind": "field",
+              "name": "showShareMenu",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false"
+            }
+          ],
+          "attributes": [
+            {
+              "name": "url",
+              "type": {
+                "text": "string"
+              },
+              "description": "URL to display in the address bar"
+            },
+            {
+              "name": "title",
+              "type": {
+                "text": "string"
+              },
+              "description": "Title shown in the URL bar (defaults to hostname)"
+            },
+            {
+              "name": "mode",
+              "type": {
+                "text": "'light'|'dark'"
+              },
+              "description": "Color scheme (default: 'light')"
+            },
+            {
+              "name": "shadow",
+              "type": {
+                "text": "boolean"
+              },
+              "description": "Whether to show drop shadow"
+            },
+            {
+              "name": "src",
+              "type": {
+                "text": "string"
+              },
+              "description": "Path to the HTML file to load in iframe"
+            }
+          ],
+          "superclass": {
+            "name": "HTMLElement"
+          },
+          "tagName": "browser-window",
+          "customElement": true
+        }
+      ],
+      "exports": [
+        {
+          "kind": "js",
+          "name": "BrowserWindow",
+          "declaration": {
+            "name": "BrowserWindow",
+            "module": "src/browser-window.js"
+          }
+        },
+        {
+          "kind": "custom-element-definition",
+          "name": "browser-window",
+          "declaration": {
+            "name": "BrowserWindow",
+            "module": "src/browser-window.js"
+          }
+        }
+      ]
+    }
+  ]
+}

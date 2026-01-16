@@ -5,62 +5,59 @@
   "type": "module",
   "main": "dist/browser-window.js",
   "module": "dist/browser-window.js",
-  "types": "dist/browser-window.d.ts",
+  "types": "browser-window.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/browser-window.d.ts",
+      "types": "./browser-window.d.ts",
       "import": "./dist/browser-window.js",
       "default": "./dist/browser-window.js"
     }
   },
   "files": [
     "dist",
-    "src",
-    "custom-elements.json"
+    "browser-window.d.ts",
+    "custom-elements.json",
+    "README.md",
+    "LICENSE"
   ],
   "scripts": {
-    "build": "npm run build:js && npm run build:types",
-    "build:js": "esbuild src/browser-window.js --bundle --format=esm --outfile=dist/browser-window.js && esbuild src/browser-window.js --bundle --format=esm --minify --outfile=dist/browser-window.min.js",
-    "build:types": "tsc",
     "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
     "lint": "eslint src/",
     "lint:fix": "eslint src/ --fix",
-    "format": "prettier --write \"src/**/*.js\" \"demos/**/*.html\"",
-    "format:check": "prettier --check \"src/**/*.js\" \"demos/**/*.html\"",
-    "test": "web-test-runner",
-    "test:watch": "web-test-runner --watch",
-    "analyze": "cem analyze",
+    "format": "prettier --write \"src/**/*.js\"",
+    "format:check": "prettier --check \"src/**/*.js\"",
+    "analyze": "cem analyze --litelement",
     "prepublishOnly": "npm run build && npm run analyze"
   },
   "customElements": "custom-elements.json",
   "keywords": [
-    "web-component",
+    "web-components",
+    "custom-elements",
+    "vanilla-js",
     "browser-window",
     "demo",
     "tutorial",
-    "custom-element"
+    "profpowell-web-components"
   ],
   "author": "ProfPowell",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ProfPowell/browser-window.git"
+    "url": "git+https://github.com/ProfPowell/browser-window.git"
   },
-  "dependencies": {
-    "@profpowell/code-block": "github:ProfPowell/code-block#v2.0.1"
+  "bugs": {
+    "url": "https://github.com/ProfPowell/browser-window/issues"
   },
+  "homepage": "https://profpowell.github.io/browser-window/",
   "devDependencies": {
     "@custom-elements-manifest/analyzer": "^0.11.0",
-    "@eslint/js": "^9.39.2",
-    "@esm-bundle/chai": "^4.3.4-fix.0",
-    "@open-wc/testing": "^4.0.0",
-    "@web/test-runner": "^0.20.2",
-    "esbuild": "0.25.0",
+    "@playwright/test": "^1.57.0",
     "eslint": "^9.39.2",
-    "eslint-config-prettier": "^10.1.8",
-    "globals": "^17.0.0",
     "prettier": "^3.8.0",
-    "typescript": "^5.3.0",
     "vite": "^7.3.1"
   }
 }

@@ -1,568 +1,164 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Radial & Conic Gradients Demo</title>
-	<style>
-		* {
-			margin: 0;
-			padding: 0;
-			box-sizing: border-box;
-		}
-
-		body {
-			padding: 1.5rem;
-			font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-			background: white;
-			line-height: 1.6;
-		}
-
-		h2 {
-			margin-bottom: 1rem;
-			color: #333;
-			font-size: 1.2rem;
-		}
-
-		h3 {
-			margin: 1.5rem 0 0.75rem;
-			color: #555;
-			font-size: 1rem;
-		}
-
-		.info {
-			background: #e7f3ff;
-			padding: 1rem;
-			margin: 1.5rem 0;
-			border-left: 4px solid #0066cc;
-			border-radius: 4px;
-			font-size: 0.9rem;
-		}
-
-		code {
-			background: #f4f4f4;
-			padding: 0.2rem 0.4rem;
-			border-radius: 3px;
-			font-family: monospace;
-			color: #c7254e;
-			font-size: 0.9em;
-		}
-
-		pre {
-			background: #f8f9fa;
-			padding: 1rem;
-			border-radius: 4px;
-			overflow-x: auto;
-			margin: 1rem 0;
-			border: 1px solid #e5e7eb;
-		}
-
-		pre code {
-			background: none;
-			padding: 0;
-			color: inherit;
-		}
-
-		.demo-box {
-			background: white;
-			border: 2px solid #e5e7eb;
-			border-radius: 8px;
-			padding: 1.5rem;
-			margin: 1rem 0;
-		}
-
-		.demo-box h4 {
-			font-size: 0.875rem;
-			color: #6b7280;
-			margin-bottom: 0.75rem;
-			font-weight: 600;
-			text-transform: uppercase;
-			letter-spacing: 0.5px;
-		}
-
-		.gradient-sample {
-			height: 200px;
-			border-radius: 8px;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			color: white;
-			font-weight: 600;
-			font-size: 1.125rem;
-			text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-			margin-bottom: 0.75rem;
-		}
-
-		/* Radial Gradients - Shape */
-		.radial-circle {
-			background: radial-gradient(circle, #667eea 0%, #764ba2 100%);
-		}
-
-		.radial-ellipse {
-			background: radial-gradient(ellipse, #fa709a 0%, #fee140 100%);
-		}
-
-		.radial-closest-side {
-			background: radial-gradient(circle closest-side, #30cfd0 0%, #330867 100%);
-		}
-
-		.radial-farthest-corner {
-			background: radial-gradient(circle farthest-corner, #f093fb 0%, #f5576c 100%);
-		}
-
-		/* Radial Gradients - Position */
-		.radial-center {
-			background: radial-gradient(circle at center, #667eea 0%, #764ba2 100%);
-		}
-
-		.radial-top-left {
-			background: radial-gradient(circle at top left, #fa709a 0%, #fee140 100%);
-		}
-
-		.radial-top-right {
-			background: radial-gradient(circle at top right, #30cfd0 0%, #330867 100%);
-		}
-
-		.radial-bottom-center {
-			background: radial-gradient(circle at bottom center, #f093fb 0%, #f5576c 100%);
-		}
-
-		.radial-precise {
-			background: radial-gradient(circle at 70% 30%, #43e97b 0%, #38f9d7 100%);
-		}
-
-		/* Radial Gradients - Multi-color */
-		.radial-spotlight {
-			background: radial-gradient(circle at center,
-			white 0%,
-			#667eea 30%,
-			#764ba2 100%
-						);
-		}
-
-		.radial-rings {
-			background: radial-gradient(circle at center,
-			#667eea 0%, #667eea 20%,
-			#764ba2 20%, #764ba2 40%,
-			#667eea 40%, #667eea 60%,
-			#764ba2 60%, #764ba2 80%,
-			#667eea 80%, #667eea 100%
-						);
-		}
-
-		/* Conic Gradients - Basic */
-		.conic-basic {
-			background: conic-gradient(from 0deg, red, yellow, lime, aqua, blue, magenta, red);
-		}
-
-		.conic-two-color {
-			background: conic-gradient(from 0deg, #667eea, #764ba2);
-		}
-
-		.conic-starting-angle {
-			background: conic-gradient(from 90deg, red, yellow, lime, aqua, blue, magenta, red);
-		}
-
-		/* Conic Gradients - Pie Charts */
-		.conic-pie-quarters {
-			background: conic-gradient(
-								#667eea 0deg 90deg,
-								#764ba2 90deg 180deg,
-								#fa709a 180deg 270deg,
-								#fee140 270deg 360deg
-						);
-		}
-
-		.conic-pie-thirds {
-			background: conic-gradient(
-								#f093fb 0deg 120deg,
-								#f5576c 120deg 240deg,
-								#30cfd0 240deg 360deg
-						);
-		}
-
-		.conic-pie-data {
-			background: conic-gradient(
-								#667eea 0deg 144deg,   /* 40% */
-								#764ba2 144deg 252deg, /* 30% */
-								#fa709a 252deg 324deg, /* 20% */
-								#fee140 324deg 360deg  /* 10% */
-						);
-		}
-
-		/* Conic Gradients - Patterns */
-		.conic-checkerboard {
-			background: conic-gradient(from 45deg,
-			#000 0deg 90deg,
-			#fff 90deg 180deg,
-			#000 180deg 270deg,
-			#fff 270deg 360deg
-						);
-			background-size: 60px 60px;
-		}
-
-		.conic-rays {
-			background: conic-gradient(from 0deg,
-			#667eea 0deg 10deg,
-			transparent 10deg 20deg,
-			#667eea 20deg 30deg,
-			transparent 30deg 40deg,
-			#667eea 40deg 50deg,
-			transparent 50deg 60deg,
-			#667eea 60deg 70deg,
-			transparent 70deg 80deg,
-			#667eea 80deg 90deg,
-			transparent 90deg 100deg,
-			#667eea 100deg 110deg,
-			transparent 110deg 120deg,
-			#667eea 120deg 130deg,
-			transparent 130deg 140deg,
-			#667eea 140deg 150deg,
-			transparent 150deg 160deg,
-			#667eea 160deg 170deg,
-			transparent 170deg 180deg,
-			#667eea 180deg 190deg,
-			transparent 190deg 200deg,
-			#667eea 200deg 210deg,
-			transparent 210deg 220deg,
-			#667eea 220deg 230deg,
-			transparent 230deg 240deg,
-			#667eea 240deg 250deg,
-			transparent 250deg 260deg,
-			#667eea 260deg 270deg,
-			transparent 270deg 280deg,
-			#667eea 280deg 290deg,
-			transparent 290deg 300deg,
-			#667eea 300deg 310deg,
-			transparent 310deg 320deg,
-			#667eea 320deg 330deg,
-			transparent 330deg 340deg,
-			#667eea 340deg 350deg,
-			transparent 350deg 360deg
-						);
-		}
-
-		.conic-loading {
-			background: conic-gradient(from 0deg at 50% 50%,
-			#667eea 0deg 270deg,
-			#e5e7eb 270deg 360deg
-						);
-			border-radius: 50%;
-		}
-
-		.grid {
-			display: grid;
-			grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-			gap: 1rem;
-			margin: 1rem 0;
-		}
-
-		.grid .gradient-sample {
-			height: 200px;
-		}
-
-		table {
-			width: 100%;
-			border-collapse: collapse;
-			margin: 1rem 0;
-			background: white;
-		}
-
-		th, td {
-			padding: 0.75rem;
-			text-align: left;
-			border: 1px solid #e5e7eb;
-		}
-
-		th {
-			background: #f8f9fa;
-			font-weight: 600;
-			font-size: 0.875rem;
-		}
-	</style>
-</head>
-<body>
-<h2>Radial Gradients</h2>
-
-<div class="info">
-	<strong>Radial gradients:</strong> Radiate from a center point outward. Control shape (circle/ellipse), size, and position.
-</div>
-
-<h3>Shape Control</h3>
-
-<div class="grid">
-	<div class="demo-box">
-		<h4>Circle (Default)</h4>
-		<div class="gradient-sample radial-circle">
-			Circle
-		</div>
-		<code>radial-gradient(circle, ...)</code>
-	</div>
-
-	<div class="demo-box">
-		<h4>Ellipse</h4>
-		<div class="gradient-sample radial-ellipse">
-			Ellipse
-		</div>
-		<code>radial-gradient(ellipse, ...)</code>
-	</div>
-</div>
-
-<h3>Size Keywords</h3>
-
-<div class="grid">
-	<div class="demo-box">
-		<h4>Closest Side</h4>
-		<div class="gradient-sample radial-closest-side">
-			Closest Side
-		</div>
-		<code>closest-side</code>
-	</div>
-
-	<div class="demo-box">
-		<h4>Farthest Corner</h4>
-		<div class="gradient-sample radial-farthest-corner">
-			Farthest Corner
-		</div>
-		<code>farthest-corner</code>
-	</div>
-</div>
-
-<h3>Position Control</h3>
-
-<div class="grid">
-	<div class="demo-box">
-		<h4>Center (Default)</h4>
-		<div class="gradient-sample radial-center">
-			Center
-		</div>
-		<code>at center</code>
-	</div>
-
-	<div class="demo-box">
-		<h4>Top Left</h4>
-		<div class="gradient-sample radial-top-left">
-			Top Left
-		</div>
-		<code>at top left</code>
-	</div>
-
-	<div class="demo-box">
-		<h4>Top Right</h4>
-		<div class="gradient-sample radial-top-right">
-			Top Right
-		</div>
-		<code>at top right</code>
-	</div>
-
-	<div class="demo-box">
-		<h4>Bottom Center</h4>
-		<div class="gradient-sample radial-bottom-center">
-			Bottom Center
-		</div>
-		<code>at bottom center</code>
-	</div>
-
-	<div class="demo-box">
-		<h4>Precise Position (70% 30%)</h4>
-		<div class="gradient-sample radial-precise">
-			70% 30%
-		</div>
-		<code>at 70% 30%</code>
-	</div>
-</div>
-
-<h3>Radial Effects</h3>
-
-<div class="grid">
-	<div class="demo-box">
-		<h4>Spotlight Effect</h4>
-		<div class="gradient-sample radial-spotlight">
-			Spotlight
-		</div>
-		<code>white 0%, #667eea 30%, #764ba2 100%</code>
-	</div>
-
-	<div class="demo-box">
-		<h4>Concentric Rings</h4>
-		<div class="gradient-sample radial-rings">
-			Rings
-		</div>
-		<code>Hard stops at 20%, 40%, 60%, 80%</code>
-	</div>
-</div>
-
-<h2>Conic Gradients</h2>
-
-<div class="info">
-	<strong>Conic gradients:</strong> Sweep around a center point like a color wheel. Perfect for pie charts, loading indicators, and patterns.
-</div>
-
-<h3>Basic Conic Gradients</h3>
-
-<div class="grid">
-	<div class="demo-box">
-		<h4>Color Wheel</h4>
-		<div class="gradient-sample conic-basic">
-			Color Wheel
-		</div>
-		<code>conic-gradient(from 0deg, red, yellow, lime, aqua, blue, magenta, red)</code>
-	</div>
-
-	<div class="demo-box">
-		<h4>Two Colors</h4>
-		<div class="gradient-sample conic-two-color">
-			Two Colors
-		</div>
-		<code>conic-gradient(from 0deg, #667eea, #764ba2)</code>
-	</div>
-
-	<div class="demo-box">
-		<h4>Starting from 90deg</h4>
-		<div class="gradient-sample conic-starting-angle">
-			90deg Start
-		</div>
-		<code>conic-gradient(from 90deg, ...)</code>
-	</div>
-</div>
-
-<h3>Pie Chart Patterns</h3>
-
-<div class="grid">
-	<div class="demo-box">
-		<h4>Four Quarters</h4>
-		<div class="gradient-sample conic-pie-quarters">
-			Quarters
-		</div>
-		<code>0-90deg, 90-180deg, 180-270deg, 270-360deg</code>
-	</div>
-
-	<div class="demo-box">
-		<h4>Three Sections</h4>
-		<div class="gradient-sample conic-pie-thirds">
-			Thirds
-		</div>
-		<code>0-120deg, 120-240deg, 240-360deg</code>
-	</div>
-
-	<div class="demo-box">
-		<h4>Data Visualization (40%, 30%, 20%, 10%)</h4>
-		<div class="gradient-sample conic-pie-data">
-			Data Pie
-		</div>
-		<code>144deg, 108deg, 72deg, 36deg</code>
-	</div>
-</div>
-
-<h3>Conic Patterns</h3>
-
-<div class="grid">
-	<div class="demo-box">
-		<h4>Checkerboard (Repeating)</h4>
-		<div class="gradient-sample conic-checkerboard" style="color: #666;">
-			Checkerboard
-		</div>
-		<code>45deg offset with background-size</code>
-	</div>
-
-	<div class="demo-box">
-		<h4>Sunburst Rays</h4>
-		<div class="gradient-sample conic-rays" style="background-color: #764ba2;">
-			Rays
-		</div>
-		<code>Alternating color/transparent every 10deg</code>
-	</div>
-
-	<div class="demo-box">
-		<h4>Loading Indicator (75%)</h4>
-		<div class="gradient-sample conic-loading">
-			75%
-		</div>
-		<code>270deg color, rest gray</code>
-	</div>
-</div>
-
-<h2>Syntax Reference</h2>
-
-<h3>Radial Gradient Syntax</h3>
-
-<table>
-	<thead>
-	<tr>
-		<th>Syntax</th>
-		<th>Example</th>
-		<th>Description</th>
-	</tr>
-	</thead>
-	<tbody>
-	<tr>
-		<td>Basic</td>
-		<td><code>radial-gradient(red, blue)</code></td>
-		<td>Circle from center</td>
-	</tr>
-	<tr>
-		<td>Shape</td>
-		<td><code>radial-gradient(circle, red, blue)</code></td>
-		<td>Force circle shape</td>
-	</tr>
-	<tr>
-		<td>Size</td>
-		<td><code>radial-gradient(circle closest-side, ...)</code></td>
-		<td>Size to closest side</td>
-	</tr>
-	<tr>
-		<td>Position</td>
-		<td><code>radial-gradient(circle at top right, ...)</code></td>
-		<td>Position gradient center</td>
-	</tr>
-	<tr>
-		<td>Combined</td>
-		<td><code>radial-gradient(ellipse farthest-corner at 70% 30%, ...)</code></td>
-		<td>All parameters</td>
-	</tr>
-	</tbody>
-</table>
-
-<h3>Conic Gradient Syntax</h3>
-
-<table>
-	<thead>
-	<tr>
-		<th>Syntax</th>
-		<th>Example</th>
-		<th>Description</th>
-	</tr>
-	</thead>
-	<tbody>
-	<tr>
-		<td>Basic</td>
-		<td><code>conic-gradient(red, blue)</code></td>
-		<td>Sweep from 0deg</td>
-	</tr>
-	<tr>
-		<td>Starting angle</td>
-		<td><code>conic-gradient(from 90deg, red, blue)</code></td>
-		<td>Start from 90deg</td>
-	</tr>
-	<tr>
-		<td>Position</td>
-		<td><code>conic-gradient(from 0deg at 50% 50%, ...)</code></td>
-		<td>Position center point</td>
-	</tr>
-	<tr>
-		<td>Hard stops</td>
-		<td><code>conic-gradient(red 0deg 90deg, blue 90deg 180deg)</code></td>
-		<td>Pie chart sections</td>
-	</tr>
-	</tbody>
-</table>
-
-<div class="info">
-	<strong>Use Cases:</strong>
-	<ul style="margin-top: 0.5rem;">
-		<li><strong>Radial:</strong> Spotlights, vignettes, buttons, loading indicators, focus effects</li>
-		<li><strong>Conic:</strong> Pie charts, color pickers, loading spinners, progress indicators, patterns</li>
-	</ul>
-</div>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CSS Flexbox Demo</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        padding: 1.5rem;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: #f8fafc;
+        line-height: 1.6;
+      }
+
+      h2 {
+        margin-bottom: 1rem;
+        color: #1e293b;
+        font-size: 1.25rem;
+      }
+
+      h3 {
+        margin: 1.5rem 0 0.75rem;
+        color: #475569;
+        font-size: 1rem;
+      }
+
+      .info {
+        background: #e0f2fe;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        border-left: 4px solid #0284c7;
+        border-radius: 4px;
+        font-size: 0.9rem;
+        color: #0c4a6e;
+      }
+
+      code {
+        background: #f1f5f9;
+        padding: 0.125rem 0.375rem;
+        border-radius: 3px;
+        font-family: 'Monaco', 'Menlo', monospace;
+        font-size: 0.875em;
+        color: #be185d;
+      }
+
+      .demo-box {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 1rem;
+        margin: 1rem 0;
+      }
+
+      .flex-container {
+        display: flex;
+        gap: 0.75rem;
+        padding: 1rem;
+        background: #f1f5f9;
+        border-radius: 6px;
+      }
+
+      .flex-item {
+        background: #3b82f6;
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 6px;
+        font-weight: 500;
+        text-align: center;
+      }
+
+      .flex-item:nth-child(2) {
+        background: #8b5cf6;
+      }
+
+      .flex-item:nth-child(3) {
+        background: #ec4899;
+      }
+
+      /* justify-content demos */
+      .justify-start { justify-content: flex-start; }
+      .justify-center { justify-content: center; }
+      .justify-between { justify-content: space-between; }
+      .justify-around { justify-content: space-around; }
+
+      /* align-items demos */
+      .align-stretch { align-items: stretch; min-height: 100px; }
+      .align-center { align-items: center; min-height: 100px; }
+
+      .align-stretch .flex-item,
+      .align-center .flex-item {
+        padding: 0.5rem 1rem;
+      }
+
+      .tall {
+        padding: 2rem 1rem !important;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>CSS Flexbox Basics</h2>
+
+    <div class="info">
+      Flexbox is a one-dimensional layout method for arranging items in rows or columns.
+      Use <code>display: flex</code> on a container to enable flexbox.
+    </div>
+
+    <h3>justify-content</h3>
+    <p style="color: #64748b; margin-bottom: 0.75rem; font-size: 0.9rem;">Controls horizontal alignment of items.</p>
+
+    <div class="demo-box">
+      <code>justify-content: flex-start</code>
+      <div class="flex-container justify-start">
+        <div class="flex-item">A</div>
+        <div class="flex-item">B</div>
+        <div class="flex-item">C</div>
+      </div>
+    </div>
+
+    <div class="demo-box">
+      <code>justify-content: center</code>
+      <div class="flex-container justify-center">
+        <div class="flex-item">A</div>
+        <div class="flex-item">B</div>
+        <div class="flex-item">C</div>
+      </div>
+    </div>
+
+    <div class="demo-box">
+      <code>justify-content: space-between</code>
+      <div class="flex-container justify-between">
+        <div class="flex-item">A</div>
+        <div class="flex-item">B</div>
+        <div class="flex-item">C</div>
+      </div>
+    </div>
+
+    <h3>align-items</h3>
+    <p style="color: #64748b; margin-bottom: 0.75rem; font-size: 0.9rem;">Controls vertical alignment of items.</p>
+
+    <div class="demo-box">
+      <code>align-items: stretch</code> (default)
+      <div class="flex-container align-stretch">
+        <div class="flex-item">Short</div>
+        <div class="flex-item tall">Tall</div>
+        <div class="flex-item">Short</div>
+      </div>
+    </div>
+
+    <div class="demo-box">
+      <code>align-items: center</code>
+      <div class="flex-container align-center">
+        <div class="flex-item">Short</div>
+        <div class="flex-item tall">Tall</div>
+        <div class="flex-item">Short</div>
+      </div>
+    </div>
+  </body>
 </html>
