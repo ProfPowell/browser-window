@@ -8,28 +8,26 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <nav class="nav">
-      <div class="nav-container">
-        <a href="index.html" class="nav-logo">&lt;browser-window&gt;</a>
+    <header class="site-header">
+      <nav>
+        <a href="index.html" class="nav-brand">&lt;browser-window&gt;</a>
         <div class="nav-links">
-          <a href="index.html" class="nav-link">Home</a>
-          <a href="demos.html" class="nav-link">Demos</a>
-          <a href="api.html" class="nav-link active">API</a>
-          <a href="https://github.com/ProfPowell/browser-window" class="nav-link nav-github" target="_blank" rel="noopener">
-            GitHub
-          </a>
+          <a href="index.html">Home</a>
+          <a href="demos.html">Demos</a>
+          <a href="api.html" class="active">API</a>
+          <a href="https://github.com/ProfPowell/browser-window" target="_blank" rel="noopener">GitHub</a>
           <button class="theme-toggle" aria-label="Toggle theme">🌓</button>
         </div>
-      </div>
-    </nav>
+      </nav>
+    </header>
 
     <main>
-      <section class="demos-intro">
+      <section class="hero">
         <h1>API Documentation</h1>
-        <p>Complete reference for the &lt;browser-window&gt; component</p>
+        <p class="tagline">Complete reference for the &lt;browser-window&gt; component</p>
       </section>
 
-      <section class="api-section">
+      <section>
         <h2>Attributes</h2>
         <p>Configure the component behavior using these HTML attributes.</p>
 
@@ -94,7 +92,7 @@
 &lt;browser-window mode="dark" src="demo.html"&gt;&lt;/browser-window&gt;</code-block>
       </section>
 
-      <section class="api-section">
+      <section>
         <h2>Slots</h2>
         <p>Use slots to provide custom content inside the browser window.</p>
 
@@ -128,7 +126,7 @@
 &lt;/browser-window&gt;</code-block>
       </section>
 
-      <section id="css-properties" class="api-section">
+      <section id="css-properties">
         <h2>CSS Custom Properties</h2>
         <p>Customize the appearance using CSS custom properties. Set these on the <code>browser-window</code> element or a parent container.</p>
 
@@ -242,7 +240,7 @@ browser-window.custom-dark {
 }</code-block>
       </section>
 
-      <section class="api-section">
+      <section>
         <h2>CSS Parts</h2>
         <p>Style internal elements using the <code>::part()</code> selector.</p>
 
@@ -278,7 +276,7 @@ browser-window::part(content) {
 }</code-block>
       </section>
 
-      <section class="api-section">
+      <section>
         <h2>Keyboard Shortcuts</h2>
         <p>The component supports keyboard navigation for accessibility.</p>
 
@@ -306,7 +304,7 @@ browser-window::part(content) {
         </table>
       </section>
 
-      <section class="api-section">
+      <section>
         <h2>Features Reference</h2>
 
         <h3>Source Code Viewing</h3>
@@ -342,7 +340,7 @@ browser-window::part(content) {
 &lt;/browser-window&gt;</code-block>
       </section>
 
-      <section class="api-section">
+      <section>
         <h2>Browser Support</h2>
         <p>Works in all modern browsers that support Web Components:</p>
         <ul>
@@ -352,7 +350,7 @@ browser-window::part(content) {
         </ul>
       </section>
 
-      <section class="api-section">
+      <section>
         <h2>Accessibility</h2>
         <p>The component is built with accessibility in mind:</p>
         <ul>
@@ -365,7 +363,7 @@ browser-window::part(content) {
       </section>
     </main>
 
-    <footer class="footer">
+    <footer class="site-footer">
       <p>
         MIT License &middot;
         <a href="https://github.com/ProfPowell/browser-window" target="_blank" rel="noopener">View on GitHub</a> &middot;
@@ -378,30 +376,18 @@ browser-window::part(content) {
       // Theme toggle
       (function() {
         const toggle = document.querySelector('.theme-toggle');
-        const root = document.documentElement;
         const storageKey = 'browser-window-theme';
 
         // Load saved theme
         const saved = localStorage.getItem(storageKey);
-        if (saved) {
-          root.setAttribute('data-theme', saved);
+        if (saved === 'dark') {
+          document.body.classList.add('dark');
         }
 
         toggle?.addEventListener('click', () => {
-          const current = root.getAttribute('data-theme');
-          const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-          let next;
-          if (current === 'dark') {
-            next = 'light';
-          } else if (current === 'light') {
-            next = 'dark';
-          } else {
-            next = prefersDark ? 'light' : 'dark';
-          }
-
-          root.setAttribute('data-theme', next);
-          localStorage.setItem(storageKey, next);
+          document.body.classList.toggle('dark');
+          const isDark = document.body.classList.contains('dark');
+          localStorage.setItem(storageKey, isDark ? 'dark' : 'light');
         });
       })();
     </script>

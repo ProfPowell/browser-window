@@ -43,38 +43,31 @@
         padding: 1.5rem;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
       }
-
-      .demo-code {
-        margin-top: 1rem;
-        font-size: 0.875rem;
-      }
     </style>
   </head>
   <body>
-    <nav class="nav">
-      <div class="nav-container">
-        <a href="index.html" class="nav-logo">&lt;browser-window&gt;</a>
+    <header class="site-header">
+      <nav>
+        <a href="index.html" class="nav-brand">&lt;browser-window&gt;</a>
         <div class="nav-links">
-          <a href="index.html" class="nav-link">Home</a>
-          <a href="demos.html" class="nav-link active">Demos</a>
-          <a href="api.html" class="nav-link">API</a>
-          <a href="https://github.com/ProfPowell/browser-window" class="nav-link nav-github" target="_blank" rel="noopener">
-            GitHub
-          </a>
+          <a href="index.html">Home</a>
+          <a href="demos.html" class="active">Demos</a>
+          <a href="api.html">API</a>
+          <a href="https://github.com/ProfPowell/browser-window" target="_blank" rel="noopener">GitHub</a>
           <button class="theme-toggle" aria-label="Toggle theme">🌓</button>
         </div>
-      </div>
-    </nav>
+      </nav>
+    </header>
 
     <main>
-      <section class="demos-intro">
+      <section class="hero">
         <h1>Interactive Demos</h1>
-        <p>Explore all the features of the &lt;browser-window&gt; component</p>
+        <p class="tagline">Explore all the features of the &lt;browser-window&gt; component</p>
       </section>
 
       <section id="source-viewing" class="demo-section">
         <h2>Basic Usage with Source Viewing</h2>
-        <p>
+        <p class="demo-description">
           Load external HTML with the <code>src</code> attribute. Click the <code>&lt;/&gt;</code> icon to view the source code!
         </p>
         <browser-window src="flexbox-demo.html" url="https://example.com/flexbox" shadow>
@@ -85,10 +78,10 @@
 
       <section id="dark-mode" class="demo-section">
         <h2>Light &amp; Dark Mode</h2>
-        <p>
+        <p class="demo-description">
           The component automatically follows system theme preference. Use <code>mode="light"</code> or <code>mode="dark"</code> to override.
         </p>
-        <div class="demo-grid side-by-side">
+        <div class="side-by-side">
           <browser-window mode="light" url="https://example.com" title="Light Mode (forced)">
             <div class="fill-content light-fill">
               <p style="margin: 0">This window is always light</p>
@@ -111,7 +104,7 @@
 
       <section id="resize" class="demo-section">
         <h2>Resizable</h2>
-        <p>
+        <p class="demo-description">
           Drag the bottom-right corner to resize. The component respects <code>min-width</code> and <code>min-height</code> constraints.
         </p>
         <browser-window url="https://example.com/resize-demo" title="Resize Me!" style="height: 300px">
@@ -126,7 +119,7 @@
 
       <section class="demo-section">
         <h2>Slotted Content</h2>
-        <p>
+        <p class="demo-description">
           When no <code>src</code> is provided, use slotted content directly. Great for screenshots or custom HTML.
         </p>
         <browser-window url="https://myapp.example.com" title="My App Dashboard" shadow>
@@ -151,7 +144,7 @@
 
       <section id="maximize" class="demo-section">
         <h2>Maximize Mode</h2>
-        <p>
+        <p class="demo-description">
           Double-click the header or click the green button to maximize. Press <code>Escape</code> or click the overlay to restore.
         </p>
         <browser-window src="example.html" url="https://example.com/fullscreen" title="Try Maximizing!" shadow>
@@ -163,7 +156,7 @@
 
       <section class="demo-section">
         <h2>Custom Theming</h2>
-        <p>
+        <p class="demo-description">
           Use CSS custom properties to create custom themes.
         </p>
         <style>
@@ -181,7 +174,7 @@
             <p style="margin: 0">Custom purple theme using CSS custom properties</p>
           </div>
         </browser-window>
-        <code-block language="html" class="demo-code">.purple-theme {
+        <code-block language="css" class="demo-code">.purple-theme {
   --browser-window-accent-color: #8b5cf6;
   --browser-window-header-bg: #faf5ff;
   --browser-window-border-color: #c4b5fd;
@@ -212,7 +205,7 @@
       </section>
     </main>
 
-    <footer class="footer">
+    <footer class="site-footer">
       <p>
         MIT License &middot;
         <a href="https://github.com/ProfPowell/browser-window" target="_blank" rel="noopener">View on GitHub</a> &middot;
@@ -226,30 +219,18 @@
       // Theme toggle
       (function() {
         const toggle = document.querySelector('.theme-toggle');
-        const root = document.documentElement;
         const storageKey = 'browser-window-theme';
 
         // Load saved theme
         const saved = localStorage.getItem(storageKey);
-        if (saved) {
-          root.setAttribute('data-theme', saved);
+        if (saved === 'dark') {
+          document.body.classList.add('dark');
         }
 
         toggle?.addEventListener('click', () => {
-          const current = root.getAttribute('data-theme');
-          const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-          let next;
-          if (current === 'dark') {
-            next = 'light';
-          } else if (current === 'light') {
-            next = 'dark';
-          } else {
-            next = prefersDark ? 'light' : 'dark';
-          }
-
-          root.setAttribute('data-theme', next);
-          localStorage.setItem(storageKey, next);
+          document.body.classList.toggle('dark');
+          const isDark = document.body.classList.contains('dark');
+          localStorage.setItem(storageKey, isDark ? 'dark' : 'light');
         });
       })();
     </script>

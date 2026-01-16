@@ -8,97 +8,86 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <nav class="nav">
-      <div class="nav-container">
-        <a href="index.html" class="nav-logo">&lt;browser-window&gt;</a>
+    <header class="site-header">
+      <nav>
+        <a href="index.html" class="nav-brand">&lt;browser-window&gt;</a>
         <div class="nav-links">
-          <a href="index.html" class="nav-link active">Home</a>
-          <a href="demos.html" class="nav-link">Demos</a>
-          <a href="api.html" class="nav-link">API</a>
-          <a href="https://github.com/ProfPowell/browser-window" class="nav-link nav-github" target="_blank" rel="noopener">
-            GitHub
-          </a>
+          <a href="index.html" class="active">Home</a>
+          <a href="demos.html">Demos</a>
+          <a href="api.html">API</a>
+          <a href="https://github.com/ProfPowell/browser-window" target="_blank" rel="noopener">GitHub</a>
           <button class="theme-toggle" aria-label="Toggle theme">🌓</button>
         </div>
-      </div>
-    </nav>
+      </nav>
+    </header>
 
     <main>
       <section class="hero">
         <h1>&lt;browser-window&gt;</h1>
-        <p class="hero-subtitle">A Safari-style browser window web component for demos and tutorials</p>
-        <div class="demo-preview">
+        <p class="tagline">A Safari-style browser window web component for demos and tutorials</p>
+        <div class="hero-demo">
           <browser-window src="example.html" url="https://example.com/demo" shadow>
           </browser-window>
         </div>
         <div class="hero-actions">
-          <a href="demos.html" class="btn btn-primary">View Demos</a>
-          <a href="api.html" class="btn btn-secondary">API Docs</a>
+          <a href="demos.html" class="btn primary">View Demos</a>
+          <a href="api.html" class="btn secondary">API Documentation</a>
         </div>
       </section>
 
-      <section class="features">
+      <section>
         <h2>Features</h2>
         <div class="feature-grid">
-          <a href="demos.html#source-viewing" class="feature-card feature-link">
+          <a href="demos.html#source-viewing" class="feature-card">
             <h3>Source Viewing</h3>
             <p>Toggle between rendered content and syntax-highlighted source code with one click.</p>
           </a>
-          <a href="demos.html#sharing" class="feature-card feature-link">
+          <a href="demos.html#sharing" class="feature-card">
             <h3>CodePen Export</h3>
             <p>Export any demo directly to CodePen with HTML, CSS, and JS properly separated.</p>
           </a>
-          <a href="demos.html#dark-mode" class="feature-card feature-link">
+          <a href="demos.html#dark-mode" class="feature-card">
             <h3>Dark Mode</h3>
             <p>Automatic theme detection with manual override. Follows system preferences.</p>
           </a>
-          <a href="demos.html#resize" class="feature-card feature-link">
+          <a href="demos.html#resize" class="feature-card">
             <h3>Resizable</h3>
             <p>Drag to resize the window. Perfect for demonstrating responsive designs.</p>
           </a>
-          <a href="demos.html#maximize" class="feature-card feature-link">
+          <a href="demos.html#maximize" class="feature-card">
             <h3>Fullscreen Mode</h3>
             <p>Double-click the header or click the green button to maximize.</p>
           </a>
-          <a href="api.html#css-properties" class="feature-card feature-link">
+          <a href="api.html#css-properties" class="feature-card">
             <h3>Fully Themeable</h3>
             <p>15+ CSS custom properties for complete visual customization.</p>
           </a>
         </div>
       </section>
 
-      <section class="quickstart">
+      <section class="quick-start">
         <h2>Quick Start</h2>
 
         <h3>Installation</h3>
-        <div class="code-tabs">
-          <div class="code-tab active" data-tab="cdn">CDN</div>
-          <div class="code-tab" data-tab="npm">npm</div>
-        </div>
-        <code-block language="html" data-content="cdn">&lt;script type="module" src="https://cdn.jsdelivr.net/gh/ProfPowell/browser-window@main/dist/browser-window.min.js"&gt;&lt;/script&gt;</code-block>
-        <code-block language="bash" data-content="npm" class="hidden">npm install @profpowell/browser-window</code-block>
+        <p>Install via npm:</p>
+        <code-block language="bash">npm install @profpowell/browser-window</code-block>
 
-        <h3>Usage</h3>
+        <p>Or include via CDN:</p>
+        <code-block language="html">&lt;script type="module" src="https://cdn.jsdelivr.net/gh/ProfPowell/browser-window@main/dist/browser-window.min.js"&gt;&lt;/script&gt;</code-block>
+
+        <h3>Basic Usage</h3>
         <code-block language="html">&lt;browser-window src="demo.html" url="https://example.com" shadow&gt;
 &lt;/browser-window&gt;</code-block>
 
-        <p class="quickstart-cta">
-          See <a href="api.html">API documentation</a> for all attributes and CSS custom properties.
-        </p>
-      </section>
-
-      <section class="cta">
-        <h2>Ready to get started?</h2>
-        <p>Check out the demos to see all features in action, or dive into the API documentation.</p>
-        <div class="cta-actions">
-          <a href="demos.html" class="btn btn-primary">Explore Demos</a>
-          <a href="api.html" class="btn btn-secondary">Read the Docs</a>
+        <div class="hero-actions">
+          <a href="demos.html" class="btn primary">See All Demos</a>
+          <a href="api.html" class="btn secondary">Full API Reference</a>
         </div>
       </section>
 
-      <section class="related">
+      <section>
         <h2>Related Components</h2>
-        <p class="related-subtitle">Part of the ProfPowell vanilla web components suite:</p>
+        <p>Part of the ProfPowell vanilla web components suite:</p>
         <div class="related-grid">
           <a href="https://profpowell.github.io/code-block/" class="related-card">
             <strong>&lt;code-block&gt;</strong> Syntax highlighting with copy button
@@ -116,7 +105,7 @@
       </section>
     </main>
 
-    <footer class="footer">
+    <footer class="site-footer">
       <p>
         MIT License &middot;
         <a href="https://github.com/ProfPowell/browser-window" target="_blank" rel="noopener">View on GitHub</a> &middot;
@@ -130,45 +119,20 @@
       // Theme toggle
       (function() {
         const toggle = document.querySelector('.theme-toggle');
-        const root = document.documentElement;
         const storageKey = 'browser-window-theme';
 
         // Load saved theme
         const saved = localStorage.getItem(storageKey);
-        if (saved) {
-          root.setAttribute('data-theme', saved);
+        if (saved === 'dark') {
+          document.body.classList.add('dark');
         }
 
         toggle?.addEventListener('click', () => {
-          const current = root.getAttribute('data-theme');
-          const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-          let next;
-          if (current === 'dark') {
-            next = 'light';
-          } else if (current === 'light') {
-            next = 'dark';
-          } else {
-            // No explicit theme - toggle opposite of system preference
-            next = prefersDark ? 'light' : 'dark';
-          }
-
-          root.setAttribute('data-theme', next);
-          localStorage.setItem(storageKey, next);
+          document.body.classList.toggle('dark');
+          const isDark = document.body.classList.contains('dark');
+          localStorage.setItem(storageKey, isDark ? 'dark' : 'light');
         });
       })();
-
-      // Code tab switching
-      document.querySelectorAll('.code-tab').forEach(tab => {
-        tab.addEventListener('click', () => {
-          const tabName = tab.dataset.tab;
-          document.querySelectorAll('.code-tab').forEach(t => t.classList.remove('active'));
-          tab.classList.add('active');
-          document.querySelectorAll('code-block[data-content]').forEach(block => {
-            block.classList.toggle('hidden', block.dataset.content !== tabName);
-          });
-        });
-      });
     </script>
   </body>
 </html>
