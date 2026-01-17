@@ -285,10 +285,14 @@ body.dark .feature-card:hover {
 }
 
 .related-card strong {
-  display: inline;
+  display: block;
   color: var(--text-primary);
-  font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
-  margin-right: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.related-card span {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
 }
 
 /* Quick Start */
