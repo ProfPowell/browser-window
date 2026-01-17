@@ -282,7 +282,12 @@ body.dark .feature-card:hover {
 .related-card:hover {
   border-color: var(--accent-color);
   background: var(--bg-tertiary);
+  color: var(--text-secondary);
   text-decoration: none;
+}
+
+.related-card:hover strong {
+  color: var(--text-primary);
 }
 
 .related-card strong {
