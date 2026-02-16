@@ -212,4 +212,86 @@ test.describe('browser-window', () => {
       expect(slot).toBe(true)
     })
   })
+
+  test.describe('page-level dark mode', () => {
+    test('detects body.dark class and sets data-page-mode="dark"', async ({ page }) => {
+      const el = page.locator('#no-mode')
+
+      // Initially no page-level signal
+      let pageMode = await el.evaluate((node) => node.getAttribute('data-page-mode'))
+      expect(pageMode).toBeNull()
+
+      // Add dark class to body
+      await page.evaluate(() => document.body.classList.add('dark'))
+      // Wait for MutationObserver to fire
+      await page.waitForFunction(() => {
+        const el = document.querySelector('#no-mode')
+        return el.getAttribute('data-page-mode') === 'dark'
+      })
+
+      pageMode = await el.evaluate((node) => node.getAttribute('data-page-mode'))
+      expect(pageMode).toBe('dark')
+    })
+
+    test('detects html[data-theme="dark"] and sets data-page-mode="dark"', async ({ page }) => {
+      const el = page.locator('#no-mode')
+
+      await page.evaluate(() => document.documentElement.setAttribute('data-theme', 'dark'))
+      await page.waitForFunction(() => {
+        const el = document.querySelector('#no-mode')
+        return el.getAttribute('data-page-mode') === 'dark'
+      })
+
+      const pageMode = await el.evaluate((node) => node.getAttribute('data-page-mode'))
+      expect(pageMode).toBe('dark')
+    })
+
+    test('does NOT override explicit mode attribute', async ({ page }) => {
+      const el = page.locator('#dark-mode')
+
+      // Add dark class to body — should not affect element with explicit mode
+      await page.evaluate(() => document.body.classList.add('dark'))
+      // Give observer time to fire
+      await page.waitForTimeout(50)
+
+      const pageMode = await el.evaluate((node) => node.getAttribute('data-page-mode'))
+      expect(pageMode).toBeNull()
+
+      const mode = await el.evaluate((node) => node.mode)
+      expect(mode).toBe('dark')
+    })
+
+    test('removes data-page-mode when page dark class is removed', async ({ page }) => {
+      const el = page.locator('#no-mode')
+
+      // Add then remove dark class
+      await page.evaluate(() => document.body.classList.add('dark'))
+      await page.waitForFunction(() => {
+        const el = document.querySelector('#no-mode')
+        return el.getAttribute('data-page-mode') === 'dark'
+      })
+
+      await page.evaluate(() => document.body.classList.remove('dark'))
+      await page.waitForFunction(() => {
+        const el = document.querySelector('#no-mode')
+        return el.getAttribute('data-page-mode') === null
+      })
+
+      const pageMode = await el.evaluate((node) => node.getAttribute('data-page-mode'))
+      expect(pageMode).toBeNull()
+    })
+
+    test('element.mode getter reflects page detection', async ({ page }) => {
+      const el = page.locator('#no-mode')
+
+      await page.evaluate(() => document.body.classList.add('dark'))
+      await page.waitForFunction(() => {
+        const el = document.querySelector('#no-mode')
+        return el.getAttribute('data-page-mode') === 'dark'
+      })
+
+      const mode = await el.evaluate((node) => node.mode)
+      expect(mode).toBe('dark')
+    })
+  })
 })

@@ -63,7 +63,7 @@
               <td><code>mode</code></td>
               <td><code>'light'</code> | <code>'dark'</code></td>
               <td>auto</td>
-              <td>Color scheme for the component. When omitted, automatically follows system preference via <code>prefers-color-scheme</code>.</td>
+              <td>Color scheme for the component. When omitted, automatically detects page-level dark mode signals (<code>body.dark</code> class, <code>data-theme</code>, <code>data-bs-theme</code>, <code>color-scheme</code>) and falls back to system preference via <code>prefers-color-scheme</code>.</td>
             </tr>
             <tr>
               <td><code>shadow</code></td>

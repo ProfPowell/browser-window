@@ -7,7 +7,7 @@
  * @attr {string} url - URL to display in the address bar
  * @attr {string} title - Title shown in the URL bar (defaults to hostname)
  * @attr {string} src - Path to the HTML file to load in iframe
- * @attr {'light'|'dark'} mode - Color scheme (default: 'light')
+ * @attr {'light'|'dark'} mode - Color scheme. When omitted, auto-detects from page-level signals (body.dark, data-theme, data-bs-theme, color-scheme) then falls back to OS prefers-color-scheme.
  * @attr {boolean} shadow - Whether to show drop shadow
  *
  * @csspart header - The browser header/toolbar
@@ -35,6 +35,88 @@
  *   <img src="screenshot.png" alt="Demo">
  * </browser-window>
  */
+
+// --- Page-level dark mode observer (shared singleton) ---
+const _registeredInstances = new Set();
+let _pageObserver = null;
+let _currentPageDark = null;
+
+function _detectPageDarkMode() {
+  const html = document.documentElement;
+  const body = document.body;
+  if (!html || !body) return null;
+
+  // Check class-based signals (Tailwind, docs sites)
+  if (html.classList.contains('dark') || body.classList.contains('dark')) return true;
+
+  // Check data-theme attribute
+  if (html.getAttribute('data-theme') === 'dark' || body.getAttribute('data-theme') === 'dark') return true;
+  if (html.getAttribute('data-theme') === 'light' || body.getAttribute('data-theme') === 'light') return false;
+
+  // Check Bootstrap 5 data-bs-theme
+  if (html.getAttribute('data-bs-theme') === 'dark' || body.getAttribute('data-bs-theme') === 'dark') return true;
+  if (html.getAttribute('data-bs-theme') === 'light' || body.getAttribute('data-bs-theme') === 'light') return false;
+
+  // Check computed color-scheme
+  const colorScheme = getComputedStyle(html).colorScheme;
+  if (colorScheme === 'dark') return true;
+  if (colorScheme === 'light') return false;
+
+  return null; // No page-level signal found
+}
+
+function _notifyInstances() {
+  const newState = _detectPageDarkMode();
+  if (newState === _currentPageDark) return;
+  _currentPageDark = newState;
+
+  for (const instance of _registeredInstances) {
+    instance._onPageModeChange(newState);
+  }
+}
+
+function _startObserving() {
+  if (_pageObserver) return;
+
+  _pageObserver = new MutationObserver(_notifyInstances);
+
+  const observeOptions = {
+    attributes: true,
+    attributeFilter: ['class', 'data-theme', 'data-bs-theme', 'style'],
+  };
+
+  _pageObserver.observe(document.documentElement, observeOptions);
+  if (document.body) {
+    _pageObserver.observe(document.body, observeOptions);
+  }
+}
+
+function _stopObserving() {
+  if (_pageObserver) {
+    _pageObserver.disconnect();
+    _pageObserver = null;
+  }
+}
+
+function _registerInstance(instance) {
+  _registeredInstances.add(instance);
+  if (_registeredInstances.size === 1) {
+    _startObserving();
+  }
+  // Apply current state immediately
+  const state = _detectPageDarkMode();
+  _currentPageDark = state;
+  instance._onPageModeChange(state);
+}
+
+function _unregisterInstance(instance) {
+  _registeredInstances.delete(instance);
+  if (_registeredInstances.size === 0) {
+    _stopObserving();
+    _currentPageDark = null;
+  }
+}
+
 export class BrowserWindow extends HTMLElement {
   constructor() {
     super();
@@ -57,9 +139,12 @@ export class BrowserWindow extends HTMLElement {
     if (this.src) {
       await this.fetchSourceCode();
     }
+
+    _registerInstance(this);
   }
 
   disconnectedCallback() {
+    _unregisterInstance(this);
     this.removeOverlay();
     document.removeEventListener('keydown', this.handleKeydown);
     document.removeEventListener('click', this.handleOutsideClick);
@@ -69,10 +154,20 @@ export class BrowserWindow extends HTMLElement {
     return ['url', 'title', 'mode', 'shadow', 'src'];
   }
 
-  attributeChangedCallback() {
+  attributeChangedCallback(name) {
     if (this.shadowRoot) {
       this.render();
       this.attachEventListeners();
+    }
+
+    if (name === 'mode') {
+      if (this.hasAttribute('mode')) {
+        // Explicit mode set — remove page-level detection
+        this.removeAttribute('data-page-mode');
+      } else {
+        // Mode removed — re-detect page-level signal
+        this._onPageModeChange(_detectPageDarkMode());
+      }
     }
   }
 
@@ -89,7 +184,21 @@ export class BrowserWindow extends HTMLElement {
   }
 
   get mode() {
-    return this.getAttribute('mode') || 'light';
+    return this.getAttribute('mode') || this.getAttribute('data-page-mode') || 'light';
+  }
+
+  _onPageModeChange(isDark) {
+    if (this.hasAttribute('mode')) {
+      this.removeAttribute('data-page-mode');
+      return;
+    }
+    if (isDark === true) {
+      this.setAttribute('data-page-mode', 'dark');
+    } else if (isDark === false) {
+      this.setAttribute('data-page-mode', 'light');
+    } else {
+      this.removeAttribute('data-page-mode');
+    }
   }
 
   get hasShadow() {
@@ -543,6 +652,29 @@ export class BrowserWindow extends HTMLElement {
             --browser-window-hover-bg: #3a3a3c;
             --browser-window-content-bg: #000000;
           }
+        }
+
+        /* Page-level dark mode detection (overrides media query via higher specificity) */
+        :host([data-page-mode="dark"]:not([mode])) {
+          --browser-window-bg: #1c1c1e;
+          --browser-window-header-bg: #2c2c2e;
+          --browser-window-border-color: #3a3a3c;
+          --browser-window-text-color: #e5e5e7;
+          --browser-window-text-muted: #98989d;
+          --browser-window-url-bg: #1c1c1e;
+          --browser-window-hover-bg: #3a3a3c;
+          --browser-window-content-bg: #000000;
+        }
+
+        :host([data-page-mode="light"]:not([mode])) {
+          --browser-window-bg: #ffffff;
+          --browser-window-header-bg: #f6f8fa;
+          --browser-window-border-color: #d1d5da;
+          --browser-window-text-color: #24292e;
+          --browser-window-text-muted: #586069;
+          --browser-window-url-bg: #ffffff;
+          --browser-window-hover-bg: #f3f4f6;
+          --browser-window-content-bg: #ffffff;
         }
 
         /* Explicit dark mode override */
