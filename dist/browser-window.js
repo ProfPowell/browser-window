@@ -1,18 +1,58 @@
-class c extends HTMLElement {
+const a = /* @__PURE__ */ new Set();
+let s = null, c = null;
+function w() {
+  const o = document.documentElement, e = document.body;
+  if (!o || !e) return null;
+  if (o.classList.contains("dark") || e.classList.contains("dark") || o.getAttribute("data-theme") === "dark" || e.getAttribute("data-theme") === "dark") return !0;
+  if (o.getAttribute("data-theme") === "light" || e.getAttribute("data-theme") === "light") return !1;
+  if (o.getAttribute("data-bs-theme") === "dark" || e.getAttribute("data-bs-theme") === "dark") return !0;
+  if (o.getAttribute("data-bs-theme") === "light" || e.getAttribute("data-bs-theme") === "light") return !1;
+  const t = getComputedStyle(o).colorScheme;
+  return t === "dark" ? !0 : t === "light" ? !1 : null;
+}
+function b() {
+  const o = w();
+  if (o !== c) {
+    c = o;
+    for (const e of a)
+      e._onPageModeChange(o);
+  }
+}
+function m() {
+  if (s) return;
+  s = new MutationObserver(b);
+  const o = {
+    attributes: !0,
+    attributeFilter: ["class", "data-theme", "data-bs-theme", "style"]
+  };
+  s.observe(document.documentElement, o), document.body && s.observe(document.body, o);
+}
+function g() {
+  s && (s.disconnect(), s = null);
+}
+function f(o) {
+  a.add(o), a.size === 1 && m();
+  const e = w();
+  c = e, o._onPageModeChange(e);
+}
+function p(o) {
+  a.delete(o), a.size === 0 && (g(), c = null);
+}
+class v extends HTMLElement {
   constructor() {
     super(), this.attachShadow({ mode: "open" }), this.isMinimized = !1, this.isMaximized = !1, this.overlay = null, this.showSource = !1, this.sourceCode = "", this.showShareMenu = !1, this.handleKeydown = this.handleKeydown.bind(this), this.handleOutsideClick = this.handleOutsideClick.bind(this);
   }
   async connectedCallback() {
-    this.render(), this.attachEventListeners(), this.src && await this.fetchSourceCode();
+    this.render(), this.attachEventListeners(), this.src && await this.fetchSourceCode(), f(this);
   }
   disconnectedCallback() {
-    this.removeOverlay(), document.removeEventListener("keydown", this.handleKeydown), document.removeEventListener("click", this.handleOutsideClick);
+    p(this), this.removeOverlay(), document.removeEventListener("keydown", this.handleKeydown), document.removeEventListener("click", this.handleOutsideClick);
   }
   static get observedAttributes() {
     return ["url", "title", "mode", "shadow", "src"];
   }
-  attributeChangedCallback() {
-    this.shadowRoot && (this.render(), this.attachEventListeners());
+  attributeChangedCallback(e) {
+    this.shadowRoot && (this.render(), this.attachEventListeners()), e === "mode" && (this.hasAttribute("mode") ? this.removeAttribute("data-page-mode") : this._onPageModeChange(w()));
   }
   get url() {
     return this.getAttribute("url") || "";
@@ -24,7 +64,14 @@ class c extends HTMLElement {
     return this.getAttribute("title") || this.getHostname();
   }
   get mode() {
-    return this.getAttribute("mode") || "light";
+    return this.getAttribute("mode") || this.getAttribute("data-page-mode") || "light";
+  }
+  _onPageModeChange(e) {
+    if (this.hasAttribute("mode")) {
+      this.removeAttribute("data-page-mode");
+      return;
+    }
+    e === !0 ? this.setAttribute("data-page-mode", "dark") : e === !1 ? this.setAttribute("data-page-mode", "light") : this.removeAttribute("data-page-mode");
   }
   get hasShadow() {
     return this.hasAttribute("shadow");
@@ -37,12 +84,12 @@ class c extends HTMLElement {
     }
   }
   attachEventListeners() {
-    const e = this.shadowRoot.querySelector(".control-button.close"), o = this.shadowRoot.querySelector(".control-button.minimize"), t = this.shadowRoot.querySelector(".control-button.maximize"), i = this.shadowRoot.querySelector(".view-source-button"), n = this.shadowRoot.querySelector(".copy-source-button"), a = this.shadowRoot.querySelector(".share-button"), r = this.shadowRoot.querySelector(".browser-header");
-    e?.addEventListener("click", () => this.handleClose()), o?.addEventListener("click", () => this.toggleMinimize()), t?.addEventListener("click", () => this.toggleMaximize()), i?.addEventListener("click", () => this.toggleViewSource()), n?.addEventListener("click", () => this.copySourceCode()), a?.addEventListener("click", (s) => {
-      s.stopPropagation(), this.toggleShareMenu();
-    }), r?.addEventListener("dblclick", (s) => {
-      const d = s.target;
-      (d.classList.contains("browser-header") || d.classList.contains("controls")) && this.toggleMaximize();
+    const e = this.shadowRoot.querySelector(".control-button.close"), t = this.shadowRoot.querySelector(".control-button.minimize"), r = this.shadowRoot.querySelector(".control-button.maximize"), n = this.shadowRoot.querySelector(".view-source-button"), d = this.shadowRoot.querySelector(".copy-source-button"), h = this.shadowRoot.querySelector(".share-button"), i = this.shadowRoot.querySelector(".browser-header");
+    e?.addEventListener("click", () => this.handleClose()), t?.addEventListener("click", () => this.toggleMinimize()), r?.addEventListener("click", () => this.toggleMaximize()), n?.addEventListener("click", () => this.toggleViewSource()), d?.addEventListener("click", () => this.copySourceCode()), h?.addEventListener("click", (l) => {
+      l.stopPropagation(), this.toggleShareMenu();
+    }), i?.addEventListener("dblclick", (l) => {
+      const u = l.target;
+      (u.classList.contains("browser-header") || u.classList.contains("controls")) && this.toggleMaximize();
     }), this.shadowRoot.querySelector("iframe")?.addEventListener("error", () => this.handleIframeError());
   }
   handleIframeError() {
@@ -77,7 +124,7 @@ class c extends HTMLElement {
     this.showSource = !this.showSource, this.updateContentView();
   }
   updateContentView() {
-    const e = this.shadowRoot.querySelector(".browser-content"), o = this.shadowRoot.querySelector(".view-source-button");
+    const e = this.shadowRoot.querySelector(".browser-content"), t = this.shadowRoot.querySelector(".view-source-button");
     e && (this.showSource ? (e.innerHTML = `
         <div class="source-view">
           <div class="source-header">
@@ -92,7 +139,7 @@ class c extends HTMLElement {
           </div>
           <pre><code>${this.escapeHtml(this.sourceCode)}</code></pre>
         </div>
-      `, o.classList.add("active"), e.querySelector(".copy-source-button")?.addEventListener("click", () => this.copySourceCode())) : (this.src ? e.innerHTML = `<iframe src="${this.escapeHtml(this.src)}" loading="lazy"></iframe>` : e.innerHTML = "<slot></slot>", o.classList.remove("active")));
+      `, t.classList.add("active"), e.querySelector(".copy-source-button")?.addEventListener("click", () => this.copySourceCode())) : (this.src ? e.innerHTML = `<iframe src="${this.escapeHtml(this.src)}" loading="lazy"></iframe>` : e.innerHTML = "<slot></slot>", t.classList.remove("active")));
   }
   async copySourceCode() {
     if (this.sourceCode)
@@ -100,14 +147,14 @@ class c extends HTMLElement {
         await navigator.clipboard.writeText(this.sourceCode);
         const e = this.shadowRoot.querySelector(".copy-source-button");
         if (e) {
-          const o = e.innerHTML;
+          const t = e.innerHTML;
           e.innerHTML = `
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="3,8 6,11 13,4"/>
           </svg>
           Copied!
         `, e.classList.add("copied"), setTimeout(() => {
-            e.innerHTML = o, e.classList.remove("copied");
+            e.innerHTML = t, e.classList.remove("copied");
           }, 2e3);
         }
       } catch (e) {
@@ -116,14 +163,14 @@ class c extends HTMLElement {
   }
   toggleShareMenu() {
     this.showShareMenu = !this.showShareMenu;
-    const e = this.shadowRoot.querySelector(".share-menu"), o = this.shadowRoot.querySelector(".share-button");
-    this.showShareMenu ? (e.style.display = "block", o.classList.add("active"), setTimeout(() => {
+    const e = this.shadowRoot.querySelector(".share-menu"), t = this.shadowRoot.querySelector(".share-button");
+    this.showShareMenu ? (e.style.display = "block", t.classList.add("active"), setTimeout(() => {
       document.addEventListener("click", this.handleOutsideClick);
-    }, 0)) : (e.style.display = "none", o.classList.remove("active"), document.removeEventListener("click", this.handleOutsideClick));
+    }, 0)) : (e.style.display = "none", t.classList.remove("active"), document.removeEventListener("click", this.handleOutsideClick));
   }
   handleOutsideClick(e) {
-    const o = this.shadowRoot.querySelector(".share-menu");
-    o && !o.contains(e.target) && this.toggleShareMenu();
+    const t = this.shadowRoot.querySelector(".share-menu");
+    t && !t.contains(e.target) && this.toggleShareMenu();
   }
   async shareViaWebAPI() {
     if (!navigator.share) {
@@ -137,27 +184,27 @@ class c extends HTMLElement {
     };
     try {
       await navigator.share(e), this.toggleShareMenu();
-    } catch (o) {
-      o.name !== "AbortError" && console.error("Error sharing:", o);
+    } catch (t) {
+      t.name !== "AbortError" && console.error("Error sharing:", t);
     }
   }
   parseHTMLForCodePen() {
     if (!this.sourceCode) return null;
-    const o = new DOMParser().parseFromString(this.sourceCode, "text/html"), t = Array.from(o.querySelectorAll("style")).map((r) => r.textContent).join(`
+    const t = new DOMParser().parseFromString(this.sourceCode, "text/html"), r = Array.from(t.querySelectorAll("style")).map((i) => i.textContent).join(`
 
-`), i = Array.from(o.querySelectorAll("script")).filter((r) => !r.src && r.type !== "module").map((r) => r.textContent).join(`
+`), n = Array.from(t.querySelectorAll("script")).filter((i) => !i.src && i.type !== "module").map((i) => i.textContent).join(`
 
-`), n = o.body.cloneNode(!0);
-    return n.querySelectorAll("script, style").forEach((r) => r.remove()), {
-      html: n.innerHTML.trim(),
-      css: t.trim(),
-      js: i.trim()
+`), d = t.body.cloneNode(!0);
+    return d.querySelectorAll("script, style").forEach((i) => i.remove()), {
+      html: d.innerHTML.trim(),
+      css: r.trim(),
+      js: n.trim()
     };
   }
   openInCodePen() {
     const e = this.parseHTMLForCodePen();
     if (!e) return;
-    const o = {
+    const t = {
       title: this.browserTitle || "CSS Demo",
       description: `Demo from ${this.url}`,
       html: e.html,
@@ -165,10 +212,10 @@ class c extends HTMLElement {
       js: e.js,
       editors: "110"
       // Show HTML and CSS editors, hide JS if empty
-    }, t = document.createElement("form");
-    t.action = "https://codepen.io/pen/define", t.method = "POST", t.target = "_blank";
-    const i = document.createElement("input");
-    i.type = "hidden", i.name = "data", i.value = JSON.stringify(o), t.appendChild(i), document.body.appendChild(t), t.submit(), document.body.removeChild(t), this.toggleShareMenu();
+    }, r = document.createElement("form");
+    r.action = "https://codepen.io/pen/define", r.method = "POST", r.target = "_blank";
+    const n = document.createElement("input");
+    n.type = "hidden", n.name = "data", n.value = JSON.stringify(t), r.appendChild(n), document.body.appendChild(r), r.submit(), document.body.removeChild(r), this.toggleShareMenu();
   }
   handleClose() {
     this.isMaximized && this.toggleMaximize();
@@ -208,12 +255,12 @@ class c extends HTMLElement {
     const e = this.shadowRoot.querySelector(".control-button.maximize");
     if (this.isMaximized) {
       this.classList.remove("browser-window-maximized"), this.removeAttribute("role"), this.removeAttribute("aria-modal");
-      const o = this.shadowRoot.querySelector("iframe");
-      o && (o.style.minHeight = ""), this.removeOverlay(), this.isMaximized = !1, e && (e.setAttribute("aria-label", "Maximize window"), e.setAttribute("aria-expanded", "false"));
+      const t = this.shadowRoot.querySelector("iframe");
+      t && (t.style.minHeight = ""), this.removeOverlay(), this.isMaximized = !1, e && (e.setAttribute("aria-label", "Maximize window"), e.setAttribute("aria-expanded", "false"));
     } else {
       this.isMinimized && this.toggleMinimize(), this.createOverlay(), this.classList.add("browser-window-maximized"), this.setAttribute("role", "dialog"), this.setAttribute("aria-modal", "true");
-      const o = this.shadowRoot.querySelector("iframe");
-      o && (o.style.minHeight = "calc(90vh - 50px)"), this.isMaximized = !0, e && (e.setAttribute("aria-label", "Restore window"), e.setAttribute("aria-expanded", "true"));
+      const t = this.shadowRoot.querySelector("iframe");
+      t && (t.style.minHeight = "calc(90vh - 50px)"), this.isMaximized = !0, e && (e.setAttribute("aria-label", "Restore window"), e.setAttribute("aria-expanded", "true"));
     }
   }
   render() {
@@ -269,6 +316,29 @@ class c extends HTMLElement {
             --browser-window-hover-bg: #3a3a3c;
             --browser-window-content-bg: #000000;
           }
+        }
+
+        /* Page-level dark mode detection (overrides media query via higher specificity) */
+        :host([data-page-mode="dark"]:not([mode])) {
+          --browser-window-bg: #1c1c1e;
+          --browser-window-header-bg: #2c2c2e;
+          --browser-window-border-color: #3a3a3c;
+          --browser-window-text-color: #e5e5e7;
+          --browser-window-text-muted: #98989d;
+          --browser-window-url-bg: #1c1c1e;
+          --browser-window-hover-bg: #3a3a3c;
+          --browser-window-content-bg: #000000;
+        }
+
+        :host([data-page-mode="light"]:not([mode])) {
+          --browser-window-bg: #ffffff;
+          --browser-window-header-bg: #f6f8fa;
+          --browser-window-border-color: #d1d5da;
+          --browser-window-text-color: #24292e;
+          --browser-window-text-muted: #586069;
+          --browser-window-url-bg: #ffffff;
+          --browser-window-hover-bg: #f3f4f6;
+          --browser-window-content-bg: #ffffff;
         }
 
         /* Explicit dark mode override */
@@ -820,11 +890,11 @@ class c extends HTMLElement {
     `;
   }
   escapeHtml(e) {
-    const o = document.createElement("div");
-    return o.textContent = e, o.innerHTML;
+    const t = document.createElement("div");
+    return t.textContent = e, t.innerHTML;
   }
 }
-customElements.define("browser-window", c);
+customElements.define("browser-window", v);
 export {
-  c as BrowserWindow
+  v as BrowserWindow
 };

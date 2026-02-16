@@ -79,7 +79,7 @@
       <section id="dark-mode" class="demo-section">
         <h2>Light &amp; Dark Mode</h2>
         <p class="demo-description">
-          The component automatically follows system theme preference. Use <code>mode="light"</code> or <code>mode="dark"</code> to override.
+          Use <code>mode="light"</code> or <code>mode="dark"</code> to pin the theme. These components ignore the page theme toggle.
         </p>
         <div class="side-by-side">
           <browser-window mode="light" url="https://example.com" title="Light Mode (forced)">
@@ -100,6 +100,41 @@
 &lt;browser-window mode="dark" url="https://example.com" title="Dark Mode"&gt;
   &lt;div class="content"&gt;Always dark&lt;/div&gt;
 &lt;/browser-window&gt;</code-block>
+      </section>
+
+      <section id="page-dark-mode" class="demo-section">
+        <h2>Page-Level Dark Mode Detection</h2>
+        <p class="demo-description">
+          When no <code>mode</code> attribute is set, the component automatically follows
+          page-level dark mode signals. Click the <strong>theme toggle button</strong> (🌓) in the
+          top-right corner and watch these components switch themes automatically.
+        </p>
+        <div class="side-by-side">
+          <browser-window url="https://example.com/auto" title="Auto-Detects Theme" shadow>
+            <div class="fill-content light-fill">
+              <p style="margin: 0">No <code>mode</code> attribute &mdash; follows page theme</p>
+            </div>
+          </browser-window>
+          <browser-window mode="light" url="https://example.com/pinned" title="Pinned to Light" shadow>
+            <div class="fill-content light-fill">
+              <p style="margin: 0"><code>mode="light"</code> &mdash; stays light always</p>
+            </div>
+          </browser-window>
+        </div>
+        <code-block language="html" class="demo-code">&lt;!-- Automatically follows page theme toggle --&gt;
+&lt;browser-window url="https://example.com" title="Auto Theme"&gt;
+  ...
+&lt;/browser-window&gt;
+
+&lt;!-- Pinned to light — ignores page theme --&gt;
+&lt;browser-window mode="light" url="https://example.com" title="Always Light"&gt;
+  ...
+&lt;/browser-window&gt;</code-block>
+        <p class="demo-description" style="margin-top: 1rem;">
+          Detected signals: <code>body.dark</code> class (Tailwind/docs sites),
+          <code>data-theme="dark"</code>, <code>data-bs-theme="dark"</code> (Bootstrap 5),
+          and <code>color-scheme: dark</code> computed style.
+        </p>
       </section>
 
       <section id="resize" class="demo-section">
@@ -213,7 +248,7 @@
       </p>
     </footer>
 
-    <script type="module" src="https://cdn.jsdelivr.net/gh/ProfPowell/browser-window@main/dist/browser-window.min.js"></script>
+    <script type="module" src="../dist/browser-window.js"></script>
     <script type="module" src="https://cdn.jsdelivr.net/gh/ProfPowell/code-block@v2.0.1/dist/code-block.min.js"></script>
     <script>
       // Theme toggle
