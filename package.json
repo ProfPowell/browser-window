@@ -1,6 +1,6 @@
 {
   "name": "@profpowell/browser-window",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A Safari-style browser window web component for demos and tutorials",
   "type": "module",
   "main": "dist/browser-window.js",
