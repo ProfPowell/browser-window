@@ -1,6 +1,6 @@
 const a = /* @__PURE__ */ new Set();
 let s = null, c = null;
-function w() {
+function h() {
   const o = document.documentElement, e = document.body;
   if (!o || !e) return null;
   if (o.classList.contains("dark") || e.classList.contains("dark") || o.getAttribute("data-theme") === "dark" || e.getAttribute("data-theme") === "dark") return !0;
@@ -10,17 +10,17 @@ function w() {
   const t = getComputedStyle(o).colorScheme;
   return t === "dark" ? !0 : t === "light" ? !1 : null;
 }
-function b() {
-  const o = w();
+function m() {
+  const o = h();
   if (o !== c) {
     c = o;
     for (const e of a)
       e._onPageModeChange(o);
   }
 }
-function m() {
+function f() {
   if (s) return;
-  s = new MutationObserver(b);
+  s = new MutationObserver(m);
   const o = {
     attributes: !0,
     attributeFilter: ["class", "data-theme", "data-bs-theme", "style"]
@@ -30,29 +30,29 @@ function m() {
 function g() {
   s && (s.disconnect(), s = null);
 }
-function f(o) {
-  a.add(o), a.size === 1 && m();
-  const e = w();
+function p(o) {
+  a.add(o), a.size === 1 && f();
+  const e = h();
   c = e, o._onPageModeChange(e);
 }
-function p(o) {
+function v(o) {
   a.delete(o), a.size === 0 && (g(), c = null);
 }
-class v extends HTMLElement {
+class x extends HTMLElement {
   constructor() {
     super(), this.attachShadow({ mode: "open" }), this.isMinimized = !1, this.isMaximized = !1, this.overlay = null, this.showSource = !1, this.sourceCode = "", this.showShareMenu = !1, this.handleKeydown = this.handleKeydown.bind(this), this.handleOutsideClick = this.handleOutsideClick.bind(this);
   }
   async connectedCallback() {
-    this.render(), this.attachEventListeners(), this.src && await this.fetchSourceCode(), f(this);
+    this.render(), this.attachEventListeners(), this.src && await this.fetchSourceCode(), p(this);
   }
   disconnectedCallback() {
-    p(this), this.removeOverlay(), document.removeEventListener("keydown", this.handleKeydown), document.removeEventListener("click", this.handleOutsideClick);
+    v(this), this.removeOverlay(), document.removeEventListener("keydown", this.handleKeydown), document.removeEventListener("click", this.handleOutsideClick);
   }
   static get observedAttributes() {
     return ["url", "title", "mode", "shadow", "src"];
   }
   attributeChangedCallback(e) {
-    this.shadowRoot && (this.render(), this.attachEventListeners()), e === "mode" && (this.hasAttribute("mode") ? this.removeAttribute("data-page-mode") : this._onPageModeChange(w()));
+    this.shadowRoot && (this.render(), this.attachEventListeners()), e === "mode" && (this.hasAttribute("mode") ? this.removeAttribute("data-page-mode") : this._onPageModeChange(h()));
   }
   get url() {
     return this.getAttribute("url") || "";
@@ -71,7 +71,17 @@ class v extends HTMLElement {
       this.removeAttribute("data-page-mode");
       return;
     }
-    e === !0 ? this.setAttribute("data-page-mode", "dark") : e === !1 ? this.setAttribute("data-page-mode", "light") : this.removeAttribute("data-page-mode");
+    e === !0 ? this.setAttribute("data-page-mode", "dark") : e === !1 ? this.setAttribute("data-page-mode", "light") : this.removeAttribute("data-page-mode"), this._syncIframeColorScheme();
+  }
+  _syncIframeColorScheme() {
+    const e = this.shadowRoot?.querySelector("iframe");
+    if (!e) return;
+    const t = this.mode === "dark";
+    try {
+      const r = e.contentDocument;
+      r?.documentElement && (r.documentElement.style.colorScheme = t ? "dark" : "light");
+    } catch {
+    }
   }
   get hasShadow() {
     return this.hasAttribute("shadow");
@@ -84,13 +94,15 @@ class v extends HTMLElement {
     }
   }
   attachEventListeners() {
-    const e = this.shadowRoot.querySelector(".control-button.close"), t = this.shadowRoot.querySelector(".control-button.minimize"), r = this.shadowRoot.querySelector(".control-button.maximize"), n = this.shadowRoot.querySelector(".view-source-button"), d = this.shadowRoot.querySelector(".copy-source-button"), h = this.shadowRoot.querySelector(".share-button"), i = this.shadowRoot.querySelector(".browser-header");
-    e?.addEventListener("click", () => this.handleClose()), t?.addEventListener("click", () => this.toggleMinimize()), r?.addEventListener("click", () => this.toggleMaximize()), n?.addEventListener("click", () => this.toggleViewSource()), d?.addEventListener("click", () => this.copySourceCode()), h?.addEventListener("click", (l) => {
+    const e = this.shadowRoot.querySelector(".control-button.close"), t = this.shadowRoot.querySelector(".control-button.minimize"), r = this.shadowRoot.querySelector(".control-button.maximize"), n = this.shadowRoot.querySelector(".view-source-button"), d = this.shadowRoot.querySelector(".copy-source-button"), w = this.shadowRoot.querySelector(".share-button"), i = this.shadowRoot.querySelector(".browser-header");
+    e?.addEventListener("click", () => this.handleClose()), t?.addEventListener("click", () => this.toggleMinimize()), r?.addEventListener("click", () => this.toggleMaximize()), n?.addEventListener("click", () => this.toggleViewSource()), d?.addEventListener("click", () => this.copySourceCode()), w?.addEventListener("click", (l) => {
       l.stopPropagation(), this.toggleShareMenu();
     }), i?.addEventListener("dblclick", (l) => {
-      const u = l.target;
-      (u.classList.contains("browser-header") || u.classList.contains("controls")) && this.toggleMaximize();
-    }), this.shadowRoot.querySelector("iframe")?.addEventListener("error", () => this.handleIframeError());
+      const b = l.target;
+      (b.classList.contains("browser-header") || b.classList.contains("controls")) && this.toggleMaximize();
+    });
+    const u = this.shadowRoot.querySelector("iframe");
+    u?.addEventListener("error", () => this.handleIframeError()), u?.addEventListener("load", () => this._syncIframeColorScheme());
   }
   handleIframeError() {
     const e = this.shadowRoot.querySelector(".browser-content");
@@ -109,7 +121,9 @@ class v extends HTMLElement {
   retryLoad() {
     const e = this.shadowRoot.querySelector(".browser-content");
     if (!e || !this.src) return;
-    e.innerHTML = `<iframe src="${this.escapeHtml(this.src)}" loading="lazy"></iframe>`, e.querySelector("iframe")?.addEventListener("error", () => this.handleIframeError());
+    e.innerHTML = `<iframe src="${this.escapeHtml(this.src)}" loading="lazy"></iframe>`;
+    const t = e.querySelector("iframe");
+    t?.addEventListener("error", () => this.handleIframeError()), t?.addEventListener("load", () => this._syncIframeColorScheme());
   }
   async fetchSourceCode() {
     if (this.src)
@@ -139,7 +153,7 @@ class v extends HTMLElement {
           </div>
           <pre><code>${this.escapeHtml(this.sourceCode)}</code></pre>
         </div>
-      `, t.classList.add("active"), e.querySelector(".copy-source-button")?.addEventListener("click", () => this.copySourceCode())) : (this.src ? e.innerHTML = `<iframe src="${this.escapeHtml(this.src)}" loading="lazy"></iframe>` : e.innerHTML = "<slot></slot>", t.classList.remove("active")));
+      `, t.classList.add("active"), e.querySelector(".copy-source-button")?.addEventListener("click", () => this.copySourceCode())) : (this.src ? (e.innerHTML = `<iframe src="${this.escapeHtml(this.src)}" loading="lazy"></iframe>`, e.querySelector("iframe")?.addEventListener("load", () => this._syncIframeColorScheme())) : e.innerHTML = "<slot></slot>", t.classList.remove("active")));
   }
   async copySourceCode() {
     if (this.sourceCode)
@@ -901,7 +915,7 @@ class v extends HTMLElement {
     return t.textContent = e, t.innerHTML;
   }
 }
-customElements.define("browser-window", v);
+customElements.define("browser-window", x);
 export {
-  v as BrowserWindow
+  x as BrowserWindow
 };

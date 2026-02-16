@@ -242,6 +242,60 @@ test.describe('browser-window', () => {
     })
   })
 
+  test.describe('iframe dark mode propagation', () => {
+    test('sets color-scheme: dark on iframe contentDocument when page goes dark', async ({ page }) => {
+      const el = page.locator('#with-src')
+
+      // Wait for iframe to load
+      const iframe = el.locator('iframe')
+      await iframe.waitFor({ state: 'attached' })
+      await page.waitForTimeout(500) // wait for iframe load event
+
+      // Trigger dark mode via body class
+      await page.evaluate(() => document.body.classList.add('dark'))
+      await page.waitForFunction(() => {
+        const el = document.querySelector('#with-src')
+        return el.getAttribute('data-page-mode') === 'dark'
+      })
+
+      // Check iframe contentDocument color-scheme
+      const colorScheme = await el.evaluate((node) => {
+        const iframe = node.shadowRoot.querySelector('iframe')
+        return iframe?.contentDocument?.documentElement?.style.colorScheme
+      })
+      expect(colorScheme).toBe('dark')
+    })
+
+    test('sets color-scheme back to light when page goes light', async ({ page }) => {
+      const el = page.locator('#with-src')
+
+      // Wait for iframe to load
+      const iframe = el.locator('iframe')
+      await iframe.waitFor({ state: 'attached' })
+      await page.waitForTimeout(500)
+
+      // Go dark first
+      await page.evaluate(() => document.body.classList.add('dark'))
+      await page.waitForFunction(() => {
+        const el = document.querySelector('#with-src')
+        return el.getAttribute('data-page-mode') === 'dark'
+      })
+
+      // Go back to light
+      await page.evaluate(() => document.body.classList.remove('dark'))
+      await page.waitForFunction(() => {
+        const el = document.querySelector('#with-src')
+        return el.getAttribute('data-page-mode') === null
+      })
+
+      const colorScheme = await el.evaluate((node) => {
+        const iframe = node.shadowRoot.querySelector('iframe')
+        return iframe?.contentDocument?.documentElement?.style.colorScheme
+      })
+      expect(colorScheme).toBe('light')
+    })
+  })
+
   test.describe('page-level dark mode', () => {
     test('detects body.dark class and sets data-page-mode="dark"', async ({ page }) => {
       const el = page.locator('#no-mode')

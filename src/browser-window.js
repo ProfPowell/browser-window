@@ -199,6 +199,21 @@ export class BrowserWindow extends HTMLElement {
     } else {
       this.removeAttribute('data-page-mode');
     }
+    this._syncIframeColorScheme();
+  }
+
+  _syncIframeColorScheme() {
+    const iframe = this.shadowRoot?.querySelector('iframe');
+    if (!iframe) return;
+    const isDark = this.mode === 'dark';
+    try {
+      const doc = iframe.contentDocument;
+      if (doc?.documentElement) {
+        doc.documentElement.style.colorScheme = isDark ? 'dark' : 'light';
+      }
+    } catch (e) {
+      // Cross-origin iframe — silently ignore
+    }
   }
 
   get hasShadow() {
@@ -244,9 +259,10 @@ export class BrowserWindow extends HTMLElement {
       }
     });
 
-    // Handle iframe load errors
+    // Handle iframe load errors and sync color scheme
     const iframe = this.shadowRoot.querySelector('iframe');
     iframe?.addEventListener('error', () => this.handleIframeError());
+    iframe?.addEventListener('load', () => this._syncIframeColorScheme());
   }
 
   handleIframeError() {
@@ -272,9 +288,10 @@ export class BrowserWindow extends HTMLElement {
 
     content.innerHTML = `<iframe src="${this.escapeHtml(this.src)}" loading="lazy"></iframe>`;
 
-    // Re-attach error handler
+    // Re-attach error handler and sync color scheme
     const iframe = content.querySelector('iframe');
     iframe?.addEventListener('error', () => this.handleIframeError());
+    iframe?.addEventListener('load', () => this._syncIframeColorScheme());
   }
 
   async fetchSourceCode() {
@@ -328,6 +345,8 @@ export class BrowserWindow extends HTMLElement {
       // Restore original content
       if (this.src) {
         content.innerHTML = `<iframe src="${this.escapeHtml(this.src)}" loading="lazy"></iframe>`;
+        const newIframe = content.querySelector('iframe');
+        newIframe?.addEventListener('load', () => this._syncIframeColorScheme());
       } else {
         content.innerHTML = '<slot></slot>';
       }
