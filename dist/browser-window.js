@@ -296,6 +296,8 @@ class v extends HTMLElement {
           box-shadow: var(--browser-window-shadow);
           transition: all 250ms ease-out;
           font-family: var(--browser-window-font-family);
+          color: var(--browser-window-text-color);
+          color-scheme: light;
 
           /* Resizable container */
           resize: both;
@@ -315,6 +317,7 @@ class v extends HTMLElement {
             --browser-window-url-bg: #1c1c1e;
             --browser-window-hover-bg: #3a3a3c;
             --browser-window-content-bg: #000000;
+            color-scheme: dark;
           }
         }
 
@@ -328,6 +331,7 @@ class v extends HTMLElement {
           --browser-window-url-bg: #1c1c1e;
           --browser-window-hover-bg: #3a3a3c;
           --browser-window-content-bg: #000000;
+          color-scheme: dark;
         }
 
         :host([data-page-mode="light"]:not([mode])) {
@@ -339,6 +343,7 @@ class v extends HTMLElement {
           --browser-window-url-bg: #ffffff;
           --browser-window-hover-bg: #f3f4f6;
           --browser-window-content-bg: #ffffff;
+          color-scheme: light;
         }
 
         /* Explicit dark mode override */
@@ -351,6 +356,7 @@ class v extends HTMLElement {
           --browser-window-url-bg: #1c1c1e;
           --browser-window-hover-bg: #3a3a3c;
           --browser-window-content-bg: #000000;
+          color-scheme: dark;
         }
 
         /* Explicit light mode override (for users on dark system who want light) */
@@ -363,6 +369,7 @@ class v extends HTMLElement {
           --browser-window-url-bg: #ffffff;
           --browser-window-hover-bg: #f3f4f6;
           --browser-window-content-bg: #ffffff;
+          color-scheme: light;
         }
 
         :host(.browser-window-maximized) {

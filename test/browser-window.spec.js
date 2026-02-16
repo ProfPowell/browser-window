@@ -103,6 +103,35 @@ test.describe('browser-window', () => {
       expect(style).toContain(':host(:not([mode]))')
     })
 
+    test('base :host sets color from custom property', async ({ page }) => {
+      const el = page.locator('#default')
+      const style = await el.evaluate((node) => {
+        const styleEl = node.shadowRoot.querySelector('style')
+        return styleEl?.textContent || ''
+      })
+      expect(style).toContain('color: var(--browser-window-text-color)')
+    })
+
+    test('base :host sets color-scheme: light', async ({ page }) => {
+      const el = page.locator('#default')
+      const style = await el.evaluate((node) => {
+        const styleEl = node.shadowRoot.querySelector('style')
+        return styleEl?.textContent || ''
+      })
+      expect(style).toMatch(/color-scheme:\s*light/)
+    })
+
+    test('dark mode blocks include color-scheme: dark', async ({ page }) => {
+      const el = page.locator('#dark-mode')
+      const style = await el.evaluate((node) => {
+        const styleEl = node.shadowRoot.querySelector('style')
+        return styleEl?.textContent || ''
+      })
+      // The :host([mode="dark"]) block should contain color-scheme: dark
+      const darkBlock = style.match(/:host\(\[mode="dark"\]\)\s*\{[^}]+\}/)?.[0] || ''
+      expect(darkBlock).toContain('color-scheme: dark')
+    })
+
     test('explicit mode="light" overrides system preference', async ({ page }) => {
       const el = page.locator('#light-mode')
       const style = await el.evaluate((node) => {

@@ -95,14 +95,9 @@
         text-align: center;
       }
 
-      .light-fill {
-        background: #e0f2fe;
-        color: #1e293b;
-      }
-
-      .dark-fill {
-        background: #0f172a;
-        color: #f1f5f9;
+      .fill-adaptive {
+        background: var(--browser-window-content-bg, #e0f2fe);
+        color: var(--browser-window-text-color, #1e293b);
       }
 
       .blue-fill {
@@ -112,12 +107,13 @@
 
       .card-content {
         padding: 2rem;
-        background: #f0f9ff;
+        background: var(--browser-window-content-bg, #f0f9ff);
         min-height: 200px;
       }
 
       .card {
-        background: white;
+        background: var(--browser-window-bg, white);
+        color: var(--browser-window-text-color, #1e293b);
         border-radius: 8px;
         padding: 1.5rem;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -143,12 +139,12 @@
     </p>
     <div class="demo-grid side-by-side">
       <browser-window mode="light" url="https://example.com" title="Light Mode (forced)">
-        <div class="fill-content light-fill">
+        <div class="fill-content fill-adaptive">
           <p style="margin: 0">This window is always light</p>
         </div>
       </browser-window>
       <browser-window mode="dark" url="https://example.com" title="Dark Mode (forced)">
-        <div class="fill-content dark-fill">
+        <div class="fill-content fill-adaptive">
           <p style="margin: 0">This window is always dark</p>
         </div>
       </browser-window>
@@ -173,8 +169,8 @@
     <browser-window url="https://myapp.example.com" title="My App Dashboard" shadow>
       <div class="card-content">
         <div class="card">
-          <h3 style="margin: 0 0 0.5rem; color: #1e293b">Dashboard</h3>
-          <p style="margin: 0; color: #64748b; font-size: 0.875rem">
+          <h3 style="margin: 0 0 0.5rem">Dashboard</h3>
+          <p style="margin: 0; font-size: 0.875rem; color: var(--browser-window-text-muted, #64748b)">
             Welcome back! Your stats are looking great.
           </p>
         </div>
