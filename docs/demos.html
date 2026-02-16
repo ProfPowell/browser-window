@@ -193,28 +193,40 @@
         <style>
           .purple-theme {
             --browser-window-accent-color: #8b5cf6;
-            --browser-window-header-bg: #faf5ff;
+            --browser-window-bg: #faf5ff;
+            --browser-window-header-bg: #f3e8ff;
             --browser-window-border-color: #c4b5fd;
+            --browser-window-url-bg: #faf5ff;
+            --browser-window-hover-bg: #ede9fe;
+            --browser-window-content-bg: #f5f3ff;
+            --browser-window-text-color: #4c1d95;
+            --browser-window-text-muted: #6d28d9;
             --browser-window-close-color: #f472b6;
             --browser-window-minimize-color: #a78bfa;
             --browser-window-maximize-color: #34d399;
           }
         </style>
-        <browser-window class="purple-theme" url="https://example.com" title="Purple Theme" shadow>
-          <div class="fill-content" style="background: #f5f3ff; color: #4c1d95;">
+        <browser-window class="purple-theme" mode="light" url="https://example.com" title="Purple Theme" shadow>
+          <div class="fill-content fill-adaptive">
             <p style="margin: 0">Custom purple theme using CSS custom properties</p>
           </div>
         </browser-window>
         <code-block language="css" class="demo-code">.purple-theme {
   --browser-window-accent-color: #8b5cf6;
-  --browser-window-header-bg: #faf5ff;
+  --browser-window-bg: #faf5ff;
+  --browser-window-header-bg: #f3e8ff;
   --browser-window-border-color: #c4b5fd;
+  --browser-window-url-bg: #faf5ff;
+  --browser-window-hover-bg: #ede9fe;
+  --browser-window-content-bg: #f5f3ff;
+  --browser-window-text-color: #4c1d95;
+  --browser-window-text-muted: #6d28d9;
   --browser-window-close-color: #f472b6;
   --browser-window-minimize-color: #a78bfa;
   --browser-window-maximize-color: #34d399;
 }
 
-&lt;browser-window class="purple-theme" url="https://example.com"&gt;
+&lt;browser-window class="purple-theme" mode="light" url="https://example.com"&gt;
   ...
 &lt;/browser-window&gt;</code-block>
       </section>
