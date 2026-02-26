@@ -1,58 +1,174 @@
-const a = /* @__PURE__ */ new Set();
-let s = null, c = null;
-function h() {
-  const o = document.documentElement, e = document.body;
-  if (!o || !e) return null;
-  if (o.classList.contains("dark") || e.classList.contains("dark") || o.getAttribute("data-theme") === "dark" || e.getAttribute("data-theme") === "dark") return !0;
-  if (o.getAttribute("data-theme") === "light" || e.getAttribute("data-theme") === "light") return !1;
-  if (o.getAttribute("data-bs-theme") === "dark" || e.getAttribute("data-bs-theme") === "dark") return !0;
-  if (o.getAttribute("data-bs-theme") === "light" || e.getAttribute("data-bs-theme") === "light") return !1;
-  const t = getComputedStyle(o).colorScheme;
+const w = /* @__PURE__ */ new Set();
+let l = null, m = null;
+function p() {
+  const i = document.documentElement, e = document.body;
+  if (!i || !e) return null;
+  if (i.classList.contains("dark") || e.classList.contains("dark") || i.getAttribute("data-theme") === "dark" || e.getAttribute("data-theme") === "dark")
+    return !0;
+  if (i.getAttribute("data-theme") === "light" || e.getAttribute("data-theme") === "light")
+    return !1;
+  if (i.getAttribute("data-bs-theme") === "dark" || e.getAttribute("data-bs-theme") === "dark")
+    return !0;
+  if (i.getAttribute("data-bs-theme") === "light" || e.getAttribute("data-bs-theme") === "light")
+    return !1;
+  const t = getComputedStyle(i).colorScheme;
   return t === "dark" ? !0 : t === "light" ? !1 : null;
 }
-function m() {
-  const o = h();
-  if (o !== c) {
-    c = o;
-    for (const e of a)
-      e._onPageModeChange(o);
+function y() {
+  const i = p();
+  if (i !== m) {
+    m = i;
+    for (const e of w)
+      e._onPageModeChange(i);
   }
 }
-function f() {
-  if (s) return;
-  s = new MutationObserver(m);
-  const o = {
+function k() {
+  if (l) return;
+  l = new MutationObserver(y);
+  const i = {
     attributes: !0,
     attributeFilter: ["class", "data-theme", "data-bs-theme", "style"]
   };
-  s.observe(document.documentElement, o), document.body && s.observe(document.body, o);
+  l.observe(document.documentElement, i), document.body && l.observe(document.body, i);
 }
-function g() {
-  s && (s.disconnect(), s = null);
+function S() {
+  l && (l.disconnect(), l = null);
 }
-function p(o) {
-  a.add(o), a.size === 1 && f();
-  const e = h();
-  c = e, o._onPageModeChange(e);
+function z(i) {
+  w.add(i), w.size === 1 && k();
+  const e = p();
+  m = e, i._onPageModeChange(e);
 }
-function v(o) {
-  a.delete(o), a.size === 0 && (g(), c = null);
+function C(i) {
+  w.delete(i), w.size === 0 && (S(), m = null);
 }
-class x extends HTMLElement {
+const g = {
+  "iphone-16": {
+    width: 393,
+    height: 852,
+    bezel: 12,
+    notch: "dynamic-island",
+    cornerRadius: 55,
+    homeIndicator: !0,
+    homeButton: !1,
+    safeInsets: [59, 0, 34, 0]
+  },
+  "iphone-16-pro-max": {
+    width: 440,
+    height: 956,
+    bezel: 12,
+    notch: "dynamic-island",
+    cornerRadius: 55,
+    homeIndicator: !0,
+    homeButton: !1,
+    safeInsets: [59, 0, 34, 0]
+  },
+  "iphone-se": {
+    width: 375,
+    height: 667,
+    bezel: 12,
+    notch: "none",
+    cornerRadius: 0,
+    homeIndicator: !1,
+    homeButton: !0,
+    safeInsets: [20, 0, 0, 0]
+  },
+  "pixel-9": {
+    width: 412,
+    height: 923,
+    bezel: 10,
+    notch: "punch-hole",
+    cornerRadius: 48,
+    homeIndicator: !0,
+    homeButton: !1,
+    safeInsets: [48, 0, 24, 0]
+  },
+  "pixel-9-pro-xl": {
+    width: 448,
+    height: 998,
+    bezel: 10,
+    notch: "punch-hole",
+    cornerRadius: 48,
+    homeIndicator: !0,
+    homeButton: !1,
+    safeInsets: [48, 0, 24, 0]
+  },
+  "galaxy-s24": {
+    width: 360,
+    height: 780,
+    bezel: 10,
+    notch: "punch-hole",
+    cornerRadius: 40,
+    homeIndicator: !0,
+    homeButton: !1,
+    safeInsets: [48, 0, 24, 0]
+  },
+  "ipad-air": {
+    width: 820,
+    height: 1180,
+    bezel: 16,
+    notch: "none",
+    cornerRadius: 18,
+    homeIndicator: !0,
+    homeButton: !1,
+    safeInsets: [24, 0, 20, 0]
+  },
+  "ipad-pro-13": {
+    width: 1032,
+    height: 1376,
+    bezel: 16,
+    notch: "none",
+    cornerRadius: 18,
+    homeIndicator: !0,
+    homeButton: !1,
+    safeInsets: [24, 0, 20, 0]
+  },
+  "ipad-mini": {
+    width: 744,
+    height: 1133,
+    bezel: 16,
+    notch: "none",
+    cornerRadius: 18,
+    homeIndicator: !0,
+    homeButton: !1,
+    safeInsets: [24, 0, 20, 0]
+  }
+}, v = {
+  midnight: "#1a1a1a",
+  silver: "#c0c0c0",
+  gold: "#d4a574",
+  blue: "#3a4f6f",
+  white: "#f0f0f0"
+}, M = {
+  "dynamic-island": 54,
+  "punch-hole": 36,
+  none: 24
+}, _ = 28, x = 80;
+class L extends HTMLElement {
   constructor() {
-    super(), this.attachShadow({ mode: "open" }), this.isMinimized = !1, this.isMaximized = !1, this.overlay = null, this.showSource = !1, this.sourceCode = "", this.showShareMenu = !1, this.handleKeydown = this.handleKeydown.bind(this), this.handleOutsideClick = this.handleOutsideClick.bind(this);
+    super(), this.attachShadow({ mode: "open" }), this.isMinimized = !1, this.isMaximized = !1, this.overlay = null, this.showSource = !1, this.sourceCode = "", this.showShareMenu = !1, this.handleKeydown = this.handleKeydown.bind(this), this.handleOutsideClick = this.handleOutsideClick.bind(this), this._resizeObserver = null, this._currentScale = 1;
   }
   async connectedCallback() {
-    this.render(), this.attachEventListeners(), this.src && await this.fetchSourceCode(), p(this);
+    this.render(), this.attachEventListeners(), this.src && await this.fetchSourceCode(), z(this), this._getDevicePreset() && this._setupDeviceScaling();
   }
   disconnectedCallback() {
-    v(this), this.removeOverlay(), document.removeEventListener("keydown", this.handleKeydown), document.removeEventListener("click", this.handleOutsideClick);
+    C(this), this.removeOverlay(), this._teardownDeviceScaling(), document.removeEventListener("keydown", this.handleKeydown), document.removeEventListener("click", this.handleOutsideClick);
   }
   static get observedAttributes() {
-    return ["url", "title", "mode", "shadow", "src"];
+    return [
+      "url",
+      "title",
+      "mode",
+      "shadow",
+      "src",
+      "device",
+      "device-color",
+      "orientation",
+      "show-safe-areas"
+    ];
   }
   attributeChangedCallback(e) {
-    this.shadowRoot && (this.render(), this.attachEventListeners()), e === "mode" && (this.hasAttribute("mode") ? this.removeAttribute("data-page-mode") : this._onPageModeChange(h()));
+    this.shadowRoot && (this.render(), this.attachEventListeners()), (e === "device" || e === "orientation") && (this._teardownDeviceScaling(), this._getDevicePreset() && this._setupDeviceScaling()), e === "mode" && (this.hasAttribute("mode") ? this.removeAttribute("data-page-mode") : this._onPageModeChange(p()));
   }
   get url() {
     return this.getAttribute("url") || "";
@@ -66,6 +182,31 @@ class x extends HTMLElement {
   get mode() {
     return this.getAttribute("mode") || this.getAttribute("data-page-mode") || "light";
   }
+  get device() {
+    return this.getAttribute("device") || "";
+  }
+  get deviceColor() {
+    return this.getAttribute("device-color") || "midnight";
+  }
+  _getDevicePreset() {
+    const e = this.getAttribute("device");
+    if (!e) return null;
+    const t = g[e];
+    return t || (console.warn(
+      `<browser-window>: Unknown device preset "${e}", falling back to "iphone-16"`
+    ), g["iphone-16"]);
+  }
+  _getEffectiveDimensions(e) {
+    const t = this.getAttribute("orientation") === "landscape";
+    return {
+      width: t ? e.height : e.width,
+      height: t ? e.width : e.height
+    };
+  }
+  _getEffectiveSafeInsets(e) {
+    const [t, o, r, s] = e.safeInsets;
+    return this.getAttribute("orientation") === "landscape" ? [s, t, o, r] : [t, o, r, s];
+  }
   _onPageModeChange(e) {
     if (this.hasAttribute("mode")) {
       this.removeAttribute("data-page-mode");
@@ -78,10 +219,31 @@ class x extends HTMLElement {
     if (!e) return;
     const t = this.mode === "dark";
     try {
-      const r = e.contentDocument;
-      r?.documentElement && (r.documentElement.style.colorScheme = t ? "dark" : "light");
+      const o = e.contentDocument;
+      o?.documentElement && (o.documentElement.style.colorScheme = t ? "dark" : "light");
     } catch {
     }
+  }
+  _injectSafeAreas(e) {
+    const t = this._getDevicePreset();
+    if (t)
+      try {
+        const o = e.contentDocument;
+        if (!o) return;
+        const r = o.querySelector("style[data-browser-window-safe-areas]");
+        r && r.remove();
+        const [s, c, n, d] = this._getEffectiveSafeInsets(t), a = o.createElement("style");
+        a.setAttribute("data-browser-window-safe-areas", ""), a.textContent = `
+        :root {
+          --safe-top: ${s}px;
+          --safe-right: ${c}px;
+          --safe-bottom: ${n}px;
+          --safe-left: ${d}px;
+        }
+      `, o.head.appendChild(a);
+      } catch {
+        console.info("<browser-window>: Cannot inject safe areas into cross-origin iframe");
+      }
   }
   get hasShadow() {
     return this.hasAttribute("shadow");
@@ -94,15 +256,17 @@ class x extends HTMLElement {
     }
   }
   attachEventListeners() {
-    const e = this.shadowRoot.querySelector(".control-button.close"), t = this.shadowRoot.querySelector(".control-button.minimize"), r = this.shadowRoot.querySelector(".control-button.maximize"), n = this.shadowRoot.querySelector(".view-source-button"), d = this.shadowRoot.querySelector(".copy-source-button"), w = this.shadowRoot.querySelector(".share-button"), i = this.shadowRoot.querySelector(".browser-header");
-    e?.addEventListener("click", () => this.handleClose()), t?.addEventListener("click", () => this.toggleMinimize()), r?.addEventListener("click", () => this.toggleMaximize()), n?.addEventListener("click", () => this.toggleViewSource()), d?.addEventListener("click", () => this.copySourceCode()), w?.addEventListener("click", (l) => {
-      l.stopPropagation(), this.toggleShareMenu();
-    }), i?.addEventListener("dblclick", (l) => {
-      const b = l.target;
-      (b.classList.contains("browser-header") || b.classList.contains("controls")) && this.toggleMaximize();
+    const e = this.shadowRoot.querySelector(".control-button.close"), t = this.shadowRoot.querySelector(".control-button.minimize"), o = this.shadowRoot.querySelector(".control-button.maximize"), r = this.shadowRoot.querySelector(".view-source-button"), s = this.shadowRoot.querySelector(".copy-source-button"), c = this.shadowRoot.querySelector(".share-button"), n = this.shadowRoot.querySelector(".browser-header");
+    e?.addEventListener("click", () => this.handleClose()), t?.addEventListener("click", () => this.toggleMinimize()), o?.addEventListener("click", () => this.toggleMaximize()), r?.addEventListener("click", () => this.toggleViewSource()), s?.addEventListener("click", () => this.copySourceCode()), c?.addEventListener("click", (a) => {
+      a.stopPropagation(), this.toggleShareMenu();
+    }), n?.addEventListener("dblclick", (a) => {
+      const h = a.target;
+      (h.classList.contains("browser-header") || h.classList.contains("controls")) && this.toggleMaximize();
     });
-    const u = this.shadowRoot.querySelector("iframe");
-    u?.addEventListener("error", () => this.handleIframeError()), u?.addEventListener("load", () => this._syncIframeColorScheme());
+    const d = this.shadowRoot.querySelector("iframe");
+    d?.addEventListener("error", () => this.handleIframeError()), d?.addEventListener("load", () => {
+      this._syncIframeColorScheme(), this._getDevicePreset() && this._injectSafeAreas(d);
+    });
   }
   handleIframeError() {
     const e = this.shadowRoot.querySelector(".browser-content");
@@ -204,15 +368,15 @@ class x extends HTMLElement {
   }
   parseHTMLForCodePen() {
     if (!this.sourceCode) return null;
-    const t = new DOMParser().parseFromString(this.sourceCode, "text/html"), r = Array.from(t.querySelectorAll("style")).map((i) => i.textContent).join(`
+    const t = new DOMParser().parseFromString(this.sourceCode, "text/html"), o = Array.from(t.querySelectorAll("style")).map((n) => n.textContent).join(`
 
-`), n = Array.from(t.querySelectorAll("script")).filter((i) => !i.src && i.type !== "module").map((i) => i.textContent).join(`
+`), r = Array.from(t.querySelectorAll("script")).filter((n) => !n.src && n.type !== "module").map((n) => n.textContent).join(`
 
-`), d = t.body.cloneNode(!0);
-    return d.querySelectorAll("script, style").forEach((i) => i.remove()), {
-      html: d.innerHTML.trim(),
-      css: r.trim(),
-      js: n.trim()
+`), s = t.body.cloneNode(!0);
+    return s.querySelectorAll("script, style").forEach((n) => n.remove()), {
+      html: s.innerHTML.trim(),
+      css: o.trim(),
+      js: r.trim()
     };
   }
   openInCodePen() {
@@ -226,10 +390,10 @@ class x extends HTMLElement {
       js: e.js,
       editors: "110"
       // Show HTML and CSS editors, hide JS if empty
-    }, r = document.createElement("form");
-    r.action = "https://codepen.io/pen/define", r.method = "POST", r.target = "_blank";
-    const n = document.createElement("input");
-    n.type = "hidden", n.name = "data", n.value = JSON.stringify(t), r.appendChild(n), document.body.appendChild(r), r.submit(), document.body.removeChild(r), this.toggleShareMenu();
+    }, o = document.createElement("form");
+    o.action = "https://codepen.io/pen/define", o.method = "POST", o.target = "_blank";
+    const r = document.createElement("input");
+    r.type = "hidden", r.name = "data", r.value = JSON.stringify(t), o.appendChild(r), document.body.appendChild(o), o.submit(), document.body.removeChild(o), this.toggleShareMenu();
   }
   handleClose() {
     this.isMaximized && this.toggleMaximize();
@@ -277,9 +441,17 @@ class x extends HTMLElement {
       t && (t.style.minHeight = "calc(90vh - 50px)"), this.isMaximized = !0, e && (e.setAttribute("aria-label", "Restore window"), e.setAttribute("aria-expanded", "true"));
     }
   }
+  // --- Render pipeline ---
   render() {
+    const e = this._getDevicePreset(), t = e ? this._deviceCSS(e) : this._browserCSS(), o = e ? this._deviceChrome(e) : this._browserChrome();
     this.shadowRoot.innerHTML = `
-      <style>
+      <style>${this._sharedCSS()}${t}</style>
+      ${o}
+      ${e ? "" : this._contentHTML()}
+    `, e && this._updateDeviceScale();
+  }
+  _sharedCSS() {
+    return `
         :host {
           /* CSS Custom Properties with light mode defaults */
           --browser-window-bg: #ffffff;
@@ -403,6 +575,169 @@ class x extends HTMLElement {
           }
         }
 
+        .browser-content {
+          background: var(--browser-window-content-bg);
+          min-height: 200px;
+          padding: 0;
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+        }
+
+        /* Slot fills available space */
+        slot {
+          display: flex;
+          flex-direction: column;
+          flex: 1;
+          min-height: 0;
+        }
+
+        /* Slotted content fills the slot */
+        ::slotted(*) {
+          flex: 1;
+          width: 100%;
+          min-height: 0;
+        }
+
+        iframe {
+          display: block;
+          width: 100%;
+          border: none;
+          flex: 1;
+          min-height: 200px;
+        }
+
+        ::slotted(img),
+        ::slotted(iframe) {
+          display: block;
+          border: none;
+          margin: 0;
+        }
+
+        .source-view {
+          padding: 0;
+          background: var(--browser-window-header-bg);
+          min-height: 200px;
+          /* Constrain source view height to prevent container expansion */
+          max-height: 50vh;
+          flex: 1;
+          overflow: auto;
+          display: flex;
+          flex-direction: column;
+        }
+
+        .source-header {
+          position: sticky;
+          top: 0;
+          z-index: 10;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 0.75rem 1rem;
+          background: var(--browser-window-header-bg);
+          border-bottom: 1px solid var(--browser-window-border-color);
+          backdrop-filter: blur(8px);
+        }
+
+        .source-label {
+          font-weight: 600;
+          font-size: 0.875rem;
+          color: var(--browser-window-text-color);
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+
+        .copy-source-button {
+          display: flex;
+          align-items: center;
+          gap: 0.375rem;
+          padding: 0.375rem 0.75rem;
+          background: var(--browser-window-bg);
+          border: 1px solid var(--browser-window-border-color);
+          border-radius: 6px;
+          color: var(--browser-window-text-color);
+          font-size: 0.875rem;
+          font-weight: 500;
+          cursor: pointer;
+          transition: all 150ms ease;
+        }
+
+        .copy-source-button:hover {
+          background: var(--browser-window-hover-bg);
+        }
+
+        .copy-source-button:active {
+          transform: scale(0.97);
+        }
+
+        .copy-source-button.copied {
+          background: #10b981;
+          border-color: #10b981;
+          color: white;
+        }
+
+        .source-view pre {
+          margin: 0;
+          padding: 1rem;
+          background: var(--browser-window-content-bg);
+          border: 1px solid var(--browser-window-border-color);
+          border-radius: 6px;
+          overflow-x: auto;
+          font-family: var(--browser-window-mono-font);
+          font-size: 0.875rem;
+          line-height: 1.6;
+        }
+
+        .source-view code {
+          color: var(--browser-window-text-color);
+          display: block;
+          white-space: pre;
+        }
+
+        .error-state {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          padding: 3rem 1rem;
+          text-align: center;
+          color: var(--browser-window-text-muted);
+          min-height: 200px;
+        }
+
+        .error-state svg {
+          margin-bottom: 1rem;
+          opacity: 0.5;
+        }
+
+        .error-state p {
+          margin: 0 0 1rem 0;
+          font-size: 0.875rem;
+        }
+
+        .retry-button {
+          padding: 0.5rem 1rem;
+          background: var(--browser-window-accent-color);
+          color: white;
+          border: none;
+          border-radius: 6px;
+          font-size: 0.875rem;
+          font-weight: 500;
+          cursor: pointer;
+          transition: opacity 150ms ease;
+        }
+
+        .retry-button:hover {
+          opacity: 0.9;
+        }
+
+        .retry-button:active {
+          transform: scale(0.98);
+        }
+    `;
+  }
+  _browserCSS() {
+    return `
         .browser-header {
           display: flex;
           align-items: center;
@@ -640,166 +975,6 @@ class x extends HTMLElement {
           flex-shrink: 0;
         }
 
-        .browser-content {
-          background: var(--browser-window-content-bg);
-          min-height: 200px;
-          padding: 0;
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-        }
-
-        /* Slot fills available space */
-        slot {
-          display: flex;
-          flex-direction: column;
-          flex: 1;
-          min-height: 0;
-        }
-
-        /* Slotted content fills the slot */
-        ::slotted(*) {
-          flex: 1;
-          width: 100%;
-          min-height: 0;
-        }
-
-        iframe {
-          display: block;
-          width: 100%;
-          border: none;
-          flex: 1;
-          min-height: 200px;
-        }
-
-        ::slotted(img),
-        ::slotted(iframe) {
-          display: block;
-          border: none;
-          margin: 0;
-        }
-
-        .source-view {
-          padding: 0;
-          background: var(--browser-window-header-bg);
-          min-height: 200px;
-          /* Constrain source view height to prevent container expansion */
-          max-height: 50vh;
-          flex: 1;
-          overflow: auto;
-          display: flex;
-          flex-direction: column;
-        }
-
-        .source-header {
-          position: sticky;
-          top: 0;
-          z-index: 10;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding: 0.75rem 1rem;
-          background: var(--browser-window-header-bg);
-          border-bottom: 1px solid var(--browser-window-border-color);
-          backdrop-filter: blur(8px);
-        }
-
-        .source-label {
-          font-weight: 600;
-          font-size: 0.875rem;
-          color: var(--browser-window-text-color);
-          text-transform: uppercase;
-          letter-spacing: 0.5px;
-        }
-
-        .copy-source-button {
-          display: flex;
-          align-items: center;
-          gap: 0.375rem;
-          padding: 0.375rem 0.75rem;
-          background: var(--browser-window-bg);
-          border: 1px solid var(--browser-window-border-color);
-          border-radius: 6px;
-          color: var(--browser-window-text-color);
-          font-size: 0.875rem;
-          font-weight: 500;
-          cursor: pointer;
-          transition: all 150ms ease;
-        }
-
-        .copy-source-button:hover {
-          background: var(--browser-window-hover-bg);
-        }
-
-        .copy-source-button:active {
-          transform: scale(0.97);
-        }
-
-        .copy-source-button.copied {
-          background: #10b981;
-          border-color: #10b981;
-          color: white;
-        }
-
-        .source-view pre {
-          margin: 0;
-          padding: 1rem;
-          background: var(--browser-window-content-bg);
-          border: 1px solid var(--browser-window-border-color);
-          border-radius: 6px;
-          overflow-x: auto;
-          font-family: var(--browser-window-mono-font);
-          font-size: 0.875rem;
-          line-height: 1.6;
-        }
-
-        .source-view code {
-          color: var(--browser-window-text-color);
-          display: block;
-          white-space: pre;
-        }
-
-        .error-state {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          padding: 3rem 1rem;
-          text-align: center;
-          color: var(--browser-window-text-muted);
-          min-height: 200px;
-        }
-
-        .error-state svg {
-          margin-bottom: 1rem;
-          opacity: 0.5;
-        }
-
-        .error-state p {
-          margin: 0 0 1rem 0;
-          font-size: 0.875rem;
-        }
-
-        .retry-button {
-          padding: 0.5rem 1rem;
-          background: var(--browser-window-accent-color);
-          color: white;
-          border: none;
-          border-radius: 6px;
-          font-size: 0.875rem;
-          font-weight: 500;
-          cursor: pointer;
-          transition: opacity 150ms ease;
-        }
-
-        .retry-button:hover {
-          opacity: 0.9;
-        }
-
-        .retry-button:active {
-          transform: scale(0.98);
-        }
-
         /* Responsive: narrow screens */
         @media (max-width: 480px) {
           .browser-header {
@@ -851,7 +1026,10 @@ class x extends HTMLElement {
             padding: 0.875rem 1rem;
           }
         }
-      </style>
+    `;
+  }
+  _browserChrome() {
+    return `
       <div class="browser-header" role="toolbar" aria-label="Window controls">
         <div class="controls">
           <button class="control-button close" aria-label="Close window" tabindex="0"></button>
@@ -905,17 +1083,443 @@ class x extends HTMLElement {
           ` : ""}
         </div>
       </div>
-      <div class="browser-content">
+    `;
+  }
+  _contentHTML() {
+    return `
+      <div class="browser-content" part="content">
         ${this.src ? `<iframe src="${this.escapeHtml(this.src)}" loading="lazy"></iframe>` : "<slot></slot>"}
       </div>
     `;
+  }
+  // --- Device mode ---
+  _deviceCSS(e) {
+    const t = v[this.deviceColor] || v.midnight, o = this.getAttribute("orientation") === "landscape", r = this._getEffectiveDimensions(e), [s, c, n, d] = this._getEffectiveSafeInsets(e), a = M[e.notch] || 24, h = e.homeIndicator && !e.homeButton ? _ : 0, u = e.homeButton ? x : 0, b = e.notch !== "none";
+    return `
+        :host([device]) {
+          --device-width: ${r.width}px;
+          --device-height: ${r.height}px;
+          --device-bezel: ${e.bezel}px;
+          --device-corner-radius: ${e.cornerRadius}px;
+          --browser-window-bezel-color: ${t};
+          --status-bar-height: ${o && b ? 24 : a}px;
+          --home-indicator-height: ${h}px;
+          --home-button-area: ${u}px;
+          --safe-top: ${s}px;
+          --safe-right: ${c}px;
+          --safe-bottom: ${n}px;
+          --safe-left: ${d}px;
+
+          border: none;
+          border-radius: 0;
+          resize: none;
+          overflow: visible;
+          background: transparent;
+          box-shadow: none;
+          min-width: 0;
+          min-height: 0;
+        }
+
+        .device-wrapper {
+          display: flex;
+          justify-content: center;
+          overflow: hidden;
+          width: 100%;
+        }
+
+        .device-frame {
+          display: flex;
+          flex-direction: column;
+          width: var(--device-width);
+          height: var(--device-height);
+          border: var(--device-bezel) solid var(--browser-window-bezel-color);
+          border-radius: var(--device-corner-radius);
+          overflow: hidden;
+          position: relative;
+          background: #000;
+          flex-shrink: 0;
+          transform-origin: top center;
+        }
+
+        .device-frame.home-button {
+          padding-bottom: var(--home-button-area);
+        }
+
+        /* Landscape with notch: horizontal layout */
+        .device-frame.landscape.dynamic-island,
+        .device-frame.landscape.punch-hole {
+          flex-direction: row;
+        }
+
+        .device-main {
+          display: flex;
+          flex-direction: column;
+          flex: 1;
+          min-width: 0;
+          overflow: hidden;
+        }
+
+        /* Notch sidebar (landscape phones with notch) */
+        .notch-sidebar {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+          position: relative;
+        }
+
+        .notch-sidebar.dynamic-island {
+          width: 59px;
+        }
+
+        .notch-sidebar.dynamic-island::before {
+          content: '';
+          width: 37px;
+          height: 126px;
+          background: var(--browser-window-bezel-color);
+          border-radius: 19px;
+        }
+
+        .notch-sidebar.punch-hole {
+          width: 48px;
+        }
+
+        .notch-sidebar.punch-hole::before {
+          content: '';
+          width: 12px;
+          height: 12px;
+          background: var(--browser-window-bezel-color);
+          border-radius: 50%;
+        }
+
+        /* Status bar */
+        .status-bar {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 0 16px;
+          height: var(--status-bar-height);
+          position: relative;
+          color: var(--browser-window-status-bar-color, rgba(255,255,255,0.9));
+          font-size: 14px;
+          font-weight: 600;
+          flex-shrink: 0;
+          z-index: 1;
+          background: transparent;
+        }
+
+        .status-bar.dynamic-island {
+          padding-top: 14px;
+        }
+
+        /* Dynamic Island pill (portrait only) */
+        .status-bar.dynamic-island::before {
+          content: '';
+          position: absolute;
+          top: 12px;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 126px;
+          height: 37px;
+          background: var(--browser-window-bezel-color);
+          border-radius: 19px;
+        }
+
+        /* Punch-hole camera (portrait only) */
+        .status-bar.punch-hole::before {
+          content: '';
+          position: absolute;
+          top: 10px;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 12px;
+          height: 12px;
+          background: var(--browser-window-bezel-color);
+          border-radius: 50%;
+        }
+
+        /* Home button (iPhone SE) */
+        .device-frame.home-button::after {
+          content: '';
+          position: absolute;
+          bottom: 16px;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 58px;
+          height: 58px;
+          border: 3px solid rgba(255, 255, 255, 0.15);
+          border-radius: 50%;
+          z-index: 1;
+        }
+
+        /* Home indicator pill */
+        .home-indicator {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: var(--home-indicator-height);
+          flex-shrink: 0;
+        }
+
+        .home-indicator-pill {
+          width: 134px;
+          height: 5px;
+          background: var(--browser-window-home-indicator-color, rgba(255,255,255,0.3));
+          border-radius: 3px;
+        }
+
+        /* Device mode content area */
+        :host([device]) .browser-content {
+          flex: 1;
+          min-height: 0;
+          overflow: hidden;
+          background: var(--browser-window-content-bg);
+        }
+
+        :host([device]) .browser-content iframe {
+          width: 100%;
+          height: 100%;
+          min-height: 0;
+        }
+
+        /* Status bar icons */
+        .status-time {
+          font-size: 14px;
+          font-weight: 600;
+          letter-spacing: 0.5px;
+          position: relative;
+          z-index: 1;
+        }
+
+        .status-icons {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          position: relative;
+          z-index: 1;
+        }
+
+        .signal-bars {
+          display: inline-flex;
+          align-items: flex-end;
+          gap: 1px;
+          height: 12px;
+        }
+
+        .signal-bars span {
+          display: inline-block;
+          width: 3px;
+          background: currentColor;
+          border-radius: 1px;
+        }
+
+        .signal-bars span:nth-child(1) { height: 4px; }
+        .signal-bars span:nth-child(2) { height: 6px; }
+        .signal-bars span:nth-child(3) { height: 8px; }
+        .signal-bars span:nth-child(4) { height: 10px; }
+
+        /* Wifi icon - dot with two arcs */
+        .wifi-icon {
+          display: inline-block;
+          width: 3px;
+          height: 3px;
+          background: currentColor;
+          border-radius: 50%;
+          position: relative;
+          margin: 0 5px;
+          vertical-align: middle;
+        }
+
+        .wifi-icon::before {
+          content: '';
+          position: absolute;
+          bottom: 3px;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 9px;
+          height: 9px;
+          border: 1.5px solid currentColor;
+          border-color: currentColor transparent transparent;
+          border-radius: 50%;
+        }
+
+        .wifi-icon::after {
+          content: '';
+          position: absolute;
+          bottom: 6px;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 15px;
+          height: 15px;
+          border: 1.5px solid currentColor;
+          border-color: currentColor transparent transparent;
+          border-radius: 50%;
+        }
+
+        /* Battery icon */
+        .battery-icon {
+          display: inline-block;
+          width: 22px;
+          height: 10px;
+          border: 1.5px solid currentColor;
+          border-radius: 2px;
+          position: relative;
+          vertical-align: middle;
+        }
+
+        .battery-icon::before {
+          /* Battery fill */
+          content: '';
+          position: absolute;
+          top: 1.5px;
+          left: 1.5px;
+          right: 1.5px;
+          bottom: 1.5px;
+          background: currentColor;
+          border-radius: 0.5px;
+        }
+
+        .battery-icon::after {
+          /* Battery cap */
+          content: '';
+          position: absolute;
+          right: -4px;
+          top: 50%;
+          transform: translateY(-50%);
+          width: 2px;
+          height: 5px;
+          background: currentColor;
+          border-radius: 0 1px 1px 0;
+        }
+
+        /* Light bezel: dark status bar text */
+        .device-frame.light-bezel .status-bar {
+          color: rgba(0, 0, 0, 0.8);
+        }
+
+        .device-frame.light-bezel .home-indicator-pill {
+          background: rgba(0, 0, 0, 0.3);
+        }
+
+        .device-frame.light-bezel.home-button::after {
+          border-color: rgba(0, 0, 0, 0.15);
+        }
+
+        /* Dark mode in device mode */
+        :host([device][mode="dark"]) .browser-content,
+        :host([device][data-page-mode="dark"]:not([mode])) .browser-content {
+          background: #000000;
+        }
+
+        /* Safe area overlays */
+        .safe-area-overlays {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: var(--home-button-area);
+          pointer-events: none;
+          z-index: 3;
+        }
+
+        .safe-area-overlay {
+          position: absolute;
+          background: var(--browser-window-safe-area-color, oklch(0.65 0.2 250 / 0.25));
+        }
+
+        .safe-area-top {
+          top: 0;
+          left: 0;
+          right: 0;
+          height: var(--safe-top);
+        }
+
+        .safe-area-right {
+          top: 0;
+          right: 0;
+          bottom: 0;
+          width: var(--safe-right);
+        }
+
+        .safe-area-bottom {
+          bottom: 0;
+          left: 0;
+          right: 0;
+          height: var(--safe-bottom);
+        }
+
+        .safe-area-left {
+          top: 0;
+          left: 0;
+          bottom: 0;
+          width: var(--safe-left);
+        }
+    `;
+  }
+  _deviceChrome(e) {
+    const t = this.getAttribute("orientation") === "landscape", o = e.notch !== "none", r = o ? e.notch : "", s = e.homeButton ? "home-button" : "", n = ["silver", "gold", "white"].includes(this.deviceColor) ? "light-bezel" : "", a = ["device-frame", r, s, n, t ? "landscape" : ""].filter(Boolean).join(" "), u = `
+      <div class="status-bar ${t && o ? "" : r}">
+        <span class="status-time">9:41</span>
+        <div class="status-icons">
+          <span class="signal-bars" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+          <span class="wifi-icon" aria-hidden="true"></span>
+          <span class="battery-icon" aria-hidden="true"></span>
+        </div>
+      </div>
+    `, b = e.homeIndicator && !e.homeButton ? '<div class="home-indicator"><div class="home-indicator-pill"></div></div>' : "", f = this.hasAttribute("show-safe-areas") ? `<div class="safe-area-overlays">
+          <div class="safe-area-overlay safe-area-top"></div>
+          <div class="safe-area-overlay safe-area-right"></div>
+          <div class="safe-area-overlay safe-area-bottom"></div>
+          <div class="safe-area-overlay safe-area-left"></div>
+        </div>` : "";
+    return t && o ? `
+        <div class="device-wrapper">
+          <div class="${a}">
+            <div class="notch-sidebar ${r}"></div>
+            <div class="device-main">
+              ${u}
+              ${this._contentHTML()}
+              ${b}
+            </div>
+            ${f}
+          </div>
+        </div>
+      ` : `
+      <div class="device-wrapper">
+        <div class="${a}">
+          ${u}
+          ${this._contentHTML()}
+          ${b}
+          ${f}
+        </div>
+      </div>
+    `;
+  }
+  // --- Device scaling ---
+  _setupDeviceScaling() {
+    this._resizeObserver || (this._resizeObserver = new ResizeObserver(() => this._updateDeviceScale()), this._resizeObserver.observe(this));
+  }
+  _updateDeviceScale() {
+    const e = this._getDevicePreset();
+    if (!e) return;
+    const t = this.shadowRoot.querySelector(".device-wrapper"), o = this.shadowRoot.querySelector(".device-frame");
+    if (!t || !o) return;
+    const r = this.clientWidth;
+    if (r === 0) return;
+    const s = this._getEffectiveDimensions(e), c = s.width + e.bezel * 2, n = Math.min(1, r / c);
+    this._currentScale = n, o.style.transform = `scale(${n})`;
+    const d = e.homeButton ? x : 0, a = s.height + e.bezel * 2 + d;
+    t.style.height = `${a * n}px`;
+  }
+  _teardownDeviceScaling() {
+    this._resizeObserver && (this._resizeObserver.disconnect(), this._resizeObserver = null), this._currentScale = 1;
   }
   escapeHtml(e) {
     const t = document.createElement("div");
     return t.textContent = e, t.innerHTML;
   }
 }
-customElements.define("browser-window", x);
+customElements.define("browser-window", L);
 export {
-  x as BrowserWindow
+  L as BrowserWindow
 };

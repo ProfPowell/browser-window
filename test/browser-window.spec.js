@@ -296,6 +296,420 @@ test.describe('browser-window', () => {
     })
   })
 
+  test.describe('device mode', () => {
+    test.describe('rendering', () => {
+      test('renders device chrome when device attribute is set', async ({ page }) => {
+        const el = page.locator('#device-iphone')
+        const deviceFrame = el.locator('.device-frame')
+        await expect(deviceFrame).toBeVisible()
+
+        const browserHeader = el.locator('.browser-header')
+        await expect(browserHeader).toHaveCount(0)
+      })
+
+      test('renders status bar with 9:41', async ({ page }) => {
+        const el = page.locator('#device-iphone')
+        const statusTime = el.locator('.status-time')
+        await expect(statusTime).toHaveText('9:41')
+      })
+
+      test('renders Dynamic Island for iPhone 16', async ({ page }) => {
+        const el = page.locator('#device-iphone')
+        const statusBar = el.locator('.status-bar')
+        const hasDynamicIsland = await statusBar.evaluate((node) =>
+          node.classList.contains('dynamic-island')
+        )
+        expect(hasDynamicIsland).toBe(true)
+      })
+
+      test('renders punch-hole for Pixel 9', async ({ page }) => {
+        const el = page.locator('#device-pixel')
+        const statusBar = el.locator('.status-bar')
+        const hasPunchHole = await statusBar.evaluate((node) =>
+          node.classList.contains('punch-hole')
+        )
+        expect(hasPunchHole).toBe(true)
+      })
+
+      test('renders home button for iPhone SE', async ({ page }) => {
+        const el = page.locator('#device-se')
+        const frame = el.locator('.device-frame')
+        const hasHomeButton = await frame.evaluate((node) =>
+          node.classList.contains('home-button')
+        )
+        expect(hasHomeButton).toBe(true)
+      })
+
+      test('renders home indicator for iPhone 16', async ({ page }) => {
+        const el = page.locator('#device-iphone')
+        const homeIndicator = el.locator('.home-indicator')
+        await expect(homeIndicator).toBeVisible()
+      })
+
+      test('does not render home indicator for iPhone SE', async ({ page }) => {
+        const el = page.locator('#device-se')
+        const homeIndicator = el.locator('.home-indicator')
+        await expect(homeIndicator).toHaveCount(0)
+      })
+
+      test('renders signal bars, wifi, and battery icons', async ({ page }) => {
+        const el = page.locator('#device-iphone')
+        const signalBars = el.locator('.signal-bars')
+        const wifi = el.locator('.wifi-icon')
+        const battery = el.locator('.battery-icon')
+
+        await expect(signalBars).toBeVisible()
+        await expect(wifi).toBeVisible()
+        await expect(battery).toBeVisible()
+      })
+    })
+
+    test.describe('preset geometry', () => {
+      test('iPhone 16 iframe has correct width', async ({ page }) => {
+        const el = page.locator('#device-iphone')
+        const iframe = el.locator('iframe')
+        await iframe.waitFor({ state: 'attached' })
+
+        const width = await el.evaluate((node) => {
+          const iframe = node.shadowRoot.querySelector('iframe')
+          return iframe?.offsetWidth
+        })
+        expect(width).toBe(393)
+      })
+
+      test('device frame has correct dimensions for iPhone SE', async ({ page }) => {
+        const el = page.locator('#device-se')
+        const frame = el.locator('.device-frame')
+        await expect(frame).toBeVisible()
+
+        // Check via CSS custom properties
+        const style = await el.evaluate((node) => {
+          const cs = getComputedStyle(node)
+          return {
+            width: cs.getPropertyValue('--device-width').trim(),
+            height: cs.getPropertyValue('--device-height').trim(),
+          }
+        })
+        expect(style.width).toBe('375px')
+        expect(style.height).toBe('667px')
+      })
+    })
+
+    test.describe('scaling', () => {
+      test('device frame has transform scale applied', async ({ page }) => {
+        const el = page.locator('#device-iphone')
+        const frame = el.locator('.device-frame')
+        await expect(frame).toBeVisible()
+
+        const transform = await frame.evaluate((node) => node.style.transform)
+        expect(transform).toMatch(/scale\(/)
+      })
+
+      test('device wrapper has explicit height set', async ({ page }) => {
+        const el = page.locator('#device-iphone')
+        const wrapper = el.locator('.device-wrapper')
+        await expect(wrapper).toBeVisible()
+
+        const height = await wrapper.evaluate((node) => node.style.height)
+        expect(height).toBeTruthy()
+        expect(parseFloat(height)).toBeGreaterThan(0)
+      })
+
+      test('scale recalculates when container resizes', async ({ page }) => {
+        const el = page.locator('#device-iphone')
+        const frame = el.locator('.device-frame')
+        await expect(frame).toBeVisible()
+
+        const initialTransform = await frame.evaluate((node) => node.style.transform)
+
+        // Resize the container
+        await el.evaluate((node) => {
+          node.style.width = '200px'
+        })
+        // Wait for ResizeObserver to fire
+        await page.waitForTimeout(100)
+
+        const newTransform = await frame.evaluate((node) => node.style.transform)
+        expect(newTransform).toMatch(/scale\(/)
+
+        // With a smaller container, scale should be smaller
+        const initialScale = parseFloat(initialTransform.match(/scale\(([^)]+)\)/)?.[1] || '1')
+        const newScale = parseFloat(newTransform.match(/scale\(([^)]+)\)/)?.[1] || '1')
+        expect(newScale).toBeLessThan(initialScale)
+      })
+    })
+
+    test.describe('device color', () => {
+      test('default bezel color is midnight (#1a1a1a)', async ({ page }) => {
+        const el = page.locator('#device-iphone')
+        const style = await el.evaluate((node) => {
+          return getComputedStyle(node).getPropertyValue('--browser-window-bezel-color').trim()
+        })
+        expect(style).toBe('#1a1a1a')
+      })
+
+      test('silver bezel color when device-color="silver"', async ({ page }) => {
+        const el = page.locator('#device-silver')
+        const style = await el.evaluate((node) => {
+          return getComputedStyle(node).getPropertyValue('--browser-window-bezel-color').trim()
+        })
+        expect(style).toBe('#c0c0c0')
+      })
+
+      test('light-bezel class applied for silver', async ({ page }) => {
+        const el = page.locator('#device-silver')
+        const frame = el.locator('.device-frame')
+        const hasLightBezel = await frame.evaluate((node) =>
+          node.classList.contains('light-bezel')
+        )
+        expect(hasLightBezel).toBe(true)
+      })
+    })
+
+    test.describe('dark mode', () => {
+      test('device chrome respects mode="dark"', async ({ page }) => {
+        const el = page.locator('#device-dark')
+        const style = await el.evaluate((node) => {
+          const styleEl = node.shadowRoot.querySelector('style')
+          return styleEl?.textContent || ''
+        })
+        expect(style).toContain(':host([mode="dark"])')
+      })
+
+      test('device mode follows page-level dark mode detection', async ({ page }) => {
+        // Create a device-mode element without explicit mode
+        await page.evaluate(() => {
+          const el = document.createElement('browser-window')
+          el.id = 'device-auto-mode'
+          el.setAttribute('device', 'iphone-16')
+          document.body.appendChild(el)
+        })
+
+        const el = page.locator('#device-auto-mode')
+
+        await page.evaluate(() => document.body.classList.add('dark'))
+        await page.waitForFunction(() => {
+          const el = document.querySelector('#device-auto-mode')
+          return el.getAttribute('data-page-mode') === 'dark'
+        })
+
+        const mode = await el.evaluate((node) => node.mode)
+        expect(mode).toBe('dark')
+      })
+    })
+
+    test.describe('fallback', () => {
+      test('unknown preset renders iphone-16 dimensions', async ({ page }) => {
+        const el = page.locator('#device-unknown')
+        const style = await el.evaluate((node) => {
+          return getComputedStyle(node).getPropertyValue('--device-width').trim()
+        })
+        expect(style).toBe('393px')
+      })
+    })
+
+    test.describe('backward compatibility', () => {
+      test('browser mode still renders controls and URL bar', async ({ page }) => {
+        const el = page.locator('#with-url')
+        const controls = el.locator('.control-button')
+        await expect(controls).toHaveCount(3)
+
+        const urlBar = el.locator('.url-bar')
+        await expect(urlBar).toBeVisible()
+
+        // No device frame should exist
+        const deviceFrame = el.locator('.device-frame')
+        await expect(deviceFrame).toHaveCount(0)
+      })
+    })
+  })
+
+  test.describe('device mode phase 2', () => {
+    test.describe('orientation', () => {
+      test('landscape swaps iframe dimensions', async ({ page }) => {
+        const el = page.locator('#device-landscape')
+        const style = await el.evaluate((node) => {
+          const cs = getComputedStyle(node)
+          return {
+            width: cs.getPropertyValue('--device-width').trim(),
+            height: cs.getPropertyValue('--device-height').trim(),
+          }
+        })
+        // iPhone 16: 393×852 → landscape: 852×393
+        expect(style.width).toBe('852px')
+        expect(style.height).toBe('393px')
+      })
+
+      test('landscape adds landscape class to device-frame', async ({ page }) => {
+        const el = page.locator('#device-landscape')
+        const frame = el.locator('.device-frame')
+        const hasLandscape = await frame.evaluate((node) =>
+          node.classList.contains('landscape')
+        )
+        expect(hasLandscape).toBe(true)
+      })
+
+      test('landscape phone renders notch sidebar', async ({ page }) => {
+        const el = page.locator('#device-landscape')
+        const sidebar = el.locator('.notch-sidebar')
+        await expect(sidebar).toBeVisible()
+      })
+
+      test('landscape phone notch sidebar has correct notch class', async ({ page }) => {
+        const el = page.locator('#device-landscape')
+        const sidebar = el.locator('.notch-sidebar')
+        const hasDI = await sidebar.evaluate((node) =>
+          node.classList.contains('dynamic-island')
+        )
+        expect(hasDI).toBe(true)
+      })
+
+      test('landscape status bar does not have notch class', async ({ page }) => {
+        const el = page.locator('#device-landscape')
+        const statusBar = el.locator('.status-bar')
+        const hasDI = await statusBar.evaluate((node) =>
+          node.classList.contains('dynamic-island')
+        )
+        expect(hasDI).toBe(false)
+      })
+
+      test('landscape tablet does not render notch sidebar', async ({ page }) => {
+        const el = page.locator('#device-landscape-tablet')
+        const sidebar = el.locator('.notch-sidebar')
+        await expect(sidebar).toHaveCount(0)
+      })
+
+      test('landscape tablet swaps dimensions', async ({ page }) => {
+        const el = page.locator('#device-landscape-tablet')
+        const style = await el.evaluate((node) => {
+          const cs = getComputedStyle(node)
+          return {
+            width: cs.getPropertyValue('--device-width').trim(),
+            height: cs.getPropertyValue('--device-height').trim(),
+          }
+        })
+        // iPad Air: 820×1180 → landscape: 1180×820
+        expect(style.width).toBe('1180px')
+        expect(style.height).toBe('820px')
+      })
+
+      test('scaling uses swapped dimensions in landscape', async ({ page }) => {
+        const el = page.locator('#device-landscape')
+        const frame = el.locator('.device-frame')
+        await expect(frame).toBeVisible()
+
+        const transform = await frame.evaluate((node) => node.style.transform)
+        expect(transform).toMatch(/scale\(/)
+      })
+    })
+
+    test.describe('safe area injection', () => {
+      test('injects safe area CSS variables into same-origin iframe', async ({ page }) => {
+        const el = page.locator('#device-iphone')
+        const iframe = el.locator('iframe')
+        await iframe.waitFor({ state: 'attached' })
+        await page.waitForTimeout(500) // wait for iframe load
+
+        const vars = await el.evaluate((node) => {
+          const iframe = node.shadowRoot.querySelector('iframe')
+          const doc = iframe?.contentDocument
+          if (!doc) return null
+          const style = doc.querySelector('style[data-browser-window-safe-areas]')
+          return style?.textContent || null
+        })
+        expect(vars).not.toBeNull()
+        // iPhone 16 portrait: safeInsets [59, 0, 34, 0]
+        expect(vars).toContain('--safe-top: 59px')
+        expect(vars).toContain('--safe-right: 0px')
+        expect(vars).toContain('--safe-bottom: 34px')
+        expect(vars).toContain('--safe-left: 0px')
+      })
+
+      test('safe area values rotate in landscape', async ({ page }) => {
+        const el = page.locator('#device-landscape')
+        // Scroll into view to trigger lazy-loaded iframe
+        await el.scrollIntoViewIfNeeded()
+        const iframe = el.locator('iframe')
+        await iframe.waitFor({ state: 'attached' })
+
+        // Wait for the safe area style to be injected into the iframe
+        await page.waitForFunction(() => {
+          const el = document.querySelector('#device-landscape')
+          const iframe = el?.shadowRoot?.querySelector('iframe')
+          const doc = iframe?.contentDocument
+          return doc?.querySelector('style[data-browser-window-safe-areas]') !== null
+        }, { timeout: 5000 })
+
+        const vars = await el.evaluate((node) => {
+          const iframe = node.shadowRoot.querySelector('iframe')
+          const doc = iframe?.contentDocument
+          if (!doc) return null
+          const style = doc.querySelector('style[data-browser-window-safe-areas]')
+          return style?.textContent || null
+        })
+        expect(vars).not.toBeNull()
+        // iPhone 16 portrait [59, 0, 34, 0] → landscape [0, 59, 0, 34]
+        expect(vars).toContain('--safe-top: 0px')
+        expect(vars).toContain('--safe-right: 59px')
+        expect(vars).toContain('--safe-bottom: 0px')
+        expect(vars).toContain('--safe-left: 34px')
+      })
+
+      test('host element has safe area CSS custom properties', async ({ page }) => {
+        const el = page.locator('#device-iphone')
+        await el.locator('.device-frame').waitFor({ state: 'visible' })
+
+        const vars = await el.evaluate((node) => {
+          const cs = getComputedStyle(node)
+          return {
+            top: cs.getPropertyValue('--safe-top').trim(),
+            right: cs.getPropertyValue('--safe-right').trim(),
+            bottom: cs.getPropertyValue('--safe-bottom').trim(),
+            left: cs.getPropertyValue('--safe-left').trim(),
+          }
+        })
+        expect(vars.top).toBe('59px')
+        expect(vars.right).toBe('0px')
+        expect(vars.bottom).toBe('34px')
+        expect(vars.left).toBe('0px')
+      })
+    })
+
+    test.describe('safe area overlays', () => {
+      test('overlay elements present when show-safe-areas attribute set', async ({ page }) => {
+        const el = page.locator('#device-safe-areas')
+        const overlays = el.locator('.safe-area-overlays')
+        await expect(overlays).toBeVisible()
+
+        const children = el.locator('.safe-area-overlay')
+        await expect(children).toHaveCount(4)
+      })
+
+      test('overlay elements absent when show-safe-areas not set', async ({ page }) => {
+        const el = page.locator('#device-iphone')
+        const overlays = el.locator('.safe-area-overlays')
+        await expect(overlays).toHaveCount(0)
+      })
+
+      test('safe area overlay has top, right, bottom, left elements', async ({ page }) => {
+        const el = page.locator('#device-safe-areas')
+        await expect(el.locator('.safe-area-top')).toBeVisible()
+        await expect(el.locator('.safe-area-right')).toHaveCount(1)
+        await expect(el.locator('.safe-area-bottom')).toBeVisible()
+        await expect(el.locator('.safe-area-left')).toHaveCount(1)
+      })
+
+      test('safe area overlays work in landscape', async ({ page }) => {
+        const el = page.locator('#device-landscape-safe')
+        const overlays = el.locator('.safe-area-overlays')
+        await expect(overlays).toBeVisible()
+
+        const children = el.locator('.safe-area-overlay')
+        await expect(children).toHaveCount(4)
+      })
+    })
+  })
+
   test.describe('page-level dark mode', () => {
     test('detects body.dark class and sets data-page-mode="dark"', async ({ page }) => {
       const el = page.locator('#no-mode')

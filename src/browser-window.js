@@ -9,6 +9,10 @@
  * @attr {string} src - Path to the HTML file to load in iframe
  * @attr {'light'|'dark'} mode - Color scheme. When omitted, auto-detects from page-level signals (body.dark, data-theme, data-bs-theme, color-scheme) then falls back to OS prefers-color-scheme.
  * @attr {boolean} shadow - Whether to show drop shadow
+ * @attr {string} device - Named device preset for device chrome mode (e.g., 'iphone-16', 'pixel-9')
+ * @attr {string} device-color - Device bezel color preset (midnight, silver, gold, blue, white)
+ * @attr {'portrait'|'landscape'} orientation - Device orientation. Swaps width/height and repositions chrome.
+ * @attr {boolean} show-safe-areas - Draw translucent overlay bands showing safe area insets
  *
  * @csspart header - The browser header/toolbar
  * @csspart content - The content area
@@ -29,10 +33,18 @@
  * @cssprop [--browser-window-content-bg=#ffffff] - Content area background
  * @cssprop [--browser-window-font-family=-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif] - Font family
  * @cssprop [--browser-window-mono-font='Monaco', 'Menlo', 'Ubuntu Mono', monospace] - Monospace font for code
+ * @cssprop [--browser-window-bezel-color=#1a1a1a] - Device frame/bezel color
+ * @cssprop [--browser-window-status-bar-color=rgba(255,255,255,0.9)] - Status bar text/icon color
+ * @cssprop [--browser-window-home-indicator-color=rgba(255,255,255,0.3)] - Home indicator pill color
+ * @cssprop [--browser-window-safe-area-color=oklch(0.65 0.2 250 / 0.25)] - Safe area overlay tint
  *
  * @example
  * <browser-window url="https://example.com" title="Demo">
  *   <img src="screenshot.png" alt="Demo">
+ * </browser-window>
+ *
+ * @example
+ * <browser-window device="iphone-16" src="demo.html">
  * </browser-window>
  */
 
@@ -50,12 +62,22 @@ function _detectPageDarkMode() {
   if (html.classList.contains('dark') || body.classList.contains('dark')) return true;
 
   // Check data-theme attribute
-  if (html.getAttribute('data-theme') === 'dark' || body.getAttribute('data-theme') === 'dark') return true;
-  if (html.getAttribute('data-theme') === 'light' || body.getAttribute('data-theme') === 'light') return false;
+  if (html.getAttribute('data-theme') === 'dark' || body.getAttribute('data-theme') === 'dark')
+    return true;
+  if (html.getAttribute('data-theme') === 'light' || body.getAttribute('data-theme') === 'light')
+    return false;
 
   // Check Bootstrap 5 data-bs-theme
-  if (html.getAttribute('data-bs-theme') === 'dark' || body.getAttribute('data-bs-theme') === 'dark') return true;
-  if (html.getAttribute('data-bs-theme') === 'light' || body.getAttribute('data-bs-theme') === 'light') return false;
+  if (
+    html.getAttribute('data-bs-theme') === 'dark' ||
+    body.getAttribute('data-bs-theme') === 'dark'
+  )
+    return true;
+  if (
+    html.getAttribute('data-bs-theme') === 'light' ||
+    body.getAttribute('data-bs-theme') === 'light'
+  )
+    return false;
 
   // Check computed color-scheme
   const colorScheme = getComputedStyle(html).colorScheme;
@@ -117,6 +139,117 @@ function _unregisterInstance(instance) {
   }
 }
 
+// --- Device preset data ---
+const DEVICE_PRESETS = {
+  'iphone-16': {
+    width: 393,
+    height: 852,
+    bezel: 12,
+    notch: 'dynamic-island',
+    cornerRadius: 55,
+    homeIndicator: true,
+    homeButton: false,
+    safeInsets: [59, 0, 34, 0],
+  },
+  'iphone-16-pro-max': {
+    width: 440,
+    height: 956,
+    bezel: 12,
+    notch: 'dynamic-island',
+    cornerRadius: 55,
+    homeIndicator: true,
+    homeButton: false,
+    safeInsets: [59, 0, 34, 0],
+  },
+  'iphone-se': {
+    width: 375,
+    height: 667,
+    bezel: 12,
+    notch: 'none',
+    cornerRadius: 0,
+    homeIndicator: false,
+    homeButton: true,
+    safeInsets: [20, 0, 0, 0],
+  },
+  'pixel-9': {
+    width: 412,
+    height: 923,
+    bezel: 10,
+    notch: 'punch-hole',
+    cornerRadius: 48,
+    homeIndicator: true,
+    homeButton: false,
+    safeInsets: [48, 0, 24, 0],
+  },
+  'pixel-9-pro-xl': {
+    width: 448,
+    height: 998,
+    bezel: 10,
+    notch: 'punch-hole',
+    cornerRadius: 48,
+    homeIndicator: true,
+    homeButton: false,
+    safeInsets: [48, 0, 24, 0],
+  },
+  'galaxy-s24': {
+    width: 360,
+    height: 780,
+    bezel: 10,
+    notch: 'punch-hole',
+    cornerRadius: 40,
+    homeIndicator: true,
+    homeButton: false,
+    safeInsets: [48, 0, 24, 0],
+  },
+  'ipad-air': {
+    width: 820,
+    height: 1180,
+    bezel: 16,
+    notch: 'none',
+    cornerRadius: 18,
+    homeIndicator: true,
+    homeButton: false,
+    safeInsets: [24, 0, 20, 0],
+  },
+  'ipad-pro-13': {
+    width: 1032,
+    height: 1376,
+    bezel: 16,
+    notch: 'none',
+    cornerRadius: 18,
+    homeIndicator: true,
+    homeButton: false,
+    safeInsets: [24, 0, 20, 0],
+  },
+  'ipad-mini': {
+    width: 744,
+    height: 1133,
+    bezel: 16,
+    notch: 'none',
+    cornerRadius: 18,
+    homeIndicator: true,
+    homeButton: false,
+    safeInsets: [24, 0, 20, 0],
+  },
+};
+
+const DEVICE_COLORS = {
+  midnight: '#1a1a1a',
+  silver: '#c0c0c0',
+  gold: '#d4a574',
+  blue: '#3a4f6f',
+  white: '#f0f0f0',
+};
+
+const STATUS_BAR_HEIGHT = {
+  'dynamic-island': 54,
+  'punch-hole': 36,
+  none: 24,
+};
+
+const HOME_INDICATOR_HEIGHT = 28;
+const HOME_BUTTON_AREA = 80;
+
 export class BrowserWindow extends HTMLElement {
   constructor() {
     super();
@@ -129,6 +262,8 @@ export class BrowserWindow extends HTMLElement {
     this.showShareMenu = false;
     this.handleKeydown = this.handleKeydown.bind(this);
     this.handleOutsideClick = this.handleOutsideClick.bind(this);
+    this._resizeObserver = null;
+    this._currentScale = 1;
   }
 
   async connectedCallback() {
@@ -141,23 +276,45 @@ export class BrowserWindow extends HTMLElement {
     }
 
     _registerInstance(this);
+
+    if (this._getDevicePreset()) {
+      this._setupDeviceScaling();
+    }
   }
 
   disconnectedCallback() {
     _unregisterInstance(this);
     this.removeOverlay();
+    this._teardownDeviceScaling();
     document.removeEventListener('keydown', this.handleKeydown);
     document.removeEventListener('click', this.handleOutsideClick);
   }
 
   static get observedAttributes() {
-    return ['url', 'title', 'mode', 'shadow', 'src'];
+    return [
+      'url',
+      'title',
+      'mode',
+      'shadow',
+      'src',
+      'device',
+      'device-color',
+      'orientation',
+      'show-safe-areas',
+    ];
   }
 
   attributeChangedCallback(name) {
     if (this.shadowRoot) {
       this.render();
       this.attachEventListeners();
+    }
+
+    if (name === 'device' || name === 'orientation') {
+      this._teardownDeviceScaling();
+      if (this._getDevicePreset()) {
+        this._setupDeviceScaling();
+      }
     }
 
     if (name === 'mode') {
@@ -187,6 +344,43 @@ export class BrowserWindow extends HTMLElement {
     return this.getAttribute('mode') || this.getAttribute('data-page-mode') || 'light';
   }
 
+  get device() {
+    return this.getAttribute('device') || '';
+  }
+
+  get deviceColor() {
+    return this.getAttribute('device-color') || 'midnight';
+  }
+
+  _getDevicePreset() {
+    const device = this.getAttribute('device');
+    if (!device) return null;
+
+    const preset = DEVICE_PRESETS[device];
+    if (preset) return preset;
+
+    console.warn(
+      `<browser-window>: Unknown device preset "${device}", falling back to "iphone-16"`
+    );
+    return DEVICE_PRESETS['iphone-16'];
+  }
+
+  _getEffectiveDimensions(preset) {
+    const isLandscape = this.getAttribute('orientation') === 'landscape';
+    return {
+      width: isLandscape ? preset.height : preset.width,
+      height: isLandscape ? preset.width : preset.height,
+    };
+  }
+
+  _getEffectiveSafeInsets(preset) {
+    const [t, r, b, l] = preset.safeInsets;
+    if (this.getAttribute('orientation') === 'landscape') {
+      return [l, t, r, b];
+    }
+    return [t, r, b, l];
+  }
+
   _onPageModeChange(isDark) {
     if (this.hasAttribute('mode')) {
       this.removeAttribute('data-page-mode');
@@ -213,6 +407,36 @@ export class BrowserWindow extends HTMLElement {
       }
     } catch (e) {
       // Cross-origin iframe — silently ignore
+    }
+  }
+
+  _injectSafeAreas(iframe) {
+    const preset = this._getDevicePreset();
+    if (!preset) return;
+
+    try {
+      const doc = iframe.contentDocument;
+      if (!doc) return;
+
+      // Remove previously injected style if any
+      const existing = doc.querySelector('style[data-browser-window-safe-areas]');
+      if (existing) existing.remove();
+
+      const [top, right, bottom, left] = this._getEffectiveSafeInsets(preset);
+      const style = doc.createElement('style');
+      style.setAttribute('data-browser-window-safe-areas', '');
+      style.textContent = `
+        :root {
+          --safe-top: ${top}px;
+          --safe-right: ${right}px;
+          --safe-bottom: ${bottom}px;
+          --safe-left: ${left}px;
+        }
+      `;
+      doc.head.appendChild(style);
+    } catch (e) {
+      // Cross-origin iframe — skip silently
+      console.info('<browser-window>: Cannot inject safe areas into cross-origin iframe');
     }
   }
 
@@ -262,7 +486,12 @@ export class BrowserWindow extends HTMLElement {
     // Handle iframe load errors and sync color scheme
     const iframe = this.shadowRoot.querySelector('iframe');
     iframe?.addEventListener('error', () => this.handleIframeError());
-    iframe?.addEventListener('load', () => this._syncIframeColorScheme());
+    iframe?.addEventListener('load', () => {
+      this._syncIframeColorScheme();
+      if (this._getDevicePreset()) {
+        this._injectSafeAreas(iframe);
+      }
+    });
   }
 
   handleIframeError() {
@@ -618,9 +847,26 @@ export class BrowserWindow extends HTMLElement {
     }
   }
 
+  // --- Render pipeline ---
+
   render() {
+    const preset = this._getDevicePreset();
+    const css = preset ? this._deviceCSS(preset) : this._browserCSS();
+    const chrome = preset ? this._deviceChrome(preset) : this._browserChrome();
+
     this.shadowRoot.innerHTML = `
-      <style>
+      <style>${this._sharedCSS()}${css}</style>
+      ${chrome}
+      ${preset ? '' : this._contentHTML()}
+    `;
+
+    if (preset) {
+      this._updateDeviceScale();
+    }
+  }
+
+  _sharedCSS() {
+    return `
         :host {
           /* CSS Custom Properties with light mode defaults */
           --browser-window-bg: #ffffff;
@@ -744,6 +990,170 @@ export class BrowserWindow extends HTMLElement {
           }
         }
 
+        .browser-content {
+          background: var(--browser-window-content-bg);
+          min-height: 200px;
+          padding: 0;
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+        }
+
+        /* Slot fills available space */
+        slot {
+          display: flex;
+          flex-direction: column;
+          flex: 1;
+          min-height: 0;
+        }
+
+        /* Slotted content fills the slot */
+        ::slotted(*) {
+          flex: 1;
+          width: 100%;
+          min-height: 0;
+        }
+
+        iframe {
+          display: block;
+          width: 100%;
+          border: none;
+          flex: 1;
+          min-height: 200px;
+        }
+
+        ::slotted(img),
+        ::slotted(iframe) {
+          display: block;
+          border: none;
+          margin: 0;
+        }
+
+        .source-view {
+          padding: 0;
+          background: var(--browser-window-header-bg);
+          min-height: 200px;
+          /* Constrain source view height to prevent container expansion */
+          max-height: 50vh;
+          flex: 1;
+          overflow: auto;
+          display: flex;
+          flex-direction: column;
+        }
+
+        .source-header {
+          position: sticky;
+          top: 0;
+          z-index: 10;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 0.75rem 1rem;
+          background: var(--browser-window-header-bg);
+          border-bottom: 1px solid var(--browser-window-border-color);
+          backdrop-filter: blur(8px);
+        }
+
+        .source-label {
+          font-weight: 600;
+          font-size: 0.875rem;
+          color: var(--browser-window-text-color);
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+
+        .copy-source-button {
+          display: flex;
+          align-items: center;
+          gap: 0.375rem;
+          padding: 0.375rem 0.75rem;
+          background: var(--browser-window-bg);
+          border: 1px solid var(--browser-window-border-color);
+          border-radius: 6px;
+          color: var(--browser-window-text-color);
+          font-size: 0.875rem;
+          font-weight: 500;
+          cursor: pointer;
+          transition: all 150ms ease;
+        }
+
+        .copy-source-button:hover {
+          background: var(--browser-window-hover-bg);
+        }
+
+        .copy-source-button:active {
+          transform: scale(0.97);
+        }
+
+        .copy-source-button.copied {
+          background: #10b981;
+          border-color: #10b981;
+          color: white;
+        }
+
+        .source-view pre {
+          margin: 0;
+          padding: 1rem;
+          background: var(--browser-window-content-bg);
+          border: 1px solid var(--browser-window-border-color);
+          border-radius: 6px;
+          overflow-x: auto;
+          font-family: var(--browser-window-mono-font);
+          font-size: 0.875rem;
+          line-height: 1.6;
+        }
+
+        .source-view code {
+          color: var(--browser-window-text-color);
+          display: block;
+          white-space: pre;
+        }
+
+        .error-state {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          padding: 3rem 1rem;
+          text-align: center;
+          color: var(--browser-window-text-muted);
+          min-height: 200px;
+        }
+
+        .error-state svg {
+          margin-bottom: 1rem;
+          opacity: 0.5;
+        }
+
+        .error-state p {
+          margin: 0 0 1rem 0;
+          font-size: 0.875rem;
+        }
+
+        .retry-button {
+          padding: 0.5rem 1rem;
+          background: var(--browser-window-accent-color);
+          color: white;
+          border: none;
+          border-radius: 6px;
+          font-size: 0.875rem;
+          font-weight: 500;
+          cursor: pointer;
+          transition: opacity 150ms ease;
+        }
+
+        .retry-button:hover {
+          opacity: 0.9;
+        }
+
+        .retry-button:active {
+          transform: scale(0.98);
+        }
+    `;
+  }
+
+  _browserCSS() {
+    return `
         .browser-header {
           display: flex;
           align-items: center;
@@ -981,166 +1391,6 @@ export class BrowserWindow extends HTMLElement {
           flex-shrink: 0;
         }
 
-        .browser-content {
-          background: var(--browser-window-content-bg);
-          min-height: 200px;
-          padding: 0;
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-        }
-
-        /* Slot fills available space */
-        slot {
-          display: flex;
-          flex-direction: column;
-          flex: 1;
-          min-height: 0;
-        }
-
-        /* Slotted content fills the slot */
-        ::slotted(*) {
-          flex: 1;
-          width: 100%;
-          min-height: 0;
-        }
-
-        iframe {
-          display: block;
-          width: 100%;
-          border: none;
-          flex: 1;
-          min-height: 200px;
-        }
-
-        ::slotted(img),
-        ::slotted(iframe) {
-          display: block;
-          border: none;
-          margin: 0;
-        }
-
-        .source-view {
-          padding: 0;
-          background: var(--browser-window-header-bg);
-          min-height: 200px;
-          /* Constrain source view height to prevent container expansion */
-          max-height: 50vh;
-          flex: 1;
-          overflow: auto;
-          display: flex;
-          flex-direction: column;
-        }
-
-        .source-header {
-          position: sticky;
-          top: 0;
-          z-index: 10;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding: 0.75rem 1rem;
-          background: var(--browser-window-header-bg);
-          border-bottom: 1px solid var(--browser-window-border-color);
-          backdrop-filter: blur(8px);
-        }
-
-        .source-label {
-          font-weight: 600;
-          font-size: 0.875rem;
-          color: var(--browser-window-text-color);
-          text-transform: uppercase;
-          letter-spacing: 0.5px;
-        }
-
-        .copy-source-button {
-          display: flex;
-          align-items: center;
-          gap: 0.375rem;
-          padding: 0.375rem 0.75rem;
-          background: var(--browser-window-bg);
-          border: 1px solid var(--browser-window-border-color);
-          border-radius: 6px;
-          color: var(--browser-window-text-color);
-          font-size: 0.875rem;
-          font-weight: 500;
-          cursor: pointer;
-          transition: all 150ms ease;
-        }
-
-        .copy-source-button:hover {
-          background: var(--browser-window-hover-bg);
-        }
-
-        .copy-source-button:active {
-          transform: scale(0.97);
-        }
-
-        .copy-source-button.copied {
-          background: #10b981;
-          border-color: #10b981;
-          color: white;
-        }
-
-        .source-view pre {
-          margin: 0;
-          padding: 1rem;
-          background: var(--browser-window-content-bg);
-          border: 1px solid var(--browser-window-border-color);
-          border-radius: 6px;
-          overflow-x: auto;
-          font-family: var(--browser-window-mono-font);
-          font-size: 0.875rem;
-          line-height: 1.6;
-        }
-
-        .source-view code {
-          color: var(--browser-window-text-color);
-          display: block;
-          white-space: pre;
-        }
-
-        .error-state {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          padding: 3rem 1rem;
-          text-align: center;
-          color: var(--browser-window-text-muted);
-          min-height: 200px;
-        }
-
-        .error-state svg {
-          margin-bottom: 1rem;
-          opacity: 0.5;
-        }
-
-        .error-state p {
-          margin: 0 0 1rem 0;
-          font-size: 0.875rem;
-        }
-
-        .retry-button {
-          padding: 0.5rem 1rem;
-          background: var(--browser-window-accent-color);
-          color: white;
-          border: none;
-          border-radius: 6px;
-          font-size: 0.875rem;
-          font-weight: 500;
-          cursor: pointer;
-          transition: opacity 150ms ease;
-        }
-
-        .retry-button:hover {
-          opacity: 0.9;
-        }
-
-        .retry-button:active {
-          transform: scale(0.98);
-        }
-
         /* Responsive: narrow screens */
         @media (max-width: 480px) {
           .browser-header {
@@ -1192,7 +1442,11 @@ export class BrowserWindow extends HTMLElement {
             padding: 0.875rem 1rem;
           }
         }
-      </style>
+    `;
+  }
+
+  _browserChrome() {
+    return `
       <div class="browser-header" role="toolbar" aria-label="Window controls">
         <div class="controls">
           <button class="control-button close" aria-label="Close window" tabindex="0"></button>
@@ -1254,10 +1508,498 @@ export class BrowserWindow extends HTMLElement {
           }
         </div>
       </div>
-      <div class="browser-content">
+    `;
+  }
+
+  _contentHTML() {
+    return `
+      <div class="browser-content" part="content">
         ${this.src ? `<iframe src="${this.escapeHtml(this.src)}" loading="lazy"></iframe>` : '<slot></slot>'}
       </div>
     `;
+  }
+
+  // --- Device mode ---
+
+  _deviceCSS(preset) {
+    const bezelColor = DEVICE_COLORS[this.deviceColor] || DEVICE_COLORS.midnight;
+    const isLandscape = this.getAttribute('orientation') === 'landscape';
+    const dims = this._getEffectiveDimensions(preset);
+    const [safeT, safeR, safeB, safeL] = this._getEffectiveSafeInsets(preset);
+    const statusBarH = STATUS_BAR_HEIGHT[preset.notch] || 24;
+    const homeIndH = preset.homeIndicator && !preset.homeButton ? HOME_INDICATOR_HEIGHT : 0;
+    const homeBtnArea = preset.homeButton ? HOME_BUTTON_AREA : 0;
+    const hasNotch = preset.notch !== 'none';
+
+    return `
+        :host([device]) {
+          --device-width: ${dims.width}px;
+          --device-height: ${dims.height}px;
+          --device-bezel: ${preset.bezel}px;
+          --device-corner-radius: ${preset.cornerRadius}px;
+          --browser-window-bezel-color: ${bezelColor};
+          --status-bar-height: ${isLandscape && hasNotch ? 24 : statusBarH}px;
+          --home-indicator-height: ${homeIndH}px;
+          --home-button-area: ${homeBtnArea}px;
+          --safe-top: ${safeT}px;
+          --safe-right: ${safeR}px;
+          --safe-bottom: ${safeB}px;
+          --safe-left: ${safeL}px;
+
+          border: none;
+          border-radius: 0;
+          resize: none;
+          overflow: visible;
+          background: transparent;
+          box-shadow: none;
+          min-width: 0;
+          min-height: 0;
+        }
+
+        .device-wrapper {
+          display: flex;
+          justify-content: center;
+          overflow: hidden;
+          width: 100%;
+        }
+
+        .device-frame {
+          display: flex;
+          flex-direction: column;
+          width: var(--device-width);
+          height: var(--device-height);
+          border: var(--device-bezel) solid var(--browser-window-bezel-color);
+          border-radius: var(--device-corner-radius);
+          overflow: hidden;
+          position: relative;
+          background: #000;
+          flex-shrink: 0;
+          transform-origin: top center;
+        }
+
+        .device-frame.home-button {
+          padding-bottom: var(--home-button-area);
+        }
+
+        /* Landscape with notch: horizontal layout */
+        .device-frame.landscape.dynamic-island,
+        .device-frame.landscape.punch-hole {
+          flex-direction: row;
+        }
+
+        .device-main {
+          display: flex;
+          flex-direction: column;
+          flex: 1;
+          min-width: 0;
+          overflow: hidden;
+        }
+
+        /* Notch sidebar (landscape phones with notch) */
+        .notch-sidebar {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+          position: relative;
+        }
+
+        .notch-sidebar.dynamic-island {
+          width: 59px;
+        }
+
+        .notch-sidebar.dynamic-island::before {
+          content: '';
+          width: 37px;
+          height: 126px;
+          background: var(--browser-window-bezel-color);
+          border-radius: 19px;
+        }
+
+        .notch-sidebar.punch-hole {
+          width: 48px;
+        }
+
+        .notch-sidebar.punch-hole::before {
+          content: '';
+          width: 12px;
+          height: 12px;
+          background: var(--browser-window-bezel-color);
+          border-radius: 50%;
+        }
+
+        /* Status bar */
+        .status-bar {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 0 16px;
+          height: var(--status-bar-height);
+          position: relative;
+          color: var(--browser-window-status-bar-color, rgba(255,255,255,0.9));
+          font-size: 14px;
+          font-weight: 600;
+          flex-shrink: 0;
+          z-index: 1;
+          background: transparent;
+        }
+
+        .status-bar.dynamic-island {
+          padding-top: 14px;
+        }
+
+        /* Dynamic Island pill (portrait only) */
+        .status-bar.dynamic-island::before {
+          content: '';
+          position: absolute;
+          top: 12px;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 126px;
+          height: 37px;
+          background: var(--browser-window-bezel-color);
+          border-radius: 19px;
+        }
+
+        /* Punch-hole camera (portrait only) */
+        .status-bar.punch-hole::before {
+          content: '';
+          position: absolute;
+          top: 10px;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 12px;
+          height: 12px;
+          background: var(--browser-window-bezel-color);
+          border-radius: 50%;
+        }
+
+        /* Home button (iPhone SE) */
+        .device-frame.home-button::after {
+          content: '';
+          position: absolute;
+          bottom: 16px;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 58px;
+          height: 58px;
+          border: 3px solid rgba(255, 255, 255, 0.15);
+          border-radius: 50%;
+          z-index: 1;
+        }
+
+        /* Home indicator pill */
+        .home-indicator {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: var(--home-indicator-height);
+          flex-shrink: 0;
+        }
+
+        .home-indicator-pill {
+          width: 134px;
+          height: 5px;
+          background: var(--browser-window-home-indicator-color, rgba(255,255,255,0.3));
+          border-radius: 3px;
+        }
+
+        /* Device mode content area */
+        :host([device]) .browser-content {
+          flex: 1;
+          min-height: 0;
+          overflow: hidden;
+          background: var(--browser-window-content-bg);
+        }
+
+        :host([device]) .browser-content iframe {
+          width: 100%;
+          height: 100%;
+          min-height: 0;
+        }
+
+        /* Status bar icons */
+        .status-time {
+          font-size: 14px;
+          font-weight: 600;
+          letter-spacing: 0.5px;
+          position: relative;
+          z-index: 1;
+        }
+
+        .status-icons {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          position: relative;
+          z-index: 1;
+        }
+
+        .signal-bars {
+          display: inline-flex;
+          align-items: flex-end;
+          gap: 1px;
+          height: 12px;
+        }
+
+        .signal-bars span {
+          display: inline-block;
+          width: 3px;
+          background: currentColor;
+          border-radius: 1px;
+        }
+
+        .signal-bars span:nth-child(1) { height: 4px; }
+        .signal-bars span:nth-child(2) { height: 6px; }
+        .signal-bars span:nth-child(3) { height: 8px; }
+        .signal-bars span:nth-child(4) { height: 10px; }
+
+        /* Wifi icon - dot with two arcs */
+        .wifi-icon {
+          display: inline-block;
+          width: 3px;
+          height: 3px;
+          background: currentColor;
+          border-radius: 50%;
+          position: relative;
+          margin: 0 5px;
+          vertical-align: middle;
+        }
+
+        .wifi-icon::before {
+          content: '';
+          position: absolute;
+          bottom: 3px;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 9px;
+          height: 9px;
+          border: 1.5px solid currentColor;
+          border-color: currentColor transparent transparent;
+          border-radius: 50%;
+        }
+
+        .wifi-icon::after {
+          content: '';
+          position: absolute;
+          bottom: 6px;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 15px;
+          height: 15px;
+          border: 1.5px solid currentColor;
+          border-color: currentColor transparent transparent;
+          border-radius: 50%;
+        }
+
+        /* Battery icon */
+        .battery-icon {
+          display: inline-block;
+          width: 22px;
+          height: 10px;
+          border: 1.5px solid currentColor;
+          border-radius: 2px;
+          position: relative;
+          vertical-align: middle;
+        }
+
+        .battery-icon::before {
+          /* Battery fill */
+          content: '';
+          position: absolute;
+          top: 1.5px;
+          left: 1.5px;
+          right: 1.5px;
+          bottom: 1.5px;
+          background: currentColor;
+          border-radius: 0.5px;
+        }
+
+        .battery-icon::after {
+          /* Battery cap */
+          content: '';
+          position: absolute;
+          right: -4px;
+          top: 50%;
+          transform: translateY(-50%);
+          width: 2px;
+          height: 5px;
+          background: currentColor;
+          border-radius: 0 1px 1px 0;
+        }
+
+        /* Light bezel: dark status bar text */
+        .device-frame.light-bezel .status-bar {
+          color: rgba(0, 0, 0, 0.8);
+        }
+
+        .device-frame.light-bezel .home-indicator-pill {
+          background: rgba(0, 0, 0, 0.3);
+        }
+
+        .device-frame.light-bezel.home-button::after {
+          border-color: rgba(0, 0, 0, 0.15);
+        }
+
+        /* Dark mode in device mode */
+        :host([device][mode="dark"]) .browser-content,
+        :host([device][data-page-mode="dark"]:not([mode])) .browser-content {
+          background: #000000;
+        }
+
+        /* Safe area overlays */
+        .safe-area-overlays {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: var(--home-button-area);
+          pointer-events: none;
+          z-index: 3;
+        }
+
+        .safe-area-overlay {
+          position: absolute;
+          background: var(--browser-window-safe-area-color, oklch(0.65 0.2 250 / 0.25));
+        }
+
+        .safe-area-top {
+          top: 0;
+          left: 0;
+          right: 0;
+          height: var(--safe-top);
+        }
+
+        .safe-area-right {
+          top: 0;
+          right: 0;
+          bottom: 0;
+          width: var(--safe-right);
+        }
+
+        .safe-area-bottom {
+          bottom: 0;
+          left: 0;
+          right: 0;
+          height: var(--safe-bottom);
+        }
+
+        .safe-area-left {
+          top: 0;
+          left: 0;
+          bottom: 0;
+          width: var(--safe-left);
+        }
+    `;
+  }
+
+  _deviceChrome(preset) {
+    const isLandscape = this.getAttribute('orientation') === 'landscape';
+    const hasNotch = preset.notch !== 'none';
+    const notchClass = hasNotch ? preset.notch : '';
+    const homeButtonClass = preset.homeButton ? 'home-button' : '';
+    const lightBezels = ['silver', 'gold', 'white'];
+    const lightBezelClass = lightBezels.includes(this.deviceColor) ? 'light-bezel' : '';
+    const landscapeClass = isLandscape ? 'landscape' : '';
+
+    const classes = ['device-frame', notchClass, homeButtonClass, lightBezelClass, landscapeClass]
+      .filter(Boolean)
+      .join(' ');
+
+    // In landscape with notch, the status bar doesn't show the notch (it's in the sidebar)
+    const statusBarNotchClass = isLandscape && hasNotch ? '' : notchClass;
+
+    const statusBar = `
+      <div class="status-bar ${statusBarNotchClass}">
+        <span class="status-time">9:41</span>
+        <div class="status-icons">
+          <span class="signal-bars" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+          <span class="wifi-icon" aria-hidden="true"></span>
+          <span class="battery-icon" aria-hidden="true"></span>
+        </div>
+      </div>
+    `;
+
+    const homeIndicator =
+      preset.homeIndicator && !preset.homeButton
+        ? '<div class="home-indicator"><div class="home-indicator-pill"></div></div>'
+        : '';
+
+    const safeAreaOverlays = this.hasAttribute('show-safe-areas')
+      ? `<div class="safe-area-overlays">
+          <div class="safe-area-overlay safe-area-top"></div>
+          <div class="safe-area-overlay safe-area-right"></div>
+          <div class="safe-area-overlay safe-area-bottom"></div>
+          <div class="safe-area-overlay safe-area-left"></div>
+        </div>`
+      : '';
+
+    // In landscape with notch, use sidebar layout for the notch
+    if (isLandscape && hasNotch) {
+      return `
+        <div class="device-wrapper">
+          <div class="${classes}">
+            <div class="notch-sidebar ${notchClass}"></div>
+            <div class="device-main">
+              ${statusBar}
+              ${this._contentHTML()}
+              ${homeIndicator}
+            </div>
+            ${safeAreaOverlays}
+          </div>
+        </div>
+      `;
+    }
+
+    return `
+      <div class="device-wrapper">
+        <div class="${classes}">
+          ${statusBar}
+          ${this._contentHTML()}
+          ${homeIndicator}
+          ${safeAreaOverlays}
+        </div>
+      </div>
+    `;
+  }
+
+  // --- Device scaling ---
+
+  _setupDeviceScaling() {
+    if (this._resizeObserver) return;
+    this._resizeObserver = new ResizeObserver(() => this._updateDeviceScale());
+    this._resizeObserver.observe(this);
+  }
+
+  _updateDeviceScale() {
+    const preset = this._getDevicePreset();
+    if (!preset) return;
+
+    const wrapper = this.shadowRoot.querySelector('.device-wrapper');
+    const frame = this.shadowRoot.querySelector('.device-frame');
+    if (!wrapper || !frame) return;
+
+    const hostWidth = this.clientWidth;
+    if (hostWidth === 0) return; // not yet laid out
+
+    const dims = this._getEffectiveDimensions(preset);
+    const deviceTotalWidth = dims.width + preset.bezel * 2;
+    const scale = Math.min(1, hostWidth / deviceTotalWidth);
+    this._currentScale = scale;
+
+    frame.style.transform = `scale(${scale})`;
+
+    const homeBtnArea = preset.homeButton ? HOME_BUTTON_AREA : 0;
+    const totalHeight = dims.height + preset.bezel * 2 + homeBtnArea;
+    wrapper.style.height = `${totalHeight * scale}px`;
+  }
+
+  _teardownDeviceScaling() {
+    if (this._resizeObserver) {
+      this._resizeObserver.disconnect();
+      this._resizeObserver = null;
+    }
+    this._currentScale = 1;
   }
 
   escapeHtml(text) {

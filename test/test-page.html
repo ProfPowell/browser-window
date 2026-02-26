@@ -79,5 +79,62 @@
       </div>
     </browser-window>
   </div>
+
+  <!-- Device mode test fixtures -->
+  <div class="test-section">
+    <h2>Device: iPhone 16</h2>
+    <browser-window id="device-iphone" device="iphone-16" src="../docs/example.html"></browser-window>
+  </div>
+
+  <div class="test-section">
+    <h2>Device: iPhone SE</h2>
+    <browser-window id="device-se" device="iphone-se" src="../docs/example.html"></browser-window>
+  </div>
+
+  <div class="test-section">
+    <h2>Device: Pixel 9</h2>
+    <browser-window id="device-pixel" device="pixel-9" src="../docs/example.html"></browser-window>
+  </div>
+
+  <div class="test-section">
+    <h2>Device: iPad Air</h2>
+    <browser-window id="device-ipad" device="ipad-air" src="../docs/example.html"></browser-window>
+  </div>
+
+  <div class="test-section">
+    <h2>Device: iPhone 16 Dark Mode</h2>
+    <browser-window id="device-dark" device="iphone-16" mode="dark" src="../docs/example.html"></browser-window>
+  </div>
+
+  <div class="test-section">
+    <h2>Device: iPhone 16 Silver</h2>
+    <browser-window id="device-silver" device="iphone-16" device-color="silver" src="../docs/example.html"></browser-window>
+  </div>
+
+  <div class="test-section">
+    <h2>Device: Unknown (fallback test)</h2>
+    <browser-window id="device-unknown" device="nokia-3310" src="../docs/example.html"></browser-window>
+  </div>
+
+  <!-- Phase 2: Orientation and safe area test fixtures -->
+  <div class="test-section">
+    <h2>Device: iPhone 16 Landscape</h2>
+    <browser-window id="device-landscape" device="iphone-16" orientation="landscape" src="../docs/example.html"></browser-window>
+  </div>
+
+  <div class="test-section">
+    <h2>Device: iPad Air Landscape</h2>
+    <browser-window id="device-landscape-tablet" device="ipad-air" orientation="landscape" src="../docs/example.html"></browser-window>
+  </div>
+
+  <div class="test-section">
+    <h2>Device: iPhone 16 with Safe Areas</h2>
+    <browser-window id="device-safe-areas" device="iphone-16" show-safe-areas src="../docs/example.html"></browser-window>
+  </div>
+
+  <div class="test-section">
+    <h2>Device: iPhone 16 Landscape with Safe Areas</h2>
+    <browser-window id="device-landscape-safe" device="iphone-16" orientation="landscape" show-safe-areas src="../docs/example.html"></browser-window>
+  </div>
 </body>
 </html>
