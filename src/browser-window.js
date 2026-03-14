@@ -79,6 +79,10 @@ function _detectPageDarkMode() {
   )
     return false;
 
+  // Check Vanilla Breeze data-mode attribute
+  if (html.getAttribute('data-mode') === 'dark') return true;
+  if (html.getAttribute('data-mode') === 'light') return false;
+
   // Check computed color-scheme
   const colorScheme = getComputedStyle(html).colorScheme;
   if (colorScheme === 'dark') return true;
@@ -104,7 +108,7 @@ function _startObserving() {
 
   const observeOptions = {
     attributes: true,
-    attributeFilter: ['class', 'data-theme', 'data-bs-theme', 'style'],
+    attributeFilter: ['class', 'data-theme', 'data-bs-theme', 'data-mode', 'style'],
   };
 
   _pageObserver.observe(document.documentElement, observeOptions);
@@ -868,22 +872,24 @@ export class BrowserWindow extends HTMLElement {
   _sharedCSS() {
     return `
         :host {
-          /* CSS Custom Properties with light mode defaults */
-          --browser-window-bg: #ffffff;
-          --browser-window-header-bg: #f6f8fa;
-          --browser-window-border-color: #d1d5da;
+          /* Internal defaults — external --browser-window-* overrides always win */
+          --_bw-bg: var(--color-surface, #ffffff);
+          --_bw-header-bg: var(--color-surface-raised, #f6f8fa);
+          --_bw-border-color: var(--color-border, #d1d5da);
+          --_bw-text-color: var(--color-text, #24292e);
+          --_bw-text-muted: var(--color-text-muted, #586069);
+          --_bw-url-bg: var(--color-surface, #ffffff);
+          --_bw-hover-bg: #f3f4f6;
+          --_bw-content-bg: var(--color-surface, #ffffff);
+
+          /* Non-structural properties */
           --browser-window-border-radius: 8px;
-          --browser-window-text-color: #24292e;
-          --browser-window-text-muted: #586069;
-          --browser-window-url-bg: #ffffff;
           --browser-window-shadow: ${this.hasShadow ? '0 4px 12px rgba(0, 0, 0, 0.15)' : 'none'};
           --browser-window-close-color: #ff5f57;
           --browser-window-minimize-color: #febc2e;
           --browser-window-maximize-color: #28c840;
           --browser-window-accent-color: #2563eb;
-          --browser-window-hover-bg: #f3f4f6;
           --browser-window-active-bg: #dbeafe;
-          --browser-window-content-bg: #ffffff;
           --browser-window-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
           --browser-window-mono-font: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
 
@@ -892,12 +898,12 @@ export class BrowserWindow extends HTMLElement {
           margin: 1rem 0;
           border-radius: var(--browser-window-border-radius);
           overflow: hidden;
-          border: 1px solid var(--browser-window-border-color);
-          background: var(--browser-window-bg);
+          border: 1px solid var(--browser-window-border-color, var(--_bw-border-color));
+          background: var(--browser-window-bg, var(--_bw-bg));
           box-shadow: var(--browser-window-shadow);
           transition: all 250ms ease-out;
           font-family: var(--browser-window-font-family);
-          color: var(--browser-window-text-color);
+          color: var(--browser-window-text-color, var(--_bw-text-color));
           color-scheme: light;
 
           /* Resizable container */
@@ -910,66 +916,66 @@ export class BrowserWindow extends HTMLElement {
         /* Auto dark mode based on system preference (when no mode attribute) */
         @media (prefers-color-scheme: dark) {
           :host(:not([mode])) {
-            --browser-window-bg: #1c1c1e;
-            --browser-window-header-bg: #2c2c2e;
-            --browser-window-border-color: #3a3a3c;
-            --browser-window-text-color: #e5e5e7;
-            --browser-window-text-muted: #98989d;
-            --browser-window-url-bg: #1c1c1e;
-            --browser-window-hover-bg: #3a3a3c;
-            --browser-window-content-bg: #000000;
+            --_bw-bg: var(--color-surface, #1c1c1e);
+            --_bw-header-bg: var(--color-surface-raised, #2c2c2e);
+            --_bw-border-color: var(--color-border, #3a3a3c);
+            --_bw-text-color: var(--color-text, #e5e5e7);
+            --_bw-text-muted: var(--color-text-muted, #98989d);
+            --_bw-url-bg: var(--color-surface, #1c1c1e);
+            --_bw-hover-bg: #3a3a3c;
+            --_bw-content-bg: var(--color-surface, #000000);
             color-scheme: dark;
           }
         }
 
         /* Page-level dark mode detection (overrides media query via higher specificity) */
         :host([data-page-mode="dark"]:not([mode])) {
-          --browser-window-bg: #1c1c1e;
-          --browser-window-header-bg: #2c2c2e;
-          --browser-window-border-color: #3a3a3c;
-          --browser-window-text-color: #e5e5e7;
-          --browser-window-text-muted: #98989d;
-          --browser-window-url-bg: #1c1c1e;
-          --browser-window-hover-bg: #3a3a3c;
-          --browser-window-content-bg: #000000;
+          --_bw-bg: var(--color-surface, #1c1c1e);
+          --_bw-header-bg: var(--color-surface-raised, #2c2c2e);
+          --_bw-border-color: var(--color-border, #3a3a3c);
+          --_bw-text-color: var(--color-text, #e5e5e7);
+          --_bw-text-muted: var(--color-text-muted, #98989d);
+          --_bw-url-bg: var(--color-surface, #1c1c1e);
+          --_bw-hover-bg: #3a3a3c;
+          --_bw-content-bg: var(--color-surface, #000000);
           color-scheme: dark;
         }
 
         :host([data-page-mode="light"]:not([mode])) {
-          --browser-window-bg: #ffffff;
-          --browser-window-header-bg: #f6f8fa;
-          --browser-window-border-color: #d1d5da;
-          --browser-window-text-color: #24292e;
-          --browser-window-text-muted: #586069;
-          --browser-window-url-bg: #ffffff;
-          --browser-window-hover-bg: #f3f4f6;
-          --browser-window-content-bg: #ffffff;
+          --_bw-bg: var(--color-surface, #ffffff);
+          --_bw-header-bg: var(--color-surface-raised, #f6f8fa);
+          --_bw-border-color: var(--color-border, #d1d5da);
+          --_bw-text-color: var(--color-text, #24292e);
+          --_bw-text-muted: var(--color-text-muted, #586069);
+          --_bw-url-bg: var(--color-surface, #ffffff);
+          --_bw-hover-bg: #f3f4f6;
+          --_bw-content-bg: var(--color-surface, #ffffff);
           color-scheme: light;
         }
 
         /* Explicit dark mode override */
         :host([mode="dark"]) {
-          --browser-window-bg: #1c1c1e;
-          --browser-window-header-bg: #2c2c2e;
-          --browser-window-border-color: #3a3a3c;
-          --browser-window-text-color: #e5e5e7;
-          --browser-window-text-muted: #98989d;
-          --browser-window-url-bg: #1c1c1e;
-          --browser-window-hover-bg: #3a3a3c;
-          --browser-window-content-bg: #000000;
+          --_bw-bg: var(--color-surface, #1c1c1e);
+          --_bw-header-bg: var(--color-surface-raised, #2c2c2e);
+          --_bw-border-color: var(--color-border, #3a3a3c);
+          --_bw-text-color: var(--color-text, #e5e5e7);
+          --_bw-text-muted: var(--color-text-muted, #98989d);
+          --_bw-url-bg: var(--color-surface, #1c1c1e);
+          --_bw-hover-bg: #3a3a3c;
+          --_bw-content-bg: var(--color-surface, #000000);
           color-scheme: dark;
         }
 
         /* Explicit light mode override (for users on dark system who want light) */
         :host([mode="light"]) {
-          --browser-window-bg: #ffffff;
-          --browser-window-header-bg: #f6f8fa;
-          --browser-window-border-color: #d1d5da;
-          --browser-window-text-color: #24292e;
-          --browser-window-text-muted: #586069;
-          --browser-window-url-bg: #ffffff;
-          --browser-window-hover-bg: #f3f4f6;
-          --browser-window-content-bg: #ffffff;
+          --_bw-bg: var(--color-surface, #ffffff);
+          --_bw-header-bg: var(--color-surface-raised, #f6f8fa);
+          --_bw-border-color: var(--color-border, #d1d5da);
+          --_bw-text-color: var(--color-text, #24292e);
+          --_bw-text-muted: var(--color-text-muted, #586069);
+          --_bw-url-bg: var(--color-surface, #ffffff);
+          --_bw-hover-bg: #f3f4f6;
+          --_bw-content-bg: var(--color-surface, #ffffff);
           color-scheme: light;
         }
 
@@ -991,7 +997,7 @@ export class BrowserWindow extends HTMLElement {
         }
 
         .browser-content {
-          background: var(--browser-window-content-bg);
+          background: var(--browser-window-content-bg, var(--_bw-content-bg));
           min-height: 200px;
           padding: 0;
           flex: 1;
@@ -1031,7 +1037,7 @@ export class BrowserWindow extends HTMLElement {
 
         .source-view {
           padding: 0;
-          background: var(--browser-window-header-bg);
+          background: var(--browser-window-header-bg, var(--_bw-header-bg));
           min-height: 200px;
           /* Constrain source view height to prevent container expansion */
           max-height: 50vh;
@@ -1049,15 +1055,15 @@ export class BrowserWindow extends HTMLElement {
           align-items: center;
           justify-content: space-between;
           padding: 0.75rem 1rem;
-          background: var(--browser-window-header-bg);
-          border-bottom: 1px solid var(--browser-window-border-color);
+          background: var(--browser-window-header-bg, var(--_bw-header-bg));
+          border-bottom: 1px solid var(--browser-window-border-color, var(--_bw-border-color));
           backdrop-filter: blur(8px);
         }
 
         .source-label {
           font-weight: 600;
           font-size: 0.875rem;
-          color: var(--browser-window-text-color);
+          color: var(--browser-window-text-color, var(--_bw-text-color));
           text-transform: uppercase;
           letter-spacing: 0.5px;
         }
@@ -1067,10 +1073,10 @@ export class BrowserWindow extends HTMLElement {
           align-items: center;
           gap: 0.375rem;
           padding: 0.375rem 0.75rem;
-          background: var(--browser-window-bg);
-          border: 1px solid var(--browser-window-border-color);
+          background: var(--browser-window-bg, var(--_bw-bg));
+          border: 1px solid var(--browser-window-border-color, var(--_bw-border-color));
           border-radius: 6px;
-          color: var(--browser-window-text-color);
+          color: var(--browser-window-text-color, var(--_bw-text-color));
           font-size: 0.875rem;
           font-weight: 500;
           cursor: pointer;
@@ -1078,7 +1084,7 @@ export class BrowserWindow extends HTMLElement {
         }
 
         .copy-source-button:hover {
-          background: var(--browser-window-hover-bg);
+          background: var(--browser-window-hover-bg, var(--_bw-hover-bg));
         }
 
         .copy-source-button:active {
@@ -1094,8 +1100,8 @@ export class BrowserWindow extends HTMLElement {
         .source-view pre {
           margin: 0;
           padding: 1rem;
-          background: var(--browser-window-content-bg);
-          border: 1px solid var(--browser-window-border-color);
+          background: var(--browser-window-content-bg, var(--_bw-content-bg));
+          border: 1px solid var(--browser-window-border-color, var(--_bw-border-color));
           border-radius: 6px;
           overflow-x: auto;
           font-family: var(--browser-window-mono-font);
@@ -1104,7 +1110,7 @@ export class BrowserWindow extends HTMLElement {
         }
 
         .source-view code {
-          color: var(--browser-window-text-color);
+          color: var(--browser-window-text-color, var(--_bw-text-color));
           display: block;
           white-space: pre;
         }
@@ -1116,7 +1122,7 @@ export class BrowserWindow extends HTMLElement {
           justify-content: center;
           padding: 3rem 1rem;
           text-align: center;
-          color: var(--browser-window-text-muted);
+          color: var(--browser-window-text-muted, var(--_bw-text-muted));
           min-height: 200px;
         }
 
@@ -1159,8 +1165,8 @@ export class BrowserWindow extends HTMLElement {
           align-items: center;
           gap: 0.75rem;
           padding: 0.75rem 1rem;
-          background: var(--browser-window-header-bg);
-          border-bottom: 1px solid var(--browser-window-border-color);
+          background: var(--browser-window-header-bg, var(--_bw-header-bg));
+          border-bottom: 1px solid var(--browser-window-border-color, var(--_bw-border-color));
           cursor: zoom-in;
           user-select: none;
         }
@@ -1254,16 +1260,16 @@ export class BrowserWindow extends HTMLElement {
           align-items: center;
           gap: 0.5rem;
           padding: 0.375rem 0.75rem;
-          background: var(--browser-window-url-bg);
-          border: 1px solid var(--browser-window-border-color);
+          background: var(--browser-window-url-bg, var(--_bw-url-bg));
+          border: 1px solid var(--browser-window-border-color, var(--_bw-border-color));
           border-radius: 6px;
           font-size: 0.875rem;
-          color: var(--browser-window-text-muted);
+          color: var(--browser-window-text-muted, var(--_bw-text-muted));
           cursor: default !important;
         }
 
         .lock-icon {
-          color: var(--browser-window-text-muted);
+          color: var(--browser-window-text-muted, var(--_bw-text-muted));
           font-size: 0.75rem;
         }
 
@@ -1272,7 +1278,7 @@ export class BrowserWindow extends HTMLElement {
           overflow: hidden;
           text-overflow: ellipsis;
           white-space: nowrap;
-          color: var(--browser-window-text-muted);
+          color: var(--browser-window-text-muted, var(--_bw-text-muted));
         }
 
         .view-source-button,
@@ -1284,15 +1290,15 @@ export class BrowserWindow extends HTMLElement {
           display: flex;
           align-items: center;
           justify-content: center;
-          color: var(--browser-window-text-muted);
+          color: var(--browser-window-text-muted, var(--_bw-text-muted));
           transition: all 150ms ease;
           border-radius: 4px;
         }
 
         .view-source-button:hover,
         .download-button:hover {
-          color: var(--browser-window-text-color);
-          background: var(--browser-window-hover-bg);
+          color: var(--browser-window-text-color, var(--_bw-text-color));
+          background: var(--browser-window-hover-bg, var(--_bw-hover-bg));
         }
 
         .view-source-button:active,
@@ -1323,14 +1329,14 @@ export class BrowserWindow extends HTMLElement {
           display: flex;
           align-items: center;
           justify-content: center;
-          color: var(--browser-window-text-muted);
+          color: var(--browser-window-text-muted, var(--_bw-text-muted));
           transition: all 150ms ease;
           border-radius: 4px;
         }
 
         .share-button:hover {
-          color: var(--browser-window-text-color);
-          background: var(--browser-window-hover-bg);
+          color: var(--browser-window-text-color, var(--_bw-text-color));
+          background: var(--browser-window-hover-bg, var(--_bw-hover-bg));
         }
 
         .share-button:active {
@@ -1347,8 +1353,8 @@ export class BrowserWindow extends HTMLElement {
           position: absolute;
           top: calc(100% + 4px);
           right: 0;
-          background: var(--browser-window-header-bg);
-          border: 1px solid var(--browser-window-border-color);
+          background: var(--browser-window-header-bg, var(--_bw-header-bg));
+          border: 1px solid var(--browser-window-border-color, var(--_bw-border-color));
           border-radius: 8px;
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
           min-width: 180px;
@@ -1364,13 +1370,13 @@ export class BrowserWindow extends HTMLElement {
           padding: 0.625rem 1rem;
           background: none;
           border: none;
-          color: var(--browser-window-text-color);
+          color: var(--browser-window-text-color, var(--_bw-text-color));
           font-size: 0.875rem;
           font-weight: 500;
           text-align: left;
           cursor: pointer;
           transition: background 150ms ease;
-          border-bottom: 1px solid var(--browser-window-border-color);
+          border-bottom: 1px solid var(--browser-window-border-color, var(--_bw-border-color));
         }
 
         .share-menu-item:last-child {
@@ -1378,7 +1384,7 @@ export class BrowserWindow extends HTMLElement {
         }
 
         .share-menu-item:hover {
-          background: var(--browser-window-hover-bg);
+          background: var(--browser-window-hover-bg, var(--_bw-hover-bg));
         }
 
         .share-menu-item:active {
@@ -1709,7 +1715,7 @@ export class BrowserWindow extends HTMLElement {
           flex: 1;
           min-height: 0;
           overflow: hidden;
-          background: var(--browser-window-content-bg);
+          background: var(--browser-window-content-bg, var(--_bw-content-bg));
         }
 
         :host([device]) .browser-content iframe {

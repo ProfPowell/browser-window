@@ -1,6 +1,6 @@
-const w = /* @__PURE__ */ new Set();
+const b = /* @__PURE__ */ new Set();
 let l = null, m = null;
-function p() {
+function f() {
   const i = document.documentElement, e = document.body;
   if (!i || !e) return null;
   if (i.classList.contains("dark") || e.classList.contains("dark") || i.getAttribute("data-theme") === "dark" || e.getAttribute("data-theme") === "dark")
@@ -11,38 +11,40 @@ function p() {
     return !0;
   if (i.getAttribute("data-bs-theme") === "light" || e.getAttribute("data-bs-theme") === "light")
     return !1;
+  if (i.getAttribute("data-mode") === "dark") return !0;
+  if (i.getAttribute("data-mode") === "light") return !1;
   const t = getComputedStyle(i).colorScheme;
   return t === "dark" ? !0 : t === "light" ? !1 : null;
 }
 function y() {
-  const i = p();
+  const i = f();
   if (i !== m) {
     m = i;
-    for (const e of w)
+    for (const e of b)
       e._onPageModeChange(i);
   }
 }
-function k() {
+function _() {
   if (l) return;
   l = new MutationObserver(y);
   const i = {
     attributes: !0,
-    attributeFilter: ["class", "data-theme", "data-bs-theme", "style"]
+    attributeFilter: ["class", "data-theme", "data-bs-theme", "data-mode", "style"]
   };
   l.observe(document.documentElement, i), document.body && l.observe(document.body, i);
 }
-function S() {
+function k() {
   l && (l.disconnect(), l = null);
 }
-function z(i) {
-  w.add(i), w.size === 1 && k();
-  const e = p();
+function S(i) {
+  b.add(i), b.size === 1 && _();
+  const e = f();
   m = e, i._onPageModeChange(e);
 }
-function C(i) {
-  w.delete(i), w.size === 0 && (S(), m = null);
+function z(i) {
+  b.delete(i), b.size === 0 && (k(), m = null);
 }
-const g = {
+const v = {
   "iphone-16": {
     width: 393,
     height: 852,
@@ -133,26 +135,26 @@ const g = {
     homeButton: !1,
     safeInsets: [24, 0, 20, 0]
   }
-}, v = {
+}, g = {
   midnight: "#1a1a1a",
   silver: "#c0c0c0",
   gold: "#d4a574",
   blue: "#3a4f6f",
   white: "#f0f0f0"
-}, M = {
+}, C = {
   "dynamic-island": 54,
   "punch-hole": 36,
   none: 24
-}, _ = 28, x = 80;
+}, M = 28, x = 80;
 class L extends HTMLElement {
   constructor() {
     super(), this.attachShadow({ mode: "open" }), this.isMinimized = !1, this.isMaximized = !1, this.overlay = null, this.showSource = !1, this.sourceCode = "", this.showShareMenu = !1, this.handleKeydown = this.handleKeydown.bind(this), this.handleOutsideClick = this.handleOutsideClick.bind(this), this._resizeObserver = null, this._currentScale = 1;
   }
   async connectedCallback() {
-    this.render(), this.attachEventListeners(), this.src && await this.fetchSourceCode(), z(this), this._getDevicePreset() && this._setupDeviceScaling();
+    this.render(), this.attachEventListeners(), this.src && await this.fetchSourceCode(), S(this), this._getDevicePreset() && this._setupDeviceScaling();
   }
   disconnectedCallback() {
-    C(this), this.removeOverlay(), this._teardownDeviceScaling(), document.removeEventListener("keydown", this.handleKeydown), document.removeEventListener("click", this.handleOutsideClick);
+    z(this), this.removeOverlay(), this._teardownDeviceScaling(), document.removeEventListener("keydown", this.handleKeydown), document.removeEventListener("click", this.handleOutsideClick);
   }
   static get observedAttributes() {
     return [
@@ -168,7 +170,7 @@ class L extends HTMLElement {
     ];
   }
   attributeChangedCallback(e) {
-    this.shadowRoot && (this.render(), this.attachEventListeners()), (e === "device" || e === "orientation") && (this._teardownDeviceScaling(), this._getDevicePreset() && this._setupDeviceScaling()), e === "mode" && (this.hasAttribute("mode") ? this.removeAttribute("data-page-mode") : this._onPageModeChange(p()));
+    this.shadowRoot && (this.render(), this.attachEventListeners()), (e === "device" || e === "orientation") && (this._teardownDeviceScaling(), this._getDevicePreset() && this._setupDeviceScaling()), e === "mode" && (this.hasAttribute("mode") ? this.removeAttribute("data-page-mode") : this._onPageModeChange(f()));
   }
   get url() {
     return this.getAttribute("url") || "";
@@ -191,10 +193,10 @@ class L extends HTMLElement {
   _getDevicePreset() {
     const e = this.getAttribute("device");
     if (!e) return null;
-    const t = g[e];
+    const t = v[e];
     return t || (console.warn(
       `<browser-window>: Unknown device preset "${e}", falling back to "iphone-16"`
-    ), g["iphone-16"]);
+    ), v["iphone-16"]);
   }
   _getEffectiveDimensions(e) {
     const t = this.getAttribute("orientation") === "landscape";
@@ -204,8 +206,8 @@ class L extends HTMLElement {
     };
   }
   _getEffectiveSafeInsets(e) {
-    const [t, o, r, s] = e.safeInsets;
-    return this.getAttribute("orientation") === "landscape" ? [s, t, o, r] : [t, o, r, s];
+    const [t, o, r, n] = e.safeInsets;
+    return this.getAttribute("orientation") === "landscape" ? [n, t, o, r] : [t, o, r, n];
   }
   _onPageModeChange(e) {
     if (this.hasAttribute("mode")) {
@@ -232,13 +234,13 @@ class L extends HTMLElement {
         if (!o) return;
         const r = o.querySelector("style[data-browser-window-safe-areas]");
         r && r.remove();
-        const [s, c, n, d] = this._getEffectiveSafeInsets(t), a = o.createElement("style");
+        const [n, d, s, c] = this._getEffectiveSafeInsets(t), a = o.createElement("style");
         a.setAttribute("data-browser-window-safe-areas", ""), a.textContent = `
         :root {
-          --safe-top: ${s}px;
-          --safe-right: ${c}px;
-          --safe-bottom: ${n}px;
-          --safe-left: ${d}px;
+          --safe-top: ${n}px;
+          --safe-right: ${d}px;
+          --safe-bottom: ${s}px;
+          --safe-left: ${c}px;
         }
       `, o.head.appendChild(a);
       } catch {
@@ -256,16 +258,16 @@ class L extends HTMLElement {
     }
   }
   attachEventListeners() {
-    const e = this.shadowRoot.querySelector(".control-button.close"), t = this.shadowRoot.querySelector(".control-button.minimize"), o = this.shadowRoot.querySelector(".control-button.maximize"), r = this.shadowRoot.querySelector(".view-source-button"), s = this.shadowRoot.querySelector(".copy-source-button"), c = this.shadowRoot.querySelector(".share-button"), n = this.shadowRoot.querySelector(".browser-header");
-    e?.addEventListener("click", () => this.handleClose()), t?.addEventListener("click", () => this.toggleMinimize()), o?.addEventListener("click", () => this.toggleMaximize()), r?.addEventListener("click", () => this.toggleViewSource()), s?.addEventListener("click", () => this.copySourceCode()), c?.addEventListener("click", (a) => {
+    const e = this.shadowRoot.querySelector(".control-button.close"), t = this.shadowRoot.querySelector(".control-button.minimize"), o = this.shadowRoot.querySelector(".control-button.maximize"), r = this.shadowRoot.querySelector(".view-source-button"), n = this.shadowRoot.querySelector(".copy-source-button"), d = this.shadowRoot.querySelector(".share-button"), s = this.shadowRoot.querySelector(".browser-header");
+    e?.addEventListener("click", () => this.handleClose()), t?.addEventListener("click", () => this.toggleMinimize()), o?.addEventListener("click", () => this.toggleMaximize()), r?.addEventListener("click", () => this.toggleViewSource()), n?.addEventListener("click", () => this.copySourceCode()), d?.addEventListener("click", (a) => {
       a.stopPropagation(), this.toggleShareMenu();
-    }), n?.addEventListener("dblclick", (a) => {
+    }), s?.addEventListener("dblclick", (a) => {
       const h = a.target;
       (h.classList.contains("browser-header") || h.classList.contains("controls")) && this.toggleMaximize();
     });
-    const d = this.shadowRoot.querySelector("iframe");
-    d?.addEventListener("error", () => this.handleIframeError()), d?.addEventListener("load", () => {
-      this._syncIframeColorScheme(), this._getDevicePreset() && this._injectSafeAreas(d);
+    const c = this.shadowRoot.querySelector("iframe");
+    c?.addEventListener("error", () => this.handleIframeError()), c?.addEventListener("load", () => {
+      this._syncIframeColorScheme(), this._getDevicePreset() && this._injectSafeAreas(c);
     });
   }
   handleIframeError() {
@@ -368,13 +370,13 @@ class L extends HTMLElement {
   }
   parseHTMLForCodePen() {
     if (!this.sourceCode) return null;
-    const t = new DOMParser().parseFromString(this.sourceCode, "text/html"), o = Array.from(t.querySelectorAll("style")).map((n) => n.textContent).join(`
+    const t = new DOMParser().parseFromString(this.sourceCode, "text/html"), o = Array.from(t.querySelectorAll("style")).map((s) => s.textContent).join(`
 
-`), r = Array.from(t.querySelectorAll("script")).filter((n) => !n.src && n.type !== "module").map((n) => n.textContent).join(`
+`), r = Array.from(t.querySelectorAll("script")).filter((s) => !s.src && s.type !== "module").map((s) => s.textContent).join(`
 
-`), s = t.body.cloneNode(!0);
-    return s.querySelectorAll("script, style").forEach((n) => n.remove()), {
-      html: s.innerHTML.trim(),
+`), n = t.body.cloneNode(!0);
+    return n.querySelectorAll("script, style").forEach((s) => s.remove()), {
+      html: n.innerHTML.trim(),
       css: o.trim(),
       js: r.trim()
     };
@@ -453,22 +455,24 @@ class L extends HTMLElement {
   _sharedCSS() {
     return `
         :host {
-          /* CSS Custom Properties with light mode defaults */
-          --browser-window-bg: #ffffff;
-          --browser-window-header-bg: #f6f8fa;
-          --browser-window-border-color: #d1d5da;
+          /* Internal defaults — external --browser-window-* overrides always win */
+          --_bw-bg: var(--color-surface, #ffffff);
+          --_bw-header-bg: var(--color-surface-raised, #f6f8fa);
+          --_bw-border-color: var(--color-border, #d1d5da);
+          --_bw-text-color: var(--color-text, #24292e);
+          --_bw-text-muted: var(--color-text-muted, #586069);
+          --_bw-url-bg: var(--color-surface, #ffffff);
+          --_bw-hover-bg: #f3f4f6;
+          --_bw-content-bg: var(--color-surface, #ffffff);
+
+          /* Non-structural properties */
           --browser-window-border-radius: 8px;
-          --browser-window-text-color: #24292e;
-          --browser-window-text-muted: #586069;
-          --browser-window-url-bg: #ffffff;
           --browser-window-shadow: ${this.hasShadow ? "0 4px 12px rgba(0, 0, 0, 0.15)" : "none"};
           --browser-window-close-color: #ff5f57;
           --browser-window-minimize-color: #febc2e;
           --browser-window-maximize-color: #28c840;
           --browser-window-accent-color: #2563eb;
-          --browser-window-hover-bg: #f3f4f6;
           --browser-window-active-bg: #dbeafe;
-          --browser-window-content-bg: #ffffff;
           --browser-window-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
           --browser-window-mono-font: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
 
@@ -477,12 +481,12 @@ class L extends HTMLElement {
           margin: 1rem 0;
           border-radius: var(--browser-window-border-radius);
           overflow: hidden;
-          border: 1px solid var(--browser-window-border-color);
-          background: var(--browser-window-bg);
+          border: 1px solid var(--browser-window-border-color, var(--_bw-border-color));
+          background: var(--browser-window-bg, var(--_bw-bg));
           box-shadow: var(--browser-window-shadow);
           transition: all 250ms ease-out;
           font-family: var(--browser-window-font-family);
-          color: var(--browser-window-text-color);
+          color: var(--browser-window-text-color, var(--_bw-text-color));
           color-scheme: light;
 
           /* Resizable container */
@@ -495,66 +499,66 @@ class L extends HTMLElement {
         /* Auto dark mode based on system preference (when no mode attribute) */
         @media (prefers-color-scheme: dark) {
           :host(:not([mode])) {
-            --browser-window-bg: #1c1c1e;
-            --browser-window-header-bg: #2c2c2e;
-            --browser-window-border-color: #3a3a3c;
-            --browser-window-text-color: #e5e5e7;
-            --browser-window-text-muted: #98989d;
-            --browser-window-url-bg: #1c1c1e;
-            --browser-window-hover-bg: #3a3a3c;
-            --browser-window-content-bg: #000000;
+            --_bw-bg: var(--color-surface, #1c1c1e);
+            --_bw-header-bg: var(--color-surface-raised, #2c2c2e);
+            --_bw-border-color: var(--color-border, #3a3a3c);
+            --_bw-text-color: var(--color-text, #e5e5e7);
+            --_bw-text-muted: var(--color-text-muted, #98989d);
+            --_bw-url-bg: var(--color-surface, #1c1c1e);
+            --_bw-hover-bg: #3a3a3c;
+            --_bw-content-bg: var(--color-surface, #000000);
             color-scheme: dark;
           }
         }
 
         /* Page-level dark mode detection (overrides media query via higher specificity) */
         :host([data-page-mode="dark"]:not([mode])) {
-          --browser-window-bg: #1c1c1e;
-          --browser-window-header-bg: #2c2c2e;
-          --browser-window-border-color: #3a3a3c;
-          --browser-window-text-color: #e5e5e7;
-          --browser-window-text-muted: #98989d;
-          --browser-window-url-bg: #1c1c1e;
-          --browser-window-hover-bg: #3a3a3c;
-          --browser-window-content-bg: #000000;
+          --_bw-bg: var(--color-surface, #1c1c1e);
+          --_bw-header-bg: var(--color-surface-raised, #2c2c2e);
+          --_bw-border-color: var(--color-border, #3a3a3c);
+          --_bw-text-color: var(--color-text, #e5e5e7);
+          --_bw-text-muted: var(--color-text-muted, #98989d);
+          --_bw-url-bg: var(--color-surface, #1c1c1e);
+          --_bw-hover-bg: #3a3a3c;
+          --_bw-content-bg: var(--color-surface, #000000);
           color-scheme: dark;
         }
 
         :host([data-page-mode="light"]:not([mode])) {
-          --browser-window-bg: #ffffff;
-          --browser-window-header-bg: #f6f8fa;
-          --browser-window-border-color: #d1d5da;
-          --browser-window-text-color: #24292e;
-          --browser-window-text-muted: #586069;
-          --browser-window-url-bg: #ffffff;
-          --browser-window-hover-bg: #f3f4f6;
-          --browser-window-content-bg: #ffffff;
+          --_bw-bg: var(--color-surface, #ffffff);
+          --_bw-header-bg: var(--color-surface-raised, #f6f8fa);
+          --_bw-border-color: var(--color-border, #d1d5da);
+          --_bw-text-color: var(--color-text, #24292e);
+          --_bw-text-muted: var(--color-text-muted, #586069);
+          --_bw-url-bg: var(--color-surface, #ffffff);
+          --_bw-hover-bg: #f3f4f6;
+          --_bw-content-bg: var(--color-surface, #ffffff);
           color-scheme: light;
         }
 
         /* Explicit dark mode override */
         :host([mode="dark"]) {
-          --browser-window-bg: #1c1c1e;
-          --browser-window-header-bg: #2c2c2e;
-          --browser-window-border-color: #3a3a3c;
-          --browser-window-text-color: #e5e5e7;
-          --browser-window-text-muted: #98989d;
-          --browser-window-url-bg: #1c1c1e;
-          --browser-window-hover-bg: #3a3a3c;
-          --browser-window-content-bg: #000000;
+          --_bw-bg: var(--color-surface, #1c1c1e);
+          --_bw-header-bg: var(--color-surface-raised, #2c2c2e);
+          --_bw-border-color: var(--color-border, #3a3a3c);
+          --_bw-text-color: var(--color-text, #e5e5e7);
+          --_bw-text-muted: var(--color-text-muted, #98989d);
+          --_bw-url-bg: var(--color-surface, #1c1c1e);
+          --_bw-hover-bg: #3a3a3c;
+          --_bw-content-bg: var(--color-surface, #000000);
           color-scheme: dark;
         }
 
         /* Explicit light mode override (for users on dark system who want light) */
         :host([mode="light"]) {
-          --browser-window-bg: #ffffff;
-          --browser-window-header-bg: #f6f8fa;
-          --browser-window-border-color: #d1d5da;
-          --browser-window-text-color: #24292e;
-          --browser-window-text-muted: #586069;
-          --browser-window-url-bg: #ffffff;
-          --browser-window-hover-bg: #f3f4f6;
-          --browser-window-content-bg: #ffffff;
+          --_bw-bg: var(--color-surface, #ffffff);
+          --_bw-header-bg: var(--color-surface-raised, #f6f8fa);
+          --_bw-border-color: var(--color-border, #d1d5da);
+          --_bw-text-color: var(--color-text, #24292e);
+          --_bw-text-muted: var(--color-text-muted, #586069);
+          --_bw-url-bg: var(--color-surface, #ffffff);
+          --_bw-hover-bg: #f3f4f6;
+          --_bw-content-bg: var(--color-surface, #ffffff);
           color-scheme: light;
         }
 
@@ -576,7 +580,7 @@ class L extends HTMLElement {
         }
 
         .browser-content {
-          background: var(--browser-window-content-bg);
+          background: var(--browser-window-content-bg, var(--_bw-content-bg));
           min-height: 200px;
           padding: 0;
           flex: 1;
@@ -616,7 +620,7 @@ class L extends HTMLElement {
 
         .source-view {
           padding: 0;
-          background: var(--browser-window-header-bg);
+          background: var(--browser-window-header-bg, var(--_bw-header-bg));
           min-height: 200px;
           /* Constrain source view height to prevent container expansion */
           max-height: 50vh;
@@ -634,15 +638,15 @@ class L extends HTMLElement {
           align-items: center;
           justify-content: space-between;
           padding: 0.75rem 1rem;
-          background: var(--browser-window-header-bg);
-          border-bottom: 1px solid var(--browser-window-border-color);
+          background: var(--browser-window-header-bg, var(--_bw-header-bg));
+          border-bottom: 1px solid var(--browser-window-border-color, var(--_bw-border-color));
           backdrop-filter: blur(8px);
         }
 
         .source-label {
           font-weight: 600;
           font-size: 0.875rem;
-          color: var(--browser-window-text-color);
+          color: var(--browser-window-text-color, var(--_bw-text-color));
           text-transform: uppercase;
           letter-spacing: 0.5px;
         }
@@ -652,10 +656,10 @@ class L extends HTMLElement {
           align-items: center;
           gap: 0.375rem;
           padding: 0.375rem 0.75rem;
-          background: var(--browser-window-bg);
-          border: 1px solid var(--browser-window-border-color);
+          background: var(--browser-window-bg, var(--_bw-bg));
+          border: 1px solid var(--browser-window-border-color, var(--_bw-border-color));
           border-radius: 6px;
-          color: var(--browser-window-text-color);
+          color: var(--browser-window-text-color, var(--_bw-text-color));
           font-size: 0.875rem;
           font-weight: 500;
           cursor: pointer;
@@ -663,7 +667,7 @@ class L extends HTMLElement {
         }
 
         .copy-source-button:hover {
-          background: var(--browser-window-hover-bg);
+          background: var(--browser-window-hover-bg, var(--_bw-hover-bg));
         }
 
         .copy-source-button:active {
@@ -679,8 +683,8 @@ class L extends HTMLElement {
         .source-view pre {
           margin: 0;
           padding: 1rem;
-          background: var(--browser-window-content-bg);
-          border: 1px solid var(--browser-window-border-color);
+          background: var(--browser-window-content-bg, var(--_bw-content-bg));
+          border: 1px solid var(--browser-window-border-color, var(--_bw-border-color));
           border-radius: 6px;
           overflow-x: auto;
           font-family: var(--browser-window-mono-font);
@@ -689,7 +693,7 @@ class L extends HTMLElement {
         }
 
         .source-view code {
-          color: var(--browser-window-text-color);
+          color: var(--browser-window-text-color, var(--_bw-text-color));
           display: block;
           white-space: pre;
         }
@@ -701,7 +705,7 @@ class L extends HTMLElement {
           justify-content: center;
           padding: 3rem 1rem;
           text-align: center;
-          color: var(--browser-window-text-muted);
+          color: var(--browser-window-text-muted, var(--_bw-text-muted));
           min-height: 200px;
         }
 
@@ -743,8 +747,8 @@ class L extends HTMLElement {
           align-items: center;
           gap: 0.75rem;
           padding: 0.75rem 1rem;
-          background: var(--browser-window-header-bg);
-          border-bottom: 1px solid var(--browser-window-border-color);
+          background: var(--browser-window-header-bg, var(--_bw-header-bg));
+          border-bottom: 1px solid var(--browser-window-border-color, var(--_bw-border-color));
           cursor: zoom-in;
           user-select: none;
         }
@@ -838,16 +842,16 @@ class L extends HTMLElement {
           align-items: center;
           gap: 0.5rem;
           padding: 0.375rem 0.75rem;
-          background: var(--browser-window-url-bg);
-          border: 1px solid var(--browser-window-border-color);
+          background: var(--browser-window-url-bg, var(--_bw-url-bg));
+          border: 1px solid var(--browser-window-border-color, var(--_bw-border-color));
           border-radius: 6px;
           font-size: 0.875rem;
-          color: var(--browser-window-text-muted);
+          color: var(--browser-window-text-muted, var(--_bw-text-muted));
           cursor: default !important;
         }
 
         .lock-icon {
-          color: var(--browser-window-text-muted);
+          color: var(--browser-window-text-muted, var(--_bw-text-muted));
           font-size: 0.75rem;
         }
 
@@ -856,7 +860,7 @@ class L extends HTMLElement {
           overflow: hidden;
           text-overflow: ellipsis;
           white-space: nowrap;
-          color: var(--browser-window-text-muted);
+          color: var(--browser-window-text-muted, var(--_bw-text-muted));
         }
 
         .view-source-button,
@@ -868,15 +872,15 @@ class L extends HTMLElement {
           display: flex;
           align-items: center;
           justify-content: center;
-          color: var(--browser-window-text-muted);
+          color: var(--browser-window-text-muted, var(--_bw-text-muted));
           transition: all 150ms ease;
           border-radius: 4px;
         }
 
         .view-source-button:hover,
         .download-button:hover {
-          color: var(--browser-window-text-color);
-          background: var(--browser-window-hover-bg);
+          color: var(--browser-window-text-color, var(--_bw-text-color));
+          background: var(--browser-window-hover-bg, var(--_bw-hover-bg));
         }
 
         .view-source-button:active,
@@ -907,14 +911,14 @@ class L extends HTMLElement {
           display: flex;
           align-items: center;
           justify-content: center;
-          color: var(--browser-window-text-muted);
+          color: var(--browser-window-text-muted, var(--_bw-text-muted));
           transition: all 150ms ease;
           border-radius: 4px;
         }
 
         .share-button:hover {
-          color: var(--browser-window-text-color);
-          background: var(--browser-window-hover-bg);
+          color: var(--browser-window-text-color, var(--_bw-text-color));
+          background: var(--browser-window-hover-bg, var(--_bw-hover-bg));
         }
 
         .share-button:active {
@@ -931,8 +935,8 @@ class L extends HTMLElement {
           position: absolute;
           top: calc(100% + 4px);
           right: 0;
-          background: var(--browser-window-header-bg);
-          border: 1px solid var(--browser-window-border-color);
+          background: var(--browser-window-header-bg, var(--_bw-header-bg));
+          border: 1px solid var(--browser-window-border-color, var(--_bw-border-color));
           border-radius: 8px;
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
           min-width: 180px;
@@ -948,13 +952,13 @@ class L extends HTMLElement {
           padding: 0.625rem 1rem;
           background: none;
           border: none;
-          color: var(--browser-window-text-color);
+          color: var(--browser-window-text-color, var(--_bw-text-color));
           font-size: 0.875rem;
           font-weight: 500;
           text-align: left;
           cursor: pointer;
           transition: background 150ms ease;
-          border-bottom: 1px solid var(--browser-window-border-color);
+          border-bottom: 1px solid var(--browser-window-border-color, var(--_bw-border-color));
         }
 
         .share-menu-item:last-child {
@@ -962,7 +966,7 @@ class L extends HTMLElement {
         }
 
         .share-menu-item:hover {
-          background: var(--browser-window-hover-bg);
+          background: var(--browser-window-hover-bg, var(--_bw-hover-bg));
         }
 
         .share-menu-item:active {
@@ -1094,7 +1098,7 @@ class L extends HTMLElement {
   }
   // --- Device mode ---
   _deviceCSS(e) {
-    const t = v[this.deviceColor] || v.midnight, o = this.getAttribute("orientation") === "landscape", r = this._getEffectiveDimensions(e), [s, c, n, d] = this._getEffectiveSafeInsets(e), a = M[e.notch] || 24, h = e.homeIndicator && !e.homeButton ? _ : 0, u = e.homeButton ? x : 0, b = e.notch !== "none";
+    const t = g[this.deviceColor] || g.midnight, o = this.getAttribute("orientation") === "landscape", r = this._getEffectiveDimensions(e), [n, d, s, c] = this._getEffectiveSafeInsets(e), a = C[e.notch] || 24, h = e.homeIndicator && !e.homeButton ? M : 0, u = e.homeButton ? x : 0, w = e.notch !== "none";
     return `
         :host([device]) {
           --device-width: ${r.width}px;
@@ -1102,13 +1106,13 @@ class L extends HTMLElement {
           --device-bezel: ${e.bezel}px;
           --device-corner-radius: ${e.cornerRadius}px;
           --browser-window-bezel-color: ${t};
-          --status-bar-height: ${o && b ? 24 : a}px;
+          --status-bar-height: ${o && w ? 24 : a}px;
           --home-indicator-height: ${h}px;
           --home-button-area: ${u}px;
-          --safe-top: ${s}px;
-          --safe-right: ${c}px;
-          --safe-bottom: ${n}px;
-          --safe-left: ${d}px;
+          --safe-top: ${n}px;
+          --safe-right: ${d}px;
+          --safe-bottom: ${s}px;
+          --safe-left: ${c}px;
 
           border: none;
           border-radius: 0;
@@ -1273,7 +1277,7 @@ class L extends HTMLElement {
           flex: 1;
           min-height: 0;
           overflow: hidden;
-          background: var(--browser-window-content-bg);
+          background: var(--browser-window-content-bg, var(--_bw-content-bg));
         }
 
         :host([device]) .browser-content iframe {
@@ -1457,7 +1461,7 @@ class L extends HTMLElement {
     `;
   }
   _deviceChrome(e) {
-    const t = this.getAttribute("orientation") === "landscape", o = e.notch !== "none", r = o ? e.notch : "", s = e.homeButton ? "home-button" : "", n = ["silver", "gold", "white"].includes(this.deviceColor) ? "light-bezel" : "", a = ["device-frame", r, s, n, t ? "landscape" : ""].filter(Boolean).join(" "), u = `
+    const t = this.getAttribute("orientation") === "landscape", o = e.notch !== "none", r = o ? e.notch : "", n = e.homeButton ? "home-button" : "", s = ["silver", "gold", "white"].includes(this.deviceColor) ? "light-bezel" : "", a = ["device-frame", r, n, s, t ? "landscape" : ""].filter(Boolean).join(" "), u = `
       <div class="status-bar ${t && o ? "" : r}">
         <span class="status-time">9:41</span>
         <div class="status-icons">
@@ -1466,7 +1470,7 @@ class L extends HTMLElement {
           <span class="battery-icon" aria-hidden="true"></span>
         </div>
       </div>
-    `, b = e.homeIndicator && !e.homeButton ? '<div class="home-indicator"><div class="home-indicator-pill"></div></div>' : "", f = this.hasAttribute("show-safe-areas") ? `<div class="safe-area-overlays">
+    `, w = e.homeIndicator && !e.homeButton ? '<div class="home-indicator"><div class="home-indicator-pill"></div></div>' : "", p = this.hasAttribute("show-safe-areas") ? `<div class="safe-area-overlays">
           <div class="safe-area-overlay safe-area-top"></div>
           <div class="safe-area-overlay safe-area-right"></div>
           <div class="safe-area-overlay safe-area-bottom"></div>
@@ -1479,9 +1483,9 @@ class L extends HTMLElement {
             <div class="device-main">
               ${u}
               ${this._contentHTML()}
-              ${b}
+              ${w}
             </div>
-            ${f}
+            ${p}
           </div>
         </div>
       ` : `
@@ -1489,8 +1493,8 @@ class L extends HTMLElement {
         <div class="${a}">
           ${u}
           ${this._contentHTML()}
-          ${b}
-          ${f}
+          ${w}
+          ${p}
         </div>
       </div>
     `;
@@ -1506,10 +1510,10 @@ class L extends HTMLElement {
     if (!t || !o) return;
     const r = this.clientWidth;
     if (r === 0) return;
-    const s = this._getEffectiveDimensions(e), c = s.width + e.bezel * 2, n = Math.min(1, r / c);
-    this._currentScale = n, o.style.transform = `scale(${n})`;
-    const d = e.homeButton ? x : 0, a = s.height + e.bezel * 2 + d;
-    t.style.height = `${a * n}px`;
+    const n = this._getEffectiveDimensions(e), d = n.width + e.bezel * 2, s = Math.min(1, r / d);
+    this._currentScale = s, o.style.transform = `scale(${s})`;
+    const c = e.homeButton ? x : 0, a = n.height + e.bezel * 2 + c;
+    t.style.height = `${a * s}px`;
   }
   _teardownDeviceScaling() {
     this._resizeObserver && (this._resizeObserver.disconnect(), this._resizeObserver = null), this._currentScale = 1;
