@@ -71,6 +71,30 @@
               <td><code>false</code></td>
               <td>When present, adds a drop shadow around the browser window frame.</td>
             </tr>
+            <tr>
+              <td><code>device</code></td>
+              <td>string</td>
+              <td><code>''</code></td>
+              <td>Named device preset for device chrome mode. Renders a phone or tablet bezel with status bar, notch/Dynamic Island, and home indicator. Available presets: <code>iphone-16</code>, <code>iphone-16-pro-max</code>, <code>iphone-se</code>, <code>pixel-9</code>, <code>pixel-9-pro-xl</code>, <code>galaxy-s24</code>, <code>ipad-air</code>, <code>ipad-pro-13</code>.</td>
+            </tr>
+            <tr>
+              <td><code>device-color</code></td>
+              <td>string</td>
+              <td><code>'midnight'</code></td>
+              <td>Bezel color when <code>device</code> is set. Options: <code>midnight</code>, <code>silver</code>, <code>gold</code>, <code>blue</code>, <code>white</code>.</td>
+            </tr>
+            <tr>
+              <td><code>orientation</code></td>
+              <td><code>'portrait'</code> | <code>'landscape'</code></td>
+              <td><code>'portrait'</code></td>
+              <td>Device orientation when <code>device</code> is set. Swaps width/height and repositions chrome elements.</td>
+            </tr>
+            <tr>
+              <td><code>show-safe-areas</code></td>
+              <td>boolean</td>
+              <td><code>false</code></td>
+              <td>When present with <code>device</code>, draws translucent overlay bands showing safe area insets (status bar, home indicator, etc.).</td>
+            </tr>
           </tbody>
         </table>
 
@@ -89,7 +113,18 @@
 &lt;/browser-window&gt;
 
 &lt;!-- Force dark mode --&gt;
-&lt;browser-window mode="dark" src="demo.html"&gt;&lt;/browser-window&gt;</code-block>
+&lt;browser-window mode="dark" src="demo.html"&gt;&lt;/browser-window&gt;
+
+&lt;!-- Device mode: iPhone 16 --&gt;
+&lt;browser-window device="iphone-16" src="demo.html"&gt;&lt;/browser-window&gt;
+
+&lt;!-- Landscape Pixel 9 with silver bezel --&gt;
+&lt;browser-window device="pixel-9" orientation="landscape" device-color="silver"&gt;
+  &lt;img src="screenshot.png" alt="Demo"&gt;
+&lt;/browser-window&gt;
+
+&lt;!-- iPad Air with safe area overlays --&gt;
+&lt;browser-window device="ipad-air" show-safe-areas src="demo.html"&gt;&lt;/browser-window&gt;</code-block>
       </section>
 
       <section>
@@ -218,6 +253,26 @@
               <td><code>--browser-window-mono-font</code></td>
               <td>Monospace fonts</td>
               <td>Font family for code/monospace content</td>
+            </tr>
+            <tr>
+              <td><code>--browser-window-bezel-color</code></td>
+              <td><code>#1a1a1a</code></td>
+              <td>Device frame/bezel color (device mode only)</td>
+            </tr>
+            <tr>
+              <td><code>--browser-window-status-bar-color</code></td>
+              <td><code>rgba(255,255,255,0.9)</code></td>
+              <td>Status bar text/icon color (device mode only)</td>
+            </tr>
+            <tr>
+              <td><code>--browser-window-home-indicator-color</code></td>
+              <td><code>rgba(255,255,255,0.3)</code></td>
+              <td>Home indicator pill color (device mode only)</td>
+            </tr>
+            <tr>
+              <td><code>--browser-window-safe-area-color</code></td>
+              <td><code>oklch(0.65 0.2 250 / 0.25)</code></td>
+              <td>Safe area overlay tint (device mode only)</td>
             </tr>
           </tbody>
         </table>

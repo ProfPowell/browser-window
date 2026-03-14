@@ -129,6 +129,7 @@
         <p class="demo-description" style="margin-top: 1rem;">
           Detected signals: <code>body.dark</code> class (Tailwind/docs sites),
           <code>data-theme="dark"</code>, <code>data-bs-theme="dark"</code> (Bootstrap 5),
+          <code>data-mode="dark"</code> (Vanilla Breeze),
           and <code>color-scheme: dark</code> computed style.
         </p>
       </section>
@@ -231,6 +232,117 @@
 &lt;/browser-window&gt;</code-block>
       </section>
 
+      <section id="device-mode" class="demo-section">
+        <h2>Device Mode</h2>
+        <p class="demo-description">
+          Wrap content in realistic phone and tablet bezels using the <code>device</code> attribute.
+          Includes status bars, notches, Dynamic Islands, and home indicators that match real devices.
+        </p>
+
+        <h3>iPhone 16</h3>
+        <p class="demo-description">Dynamic Island, home indicator, and rounded corners.</p>
+        <div class="device-showcase">
+          <browser-window device="iphone-16" src="mobile-demo.html"></browser-window>
+        </div>
+        <code-block language="html" class="demo-code">&lt;browser-window device="iphone-16" src="mobile-demo.html"&gt;
+&lt;/browser-window&gt;</code-block>
+
+        <h3>Device Presets</h3>
+        <p class="demo-description">
+          Choose from a range of devices. Each preset matches real device dimensions, corner radius, and chrome style.
+        </p>
+        <div class="device-grid">
+          <div class="device-grid-item">
+            <browser-window device="iphone-se" src="mobile-demo.html"></browser-window>
+            <span class="device-label">iphone-se</span>
+          </div>
+          <div class="device-grid-item">
+            <browser-window device="pixel-9" src="mobile-demo.html"></browser-window>
+            <span class="device-label">pixel-9</span>
+          </div>
+          <div class="device-grid-item">
+            <browser-window device="galaxy-s24" src="mobile-demo.html"></browser-window>
+            <span class="device-label">galaxy-s24</span>
+          </div>
+        </div>
+        <code-block language="html" class="demo-code">&lt;browser-window device="iphone-se" src="demo.html"&gt;&lt;/browser-window&gt;
+&lt;browser-window device="pixel-9" src="demo.html"&gt;&lt;/browser-window&gt;
+&lt;browser-window device="galaxy-s24" src="demo.html"&gt;&lt;/browser-window&gt;</code-block>
+
+        <h3>Landscape Orientation</h3>
+        <p class="demo-description">
+          Add <code>orientation="landscape"</code> to rotate the device. Dimensions and chrome positions are swapped automatically.
+        </p>
+        <div class="device-showcase">
+          <browser-window device="iphone-16" orientation="landscape" src="mobile-demo.html"></browser-window>
+        </div>
+        <code-block language="html" class="demo-code">&lt;browser-window device="iphone-16" orientation="landscape" src="mobile-demo.html"&gt;
+&lt;/browser-window&gt;</code-block>
+
+        <h3>Bezel Colors</h3>
+        <p class="demo-description">
+          Use <code>device-color</code> to change the bezel finish: <code>midnight</code> (default), <code>silver</code>, <code>gold</code>, <code>blue</code>, or <code>white</code>.
+        </p>
+        <div class="device-grid">
+          <div class="device-grid-item">
+            <browser-window device="iphone-16" device-color="midnight" src="mobile-demo.html"></browser-window>
+            <span class="device-label">midnight</span>
+          </div>
+          <div class="device-grid-item">
+            <browser-window device="iphone-16" device-color="silver" src="mobile-demo.html"></browser-window>
+            <span class="device-label">silver</span>
+          </div>
+          <div class="device-grid-item">
+            <browser-window device="iphone-16" device-color="gold" src="mobile-demo.html"></browser-window>
+            <span class="device-label">gold</span>
+          </div>
+        </div>
+        <code-block language="html" class="demo-code">&lt;browser-window device="iphone-16" device-color="silver" src="demo.html"&gt;
+&lt;/browser-window&gt;</code-block>
+
+        <h3>Safe Area Overlays</h3>
+        <p class="demo-description">
+          Add <code>show-safe-areas</code> to visualize the safe area insets — useful for teaching responsive mobile design.
+        </p>
+        <div class="device-showcase">
+          <browser-window device="iphone-16" show-safe-areas src="mobile-demo.html"></browser-window>
+        </div>
+        <code-block language="html" class="demo-code">&lt;browser-window device="iphone-16" show-safe-areas src="mobile-demo.html"&gt;
+&lt;/browser-window&gt;</code-block>
+
+        <h3>Tablet</h3>
+        <p class="demo-description">
+          Tablet presets like <code>ipad-air</code> render at their native dimensions, scaled to fit the container.
+        </p>
+        <div class="device-showcase">
+          <browser-window device="ipad-air" src="example.html"></browser-window>
+        </div>
+        <code-block language="html" class="demo-code">&lt;browser-window device="ipad-air" src="demo.html"&gt;
+&lt;/browser-window&gt;</code-block>
+
+        <h3>Available Device Presets</h3>
+        <table class="api-table">
+          <thead>
+            <tr>
+              <th>Preset</th>
+              <th>Screen</th>
+              <th>Notch</th>
+              <th>Home</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><code>iphone-16</code></td><td>393 &times; 852</td><td>Dynamic Island</td><td>Indicator</td></tr>
+            <tr><td><code>iphone-16-pro-max</code></td><td>440 &times; 956</td><td>Dynamic Island</td><td>Indicator</td></tr>
+            <tr><td><code>iphone-se</code></td><td>375 &times; 667</td><td>None</td><td>Button</td></tr>
+            <tr><td><code>pixel-9</code></td><td>412 &times; 923</td><td>Punch-hole</td><td>Indicator</td></tr>
+            <tr><td><code>pixel-9-pro-xl</code></td><td>448 &times; 998</td><td>Punch-hole</td><td>Indicator</td></tr>
+            <tr><td><code>galaxy-s24</code></td><td>360 &times; 780</td><td>Punch-hole</td><td>Indicator</td></tr>
+            <tr><td><code>ipad-air</code></td><td>820 &times; 1180</td><td>None</td><td>Indicator</td></tr>
+            <tr><td><code>ipad-pro-13</code></td><td>1024 &times; 1366</td><td>None</td><td>None</td></tr>
+          </tbody>
+        </table>
+      </section>
+
       <section id="sharing" class="demo-section">
         <h2>All Features</h2>
         <ul style="display: grid; gap: 0.25rem; padding-left: 1.5rem;">
@@ -241,9 +353,13 @@
           <li>Maximize/fullscreen mode</li>
           <li>Automatic light/dark theme detection</li>
           <li>Resizable container</li>
+          <li>Device mode with realistic phone/tablet bezels</li>
+          <li>8 device presets: iPhone, Pixel, Galaxy, iPad</li>
+          <li>Portrait and landscape orientation</li>
+          <li>Safe area visualization for mobile design</li>
           <li>Touch-friendly on mobile devices</li>
           <li>Full keyboard accessibility</li>
-          <li>15+ CSS custom properties for theming</li>
+          <li>20+ CSS custom properties for theming</li>
         </ul>
       </section>
     </main>
