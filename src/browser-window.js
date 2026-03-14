@@ -48,6 +48,14 @@
  * </browser-window>
  */
 
+// --- Anti-FOUC: hide element until custom element is defined ---
+if (typeof document !== 'undefined') {
+  const _antiFlash = document.createElement('style');
+  _antiFlash.textContent =
+    'browser-window:not(:defined){display:block;opacity:0}';
+  document.head.appendChild(_antiFlash);
+}
+
 // --- Page-level dark mode observer (shared singleton) ---
 const _registeredInstances = new Set();
 let _pageObserver = null;

@@ -1,48 +1,52 @@
+if (typeof document < "u") {
+  const r = document.createElement("style");
+  r.textContent = "browser-window:not(:defined){display:block;opacity:0}", document.head.appendChild(r);
+}
 const b = /* @__PURE__ */ new Set();
 let l = null, m = null;
 function f() {
-  const i = document.documentElement, e = document.body;
-  if (!i || !e) return null;
-  if (i.classList.contains("dark") || e.classList.contains("dark") || i.getAttribute("data-theme") === "dark" || e.getAttribute("data-theme") === "dark")
+  const r = document.documentElement, e = document.body;
+  if (!r || !e) return null;
+  if (r.classList.contains("dark") || e.classList.contains("dark") || r.getAttribute("data-theme") === "dark" || e.getAttribute("data-theme") === "dark")
     return !0;
-  if (i.getAttribute("data-theme") === "light" || e.getAttribute("data-theme") === "light")
+  if (r.getAttribute("data-theme") === "light" || e.getAttribute("data-theme") === "light")
     return !1;
-  if (i.getAttribute("data-bs-theme") === "dark" || e.getAttribute("data-bs-theme") === "dark")
+  if (r.getAttribute("data-bs-theme") === "dark" || e.getAttribute("data-bs-theme") === "dark")
     return !0;
-  if (i.getAttribute("data-bs-theme") === "light" || e.getAttribute("data-bs-theme") === "light")
+  if (r.getAttribute("data-bs-theme") === "light" || e.getAttribute("data-bs-theme") === "light")
     return !1;
-  if (i.getAttribute("data-mode") === "dark") return !0;
-  if (i.getAttribute("data-mode") === "light") return !1;
-  const t = getComputedStyle(i).colorScheme;
+  if (r.getAttribute("data-mode") === "dark") return !0;
+  if (r.getAttribute("data-mode") === "light") return !1;
+  const t = getComputedStyle(r).colorScheme;
   return t === "dark" ? !0 : t === "light" ? !1 : null;
 }
 function y() {
-  const i = f();
-  if (i !== m) {
-    m = i;
+  const r = f();
+  if (r !== m) {
+    m = r;
     for (const e of b)
-      e._onPageModeChange(i);
+      e._onPageModeChange(r);
   }
 }
 function _() {
   if (l) return;
   l = new MutationObserver(y);
-  const i = {
+  const r = {
     attributes: !0,
     attributeFilter: ["class", "data-theme", "data-bs-theme", "data-mode", "style"]
   };
-  l.observe(document.documentElement, i), document.body && l.observe(document.body, i);
+  l.observe(document.documentElement, r), document.body && l.observe(document.body, r);
 }
 function k() {
   l && (l.disconnect(), l = null);
 }
-function S(i) {
-  b.add(i), b.size === 1 && _();
+function S(r) {
+  b.add(r), b.size === 1 && _();
   const e = f();
-  m = e, i._onPageModeChange(e);
+  m = e, r._onPageModeChange(e);
 }
-function z(i) {
-  b.delete(i), b.size === 0 && (k(), m = null);
+function z(r) {
+  b.delete(r), b.size === 0 && (k(), m = null);
 }
 const v = {
   "iphone-16": {
@@ -206,8 +210,8 @@ class L extends HTMLElement {
     };
   }
   _getEffectiveSafeInsets(e) {
-    const [t, o, r, n] = e.safeInsets;
-    return this.getAttribute("orientation") === "landscape" ? [n, t, o, r] : [t, o, r, n];
+    const [t, o, i, s] = e.safeInsets;
+    return this.getAttribute("orientation") === "landscape" ? [s, t, o, i] : [t, o, i, s];
   }
   _onPageModeChange(e) {
     if (this.hasAttribute("mode")) {
@@ -232,14 +236,14 @@ class L extends HTMLElement {
       try {
         const o = e.contentDocument;
         if (!o) return;
-        const r = o.querySelector("style[data-browser-window-safe-areas]");
-        r && r.remove();
-        const [n, d, s, c] = this._getEffectiveSafeInsets(t), a = o.createElement("style");
+        const i = o.querySelector("style[data-browser-window-safe-areas]");
+        i && i.remove();
+        const [s, d, n, c] = this._getEffectiveSafeInsets(t), a = o.createElement("style");
         a.setAttribute("data-browser-window-safe-areas", ""), a.textContent = `
         :root {
-          --safe-top: ${n}px;
+          --safe-top: ${s}px;
           --safe-right: ${d}px;
-          --safe-bottom: ${s}px;
+          --safe-bottom: ${n}px;
           --safe-left: ${c}px;
         }
       `, o.head.appendChild(a);
@@ -258,10 +262,10 @@ class L extends HTMLElement {
     }
   }
   attachEventListeners() {
-    const e = this.shadowRoot.querySelector(".control-button.close"), t = this.shadowRoot.querySelector(".control-button.minimize"), o = this.shadowRoot.querySelector(".control-button.maximize"), r = this.shadowRoot.querySelector(".view-source-button"), n = this.shadowRoot.querySelector(".copy-source-button"), d = this.shadowRoot.querySelector(".share-button"), s = this.shadowRoot.querySelector(".browser-header");
-    e?.addEventListener("click", () => this.handleClose()), t?.addEventListener("click", () => this.toggleMinimize()), o?.addEventListener("click", () => this.toggleMaximize()), r?.addEventListener("click", () => this.toggleViewSource()), n?.addEventListener("click", () => this.copySourceCode()), d?.addEventListener("click", (a) => {
+    const e = this.shadowRoot.querySelector(".control-button.close"), t = this.shadowRoot.querySelector(".control-button.minimize"), o = this.shadowRoot.querySelector(".control-button.maximize"), i = this.shadowRoot.querySelector(".view-source-button"), s = this.shadowRoot.querySelector(".copy-source-button"), d = this.shadowRoot.querySelector(".share-button"), n = this.shadowRoot.querySelector(".browser-header");
+    e?.addEventListener("click", () => this.handleClose()), t?.addEventListener("click", () => this.toggleMinimize()), o?.addEventListener("click", () => this.toggleMaximize()), i?.addEventListener("click", () => this.toggleViewSource()), s?.addEventListener("click", () => this.copySourceCode()), d?.addEventListener("click", (a) => {
       a.stopPropagation(), this.toggleShareMenu();
-    }), s?.addEventListener("dblclick", (a) => {
+    }), n?.addEventListener("dblclick", (a) => {
       const h = a.target;
       (h.classList.contains("browser-header") || h.classList.contains("controls")) && this.toggleMaximize();
     });
@@ -370,15 +374,15 @@ class L extends HTMLElement {
   }
   parseHTMLForCodePen() {
     if (!this.sourceCode) return null;
-    const t = new DOMParser().parseFromString(this.sourceCode, "text/html"), o = Array.from(t.querySelectorAll("style")).map((s) => s.textContent).join(`
+    const t = new DOMParser().parseFromString(this.sourceCode, "text/html"), o = Array.from(t.querySelectorAll("style")).map((n) => n.textContent).join(`
 
-`), r = Array.from(t.querySelectorAll("script")).filter((s) => !s.src && s.type !== "module").map((s) => s.textContent).join(`
+`), i = Array.from(t.querySelectorAll("script")).filter((n) => !n.src && n.type !== "module").map((n) => n.textContent).join(`
 
-`), n = t.body.cloneNode(!0);
-    return n.querySelectorAll("script, style").forEach((s) => s.remove()), {
-      html: n.innerHTML.trim(),
+`), s = t.body.cloneNode(!0);
+    return s.querySelectorAll("script, style").forEach((n) => n.remove()), {
+      html: s.innerHTML.trim(),
       css: o.trim(),
-      js: r.trim()
+      js: i.trim()
     };
   }
   openInCodePen() {
@@ -394,8 +398,8 @@ class L extends HTMLElement {
       // Show HTML and CSS editors, hide JS if empty
     }, o = document.createElement("form");
     o.action = "https://codepen.io/pen/define", o.method = "POST", o.target = "_blank";
-    const r = document.createElement("input");
-    r.type = "hidden", r.name = "data", r.value = JSON.stringify(t), o.appendChild(r), document.body.appendChild(o), o.submit(), document.body.removeChild(o), this.toggleShareMenu();
+    const i = document.createElement("input");
+    i.type = "hidden", i.name = "data", i.value = JSON.stringify(t), o.appendChild(i), document.body.appendChild(o), o.submit(), document.body.removeChild(o), this.toggleShareMenu();
   }
   handleClose() {
     this.isMaximized && this.toggleMaximize();
@@ -1098,20 +1102,20 @@ class L extends HTMLElement {
   }
   // --- Device mode ---
   _deviceCSS(e) {
-    const t = g[this.deviceColor] || g.midnight, o = this.getAttribute("orientation") === "landscape", r = this._getEffectiveDimensions(e), [n, d, s, c] = this._getEffectiveSafeInsets(e), a = C[e.notch] || 24, h = e.homeIndicator && !e.homeButton ? M : 0, u = e.homeButton ? x : 0, w = e.notch !== "none";
+    const t = g[this.deviceColor] || g.midnight, o = this.getAttribute("orientation") === "landscape", i = this._getEffectiveDimensions(e), [s, d, n, c] = this._getEffectiveSafeInsets(e), a = C[e.notch] || 24, h = e.homeIndicator && !e.homeButton ? M : 0, u = e.homeButton ? x : 0, w = e.notch !== "none";
     return `
         :host([device]) {
-          --device-width: ${r.width}px;
-          --device-height: ${r.height}px;
+          --device-width: ${i.width}px;
+          --device-height: ${i.height}px;
           --device-bezel: ${e.bezel}px;
           --device-corner-radius: ${e.cornerRadius}px;
           --browser-window-bezel-color: ${t};
           --status-bar-height: ${o && w ? 24 : a}px;
           --home-indicator-height: ${h}px;
           --home-button-area: ${u}px;
-          --safe-top: ${n}px;
+          --safe-top: ${s}px;
           --safe-right: ${d}px;
-          --safe-bottom: ${s}px;
+          --safe-bottom: ${n}px;
           --safe-left: ${c}px;
 
           border: none;
@@ -1461,8 +1465,8 @@ class L extends HTMLElement {
     `;
   }
   _deviceChrome(e) {
-    const t = this.getAttribute("orientation") === "landscape", o = e.notch !== "none", r = o ? e.notch : "", n = e.homeButton ? "home-button" : "", s = ["silver", "gold", "white"].includes(this.deviceColor) ? "light-bezel" : "", a = ["device-frame", r, n, s, t ? "landscape" : ""].filter(Boolean).join(" "), u = `
-      <div class="status-bar ${t && o ? "" : r}">
+    const t = this.getAttribute("orientation") === "landscape", o = e.notch !== "none", i = o ? e.notch : "", s = e.homeButton ? "home-button" : "", n = ["silver", "gold", "white"].includes(this.deviceColor) ? "light-bezel" : "", a = ["device-frame", i, s, n, t ? "landscape" : ""].filter(Boolean).join(" "), u = `
+      <div class="status-bar ${t && o ? "" : i}">
         <span class="status-time">9:41</span>
         <div class="status-icons">
           <span class="signal-bars" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
@@ -1479,7 +1483,7 @@ class L extends HTMLElement {
     return t && o ? `
         <div class="device-wrapper">
           <div class="${a}">
-            <div class="notch-sidebar ${r}"></div>
+            <div class="notch-sidebar ${i}"></div>
             <div class="device-main">
               ${u}
               ${this._contentHTML()}
@@ -1508,12 +1512,12 @@ class L extends HTMLElement {
     if (!e) return;
     const t = this.shadowRoot.querySelector(".device-wrapper"), o = this.shadowRoot.querySelector(".device-frame");
     if (!t || !o) return;
-    const r = this.clientWidth;
-    if (r === 0) return;
-    const n = this._getEffectiveDimensions(e), d = n.width + e.bezel * 2, s = Math.min(1, r / d);
-    this._currentScale = s, o.style.transform = `scale(${s})`;
-    const c = e.homeButton ? x : 0, a = n.height + e.bezel * 2 + c;
-    t.style.height = `${a * s}px`;
+    const i = this.clientWidth;
+    if (i === 0) return;
+    const s = this._getEffectiveDimensions(e), d = s.width + e.bezel * 2, n = Math.min(1, i / d);
+    this._currentScale = n, o.style.transform = `scale(${n})`;
+    const c = e.homeButton ? x : 0, a = s.height + e.bezel * 2 + c;
+    t.style.height = `${a * n}px`;
   }
   _teardownDeviceScaling() {
     this._resizeObserver && (this._resizeObserver.disconnect(), this._resizeObserver = null), this._currentScale = 1;

@@ -1,5 +1,13 @@
 /* Browser Window Documentation Site Styles */
 
+/* Anti-FOUC: hide components until defined */
+browser-window:not(:defined),
+code-block:not(:defined),
+code-block-group:not(:defined) {
+  display: block;
+  opacity: 0;
+}
+
 :root {
   --bg-primary: #ffffff;
   --bg-secondary: #f6f8fa;
