@@ -1,54 +1,54 @@
 if (typeof document < "u") {
-  const r = document.createElement("style");
-  r.textContent = "browser-window:not(:defined){display:block;opacity:0}", document.head.appendChild(r);
+  const i = document.createElement("style");
+  i.textContent = "browser-window:not(:defined){display:block;opacity:0}", document.head.appendChild(i);
 }
-const b = /* @__PURE__ */ new Set();
+const h = /* @__PURE__ */ new Set();
 let l = null, w = null;
-function p() {
-  const r = document.documentElement, e = document.body;
-  if (!r || !e) return null;
-  if (r.classList.contains("dark") || e.classList.contains("dark") || r.getAttribute("data-theme") === "dark" || e.getAttribute("data-theme") === "dark")
+function v() {
+  const i = document.documentElement, e = document.body;
+  if (!i || !e) return null;
+  if (i.classList.contains("dark") || e.classList.contains("dark") || i.getAttribute("data-theme") === "dark" || e.getAttribute("data-theme") === "dark")
     return !0;
-  if (r.getAttribute("data-theme") === "light" || e.getAttribute("data-theme") === "light")
+  if (i.getAttribute("data-theme") === "light" || e.getAttribute("data-theme") === "light")
     return !1;
-  if (r.getAttribute("data-bs-theme") === "dark" || e.getAttribute("data-bs-theme") === "dark")
+  if (i.getAttribute("data-bs-theme") === "dark" || e.getAttribute("data-bs-theme") === "dark")
     return !0;
-  if (r.getAttribute("data-bs-theme") === "light" || e.getAttribute("data-bs-theme") === "light")
+  if (i.getAttribute("data-bs-theme") === "light" || e.getAttribute("data-bs-theme") === "light")
     return !1;
-  if (r.getAttribute("data-mode") === "dark") return !0;
-  if (r.getAttribute("data-mode") === "light") return !1;
-  const t = getComputedStyle(r).colorScheme;
+  if (i.getAttribute("data-mode") === "dark") return !0;
+  if (i.getAttribute("data-mode") === "light") return !1;
+  const t = getComputedStyle(i).colorScheme;
   return t === "dark" ? !0 : t === "light" ? !1 : null;
 }
-function k() {
-  const r = p();
-  if (r !== w) {
-    w = r;
-    for (const e of b)
-      e._onPageModeChange(r);
+function _() {
+  const i = v();
+  if (i !== w) {
+    w = i;
+    for (const e of h)
+      e._onPageModeChange(i);
   }
 }
-function _() {
+function S() {
   if (l) return;
-  l = new MutationObserver(k);
-  const r = {
+  l = new MutationObserver(_);
+  const i = {
     attributes: !0,
     attributeFilter: ["class", "data-theme", "data-bs-theme", "data-mode", "style"]
   };
-  l.observe(document.documentElement, r), document.body && l.observe(document.body, r);
+  l.observe(document.documentElement, i), document.body && l.observe(document.body, i);
 }
-function S() {
+function z() {
   l && (l.disconnect(), l = null);
 }
-function z(r) {
-  b.add(r), b.size === 1 && _();
-  const e = p();
-  w = e, r._onPageModeChange(e);
+function C(i) {
+  h.add(i), h.size === 1 && S();
+  const e = v();
+  w = e, i._onPageModeChange(e);
 }
-function C(r) {
-  b.delete(r), b.size === 0 && (S(), w = null);
+function M(i) {
+  h.delete(i), h.size === 0 && (z(), w = null);
 }
-const v = {
+const g = {
   "iphone-16": {
     width: 393,
     height: 852,
@@ -139,27 +139,27 @@ const v = {
     homeButton: !1,
     safeInsets: [24, 0, 20, 0]
   }
-}, g = {
+}, x = {
   midnight: "#1a1a1a",
   silver: "#c0c0c0",
   gold: "#d4a574",
   blue: "#3a4f6f",
   white: "#f0f0f0"
-}, M = {
+}, L = {
   "dynamic-island": 54,
   "punch-hole": 36,
   none: 24
-}, L = 28, x = 80;
-let y = !1;
-class A extends HTMLElement {
+}, A = 28, y = 80;
+let k = !1;
+class E extends HTMLElement {
   constructor() {
     super(), this.attachShadow({ mode: "open" }), this.isMinimized = !1, this.isMaximized = !1, this.overlay = null, this.showSource = !1, this.sourceCode = "", this.showShareMenu = !1, this.handleKeydown = this.handleKeydown.bind(this), this.handleOutsideClick = this.handleOutsideClick.bind(this), this._resizeObserver = null, this._currentScale = 1, this._outsideClickTimer = null, this._copyFeedbackTimer = null;
   }
   async connectedCallback() {
-    this.render(), this.attachEventListeners(), this.src && await this.fetchSourceCode(), z(this), this._getDevicePreset() && this._setupDeviceScaling();
+    this.render(), this.attachEventListeners(), this.src && await this.fetchSourceCode(), C(this), this._getDevicePreset() && this._setupDeviceScaling();
   }
   disconnectedCallback() {
-    C(this), this.removeOverlay(), this._teardownDeviceScaling(), clearTimeout(this._outsideClickTimer), clearTimeout(this._copyFeedbackTimer), document.removeEventListener("keydown", this.handleKeydown), document.removeEventListener("click", this.handleOutsideClick);
+    M(this), this.removeOverlay(), this._teardownDeviceScaling(), clearTimeout(this._outsideClickTimer), clearTimeout(this._copyFeedbackTimer), document.removeEventListener("keydown", this.handleKeydown), document.removeEventListener("click", this.handleOutsideClick);
   }
   static get observedAttributes() {
     return [
@@ -175,7 +175,7 @@ class A extends HTMLElement {
     ];
   }
   attributeChangedCallback(e) {
-    this.shadowRoot && (this.render(), this.attachEventListeners()), e === "src" && (this.showSource = !1, this.sourceCode = "", this.src && this.fetchSourceCode()), (e === "device" || e === "orientation") && (this._teardownDeviceScaling(), this._getDevicePreset() && this._setupDeviceScaling()), e === "mode" && (this.hasAttribute("mode") ? this.removeAttribute("data-page-mode") : this._onPageModeChange(p()));
+    this.shadowRoot && (this.render(), this.attachEventListeners()), e === "src" && (this.showSource = !1, this.sourceCode = "", this.src && this.fetchSourceCode()), (e === "device" || e === "orientation") && (this._teardownDeviceScaling(), this._getDevicePreset() && this._setupDeviceScaling()), e === "mode" && (this.hasAttribute("mode") ? this.removeAttribute("data-page-mode") : this._onPageModeChange(v()));
   }
   get url() {
     return this.getAttribute("url") || "";
@@ -216,10 +216,10 @@ class A extends HTMLElement {
   _getDevicePreset() {
     const e = this.getAttribute("device");
     if (!e) return null;
-    const t = v[e];
+    const t = g[e];
     return t || (console.warn(
       `<browser-window>: Unknown device preset "${e}", falling back to "iphone-16"`
-    ), v["iphone-16"]);
+    ), g["iphone-16"]);
   }
   _getEffectiveDimensions(e) {
     const t = this.getAttribute("orientation") === "landscape";
@@ -229,8 +229,8 @@ class A extends HTMLElement {
     };
   }
   _getEffectiveSafeInsets(e) {
-    const [t, o, i, n] = e.safeInsets;
-    return this.getAttribute("orientation") === "landscape" ? [n, t, o, i] : [t, o, i, n];
+    const [t, o, r, n] = e.safeInsets;
+    return this.getAttribute("orientation") === "landscape" ? [n, t, o, r] : [t, o, r, n];
   }
   _onPageModeChange(e) {
     if (this.hasAttribute("mode")) {
@@ -255,15 +255,15 @@ class A extends HTMLElement {
       try {
         const o = e.contentDocument;
         if (!o) return;
-        const i = o.querySelector("style[data-browser-window-safe-areas]");
-        i && i.remove();
-        const [n, d, s, c] = this._getEffectiveSafeInsets(t), a = o.createElement("style");
+        const r = o.querySelector("style[data-browser-window-safe-areas]");
+        r && r.remove();
+        const [n, c, s, d] = this._getEffectiveSafeInsets(t), a = o.createElement("style");
         a.setAttribute("data-browser-window-safe-areas", ""), a.textContent = `
         :root {
           --safe-top: ${n}px;
-          --safe-right: ${d}px;
+          --safe-right: ${c}px;
           --safe-bottom: ${s}px;
-          --safe-left: ${c}px;
+          --safe-left: ${d}px;
         }
       `, o.head.appendChild(a);
       } catch {
@@ -281,16 +281,15 @@ class A extends HTMLElement {
     }
   }
   attachEventListeners() {
-    const e = this.shadowRoot.querySelector(".control-button.close"), t = this.shadowRoot.querySelector(".control-button.minimize"), o = this.shadowRoot.querySelector(".control-button.maximize"), i = this.shadowRoot.querySelector(".view-source-button"), n = this.shadowRoot.querySelector(".copy-source-button"), d = this.shadowRoot.querySelector(".share-button"), s = this.shadowRoot.querySelector(".browser-header");
-    e?.addEventListener("click", () => this.handleClose()), t?.addEventListener("click", () => this.toggleMinimize()), o?.addEventListener("click", () => this.toggleMaximize()), i?.addEventListener("click", () => this.toggleViewSource()), n?.addEventListener("click", () => this.copySourceCode()), d?.addEventListener("click", (a) => {
+    const e = this.shadowRoot.querySelector(".control-button.close"), t = this.shadowRoot.querySelector(".control-button.minimize"), o = this.shadowRoot.querySelector(".control-button.maximize"), r = this.shadowRoot.querySelector(".view-source-button"), n = this.shadowRoot.querySelector(".copy-source-button"), c = this.shadowRoot.querySelector(".share-button"), s = this.shadowRoot.querySelector(".browser-header");
+    e?.addEventListener("click", () => this.handleClose()), t?.addEventListener("click", () => this.toggleMinimize()), o?.addEventListener("click", () => this.toggleMaximize()), r?.addEventListener("click", () => this.toggleViewSource()), n?.addEventListener("click", () => this.copySourceCode()), c?.addEventListener("click", (a) => {
       a.stopPropagation(), this.toggleShareMenu();
     }), s?.addEventListener("dblclick", (a) => {
-      const h = a.target;
-      (h.classList.contains("browser-header") || h.classList.contains("controls")) && this.toggleMaximize();
+      a.target.closest("button, a, .share-menu") || this.toggleMaximize();
     });
-    const c = this.shadowRoot.querySelector("iframe");
-    c?.addEventListener("error", () => this.handleIframeError()), c?.addEventListener("load", () => {
-      this._syncIframeColorScheme(), this._getDevicePreset() && this._injectSafeAreas(c);
+    const d = this.shadowRoot.querySelector("iframe");
+    d?.addEventListener("error", () => this.handleIframeError()), d?.addEventListener("load", () => {
+      this._syncIframeColorScheme(), this._getDevicePreset() && this._injectSafeAreas(d);
     }), this.shadowRoot.querySelector('[data-action="share"]')?.addEventListener("click", () => this.shareViaWebAPI()), this.shadowRoot.querySelector('[data-action="codepen"]')?.addEventListener("click", () => this.openInCodePen()), this.shadowRoot.querySelector(".retry-button")?.addEventListener("click", () => this.retryLoad());
   }
   handleIframeError() {
@@ -327,22 +326,42 @@ class A extends HTMLElement {
     this.showSource = !this.showSource, this.updateContentView();
   }
   updateContentView() {
-    const e = this.shadowRoot.querySelector(".browser-content"), t = this.shadowRoot.querySelector(".view-source-button");
-    e && (this.showSource ? (e.innerHTML = `
-        <div class="source-view">
-          <div class="source-header">
-            <span class="source-label">Source Code</span>
-            <button class="copy-source-button" title="Copy source code">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="5" y="5" width="9" height="9" rx="1"/>
-                <path d="M3 11V3a1 1 0 011-1h8"/>
-              </svg>
-              Copy
-            </button>
-          </div>
-          <pre><code>${this.escapeHtml(this.sourceCode)}</code></pre>
+    const e = this.shadowRoot.querySelector(".view-source-button");
+    !!this._getDevicePreset() ? this._updateDeviceSourceView(e) : this._updateBrowserSourceView(e);
+  }
+  _updateBrowserSourceView(e) {
+    const t = this.shadowRoot.querySelector(".browser-content");
+    t && (this.showSource ? (t.innerHTML = this._sourceViewHTML(), e?.classList.add("active"), t.querySelector(".copy-source-button")?.addEventListener("click", () => this.copySourceCode())) : (this.src ? (t.innerHTML = `<iframe src="${this.escapeHtml(this.src)}" loading="lazy"></iframe>`, t.querySelector("iframe")?.addEventListener("load", () => this._syncIframeColorScheme())) : t.innerHTML = "<slot></slot>", e?.classList.remove("active")));
+  }
+  _updateDeviceSourceView(e) {
+    const t = this.shadowRoot.querySelector(".device-wrapper");
+    let o = this.shadowRoot.querySelector(".device-source-panel");
+    if (this.showSource) {
+      if (t && (t.style.display = "none"), !o) {
+        o = document.createElement("div"), o.className = "device-source-panel";
+        const r = this.shadowRoot.querySelector(".device-toolbar");
+        r ? this.shadowRoot.insertBefore(o, r) : this.shadowRoot.appendChild(o);
+      }
+      o.innerHTML = this._sourceViewHTML(), o.style.display = "", e?.classList.add("active"), o.querySelector(".copy-source-button")?.addEventListener("click", () => this.copySourceCode());
+    } else
+      t && (t.style.display = ""), o && (o.style.display = "none"), e?.classList.remove("active");
+  }
+  _sourceViewHTML() {
+    return `
+      <div class="source-view">
+        <div class="source-header">
+          <span class="source-label">Source Code</span>
+          <button class="copy-source-button" title="Copy source code">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="5" y="5" width="9" height="9" rx="1"/>
+              <path d="M3 11V3a1 1 0 011-1h8"/>
+            </svg>
+            Copy
+          </button>
         </div>
-      `, t.classList.add("active"), e.querySelector(".copy-source-button")?.addEventListener("click", () => this.copySourceCode())) : (this.src ? (e.innerHTML = `<iframe src="${this.escapeHtml(this.src)}" loading="lazy"></iframe>`, e.querySelector("iframe")?.addEventListener("load", () => this._syncIframeColorScheme())) : e.innerHTML = "<slot></slot>", t.classList.remove("active")));
+        <pre><code>${this.escapeHtml(this.sourceCode)}</code></pre>
+      </div>
+    `;
   }
   async copySourceCode() {
     if (this.sourceCode)
@@ -395,13 +414,13 @@ class A extends HTMLElement {
     if (!this.sourceCode) return null;
     const t = new DOMParser().parseFromString(this.sourceCode, "text/html"), o = Array.from(t.querySelectorAll("style")).map((s) => s.textContent).join(`
 
-`), i = Array.from(t.querySelectorAll("script")).filter((s) => !s.src && s.type !== "module").map((s) => s.textContent).join(`
+`), r = Array.from(t.querySelectorAll("script")).filter((s) => !s.src && s.type !== "module").map((s) => s.textContent).join(`
 
 `), n = t.body.cloneNode(!0);
     return n.querySelectorAll("script, style").forEach((s) => s.remove()), {
       html: n.innerHTML.trim(),
       css: o.trim(),
-      js: i.trim()
+      js: r.trim()
     };
   }
   openInCodePen() {
@@ -417,8 +436,8 @@ class A extends HTMLElement {
       // Show HTML and CSS editors, hide JS if empty
     }, o = document.createElement("form");
     o.action = "https://codepen.io/pen/define", o.method = "POST", o.target = "_blank";
-    const i = document.createElement("input");
-    i.type = "hidden", i.name = "data", i.value = JSON.stringify(t), o.appendChild(i), document.body.appendChild(o), o.submit(), document.body.removeChild(o), this.toggleShareMenu();
+    const r = document.createElement("input");
+    r.type = "hidden", r.name = "data", r.value = JSON.stringify(t), o.appendChild(r), document.body.appendChild(o), o.submit(), document.body.removeChild(o), this.toggleShareMenu();
   }
   handleClose() {
     this.isMaximized && this.toggleMaximize(), this.isMinimized || this.toggleMinimize();
@@ -438,14 +457,14 @@ class A extends HTMLElement {
       z-index: var(--browser-window-overlay-z-index, 9998);
       cursor: pointer;
       animation: fadeIn 200ms ease;
-    `, !y) {
+    `, !k) {
         const e = document.createElement("style");
         e.textContent = `
         @keyframes fadeIn {
           from { opacity: 0; }
           to { opacity: 1; }
         }
-      `, document.head.appendChild(e), y = !0;
+      `, document.head.appendChild(e), k = !0;
       }
       this.overlay.addEventListener("click", () => this.toggleMaximize()), document.body.appendChild(this.overlay), document.addEventListener("keydown", this.handleKeydown);
     }
@@ -596,6 +615,7 @@ class A extends HTMLElement {
           flex: 1;
           display: flex;
           flex-direction: column;
+          overflow: hidden;
         }
 
         /* Slot fills available space */
@@ -631,7 +651,7 @@ class A extends HTMLElement {
         .source-view {
           padding: 0;
           background: var(--browser-window-header-bg, var(--_bw-header-bg));
-          min-height: 200px;
+          min-height: 0;
           flex: 1;
           overflow: auto;
           display: flex;
@@ -1107,21 +1127,21 @@ class A extends HTMLElement {
   }
   // --- Device mode ---
   _deviceCSS(e) {
-    const t = g[this.deviceColor] || g.midnight, o = this.getAttribute("orientation") === "landscape", i = this._getEffectiveDimensions(e), [n, d, s, c] = this._getEffectiveSafeInsets(e), a = M[e.notch] || 24, h = e.homeIndicator && !e.homeButton ? L : 0, u = e.homeButton ? x : 0, m = e.notch !== "none";
+    const t = x[this.deviceColor] || x.midnight, o = this.getAttribute("orientation") === "landscape", r = this._getEffectiveDimensions(e), [n, c, s, d] = this._getEffectiveSafeInsets(e), a = L[e.notch] || 24, m = e.homeIndicator && !e.homeButton ? A : 0, u = e.homeButton ? y : 0, b = e.notch !== "none";
     return `
         :host([device]) {
-          --device-width: ${i.width}px;
-          --device-height: ${i.height}px;
+          --device-width: ${r.width}px;
+          --device-height: ${r.height}px;
           --device-bezel: ${e.bezel}px;
           --device-corner-radius: ${e.cornerRadius}px;
           --browser-window-bezel-color: ${t};
-          --status-bar-height: ${o && m ? 24 : a}px;
-          --home-indicator-height: ${h}px;
+          --status-bar-height: ${o && b ? 24 : a}px;
+          --home-indicator-height: ${m}px;
           --home-button-area: ${u}px;
           --safe-top: ${n}px;
-          --safe-right: ${d}px;
+          --safe-right: ${c}px;
           --safe-bottom: ${s}px;
-          --safe-left: ${c}px;
+          --safe-left: ${d}px;
 
           border: none;
           border-radius: 0;
@@ -1152,6 +1172,7 @@ class A extends HTMLElement {
           background: #000;
           flex-shrink: 0;
           transform-origin: top center;
+          box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 8px 24px rgba(0, 0, 0, 0.4);
         }
 
         .device-frame.home-button {
@@ -1467,11 +1488,71 @@ class A extends HTMLElement {
           bottom: 0;
           width: var(--safe-left);
         }
+
+        .device-source-panel {
+          flex: 1;
+          min-height: 200px;
+          max-height: 60vh;
+          overflow: auto;
+          border-radius: 8px;
+          border: 1px solid var(--browser-window-border-color, var(--_bw-border-color));
+          background: var(--browser-window-content-bg, var(--_bw-content-bg));
+        }
+
+        .device-source-panel .source-view {
+          min-height: 100%;
+        }
+
+        .device-toolbar {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.5rem;
+          padding: 0.625rem 1rem;
+          margin-top: 0.75rem;
+          border-radius: 8px;
+          background: var(--browser-window-header-bg, var(--_bw-header-bg));
+          border: 1px solid var(--browser-window-border-color, var(--_bw-border-color));
+        }
+
+        .device-toolbar .view-source-button,
+        .device-toolbar .share-button,
+        .device-toolbar .download-button {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.375rem;
+          padding: 0.375rem 0.75rem;
+          background: none;
+          border: 1px solid var(--browser-window-border-color, var(--_bw-border-color));
+          border-radius: 6px;
+          color: var(--browser-window-text-color, var(--_bw-text-color));
+          font-size: 0.8125rem;
+          font-family: var(--browser-window-font-family);
+          cursor: pointer;
+          text-decoration: none;
+          transition: background 150ms ease;
+        }
+
+        .device-toolbar .view-source-button:hover,
+        .device-toolbar .share-button:hover,
+        .device-toolbar .download-button:hover {
+          background: var(--browser-window-hover-bg, var(--_bw-hover-bg));
+        }
+
+        .device-toolbar .view-source-button.active {
+          background: var(--browser-window-accent-color, #2563eb);
+          color: white;
+          border-color: var(--browser-window-accent-color, #2563eb);
+        }
+
+        .device-toolbar .share-container {
+          position: relative;
+        }
     `;
   }
   _deviceChrome(e) {
-    const t = this.getAttribute("orientation") === "landscape", o = e.notch !== "none", i = o ? e.notch : "", n = e.homeButton ? "home-button" : "", s = ["silver", "gold", "white"].includes(this.deviceColor) ? "light-bezel" : "", a = ["device-frame", i, n, s, t ? "landscape" : ""].filter(Boolean).join(" "), u = `
-      <div class="status-bar ${t && o ? "" : i}">
+    const t = this.getAttribute("orientation") === "landscape", o = e.notch !== "none", r = o ? e.notch : "", n = e.homeButton ? "home-button" : "", s = ["silver", "gold", "white"].includes(this.deviceColor) ? "light-bezel" : "", a = ["device-frame", r, n, s, t ? "landscape" : ""].filter(Boolean).join(" "), u = `
+      <div class="status-bar ${t && o ? "" : r}">
         <span class="status-time">9:41</span>
         <div class="status-icons">
           <span class="signal-bars" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
@@ -1479,34 +1560,85 @@ class A extends HTMLElement {
           <span class="battery-icon" aria-hidden="true"></span>
         </div>
       </div>
-    `, m = e.homeIndicator && !e.homeButton ? '<div class="home-indicator"><div class="home-indicator-pill"></div></div>' : "", f = this.hasAttribute("show-safe-areas") ? `<div class="safe-area-overlays">
+    `, b = e.homeIndicator && !e.homeButton ? '<div class="home-indicator"><div class="home-indicator-pill"></div></div>' : "", p = this.hasAttribute("show-safe-areas") ? `<div class="safe-area-overlays">
           <div class="safe-area-overlay safe-area-top"></div>
           <div class="safe-area-overlay safe-area-right"></div>
           <div class="safe-area-overlay safe-area-bottom"></div>
           <div class="safe-area-overlay safe-area-left"></div>
-        </div>` : "";
+        </div>` : "", f = this._deviceToolbar();
     return t && o ? `
         <div class="device-wrapper">
           <div class="${a}">
-            <div class="notch-sidebar ${i}"></div>
+            <div class="notch-sidebar ${r}"></div>
             <div class="device-main">
               ${u}
               ${this._contentHTML()}
-              ${m}
+              ${b}
             </div>
-            ${f}
+            ${p}
           </div>
         </div>
+        ${f}
       ` : `
       <div class="device-wrapper">
         <div class="${a}">
           ${u}
           ${this._contentHTML()}
-          ${m}
-          ${f}
+          ${b}
+          ${p}
         </div>
       </div>
+      ${f}
     `;
+  }
+  _deviceToolbar() {
+    return this.src ? `
+      <div class="device-toolbar">
+        <button class="view-source-button" title="View source code">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="4,6 2,8 4,10"/>
+            <polyline points="12,6 14,8 12,10"/>
+            <line x1="10" y1="4" x2="6" y2="12"/>
+          </svg>
+          Source
+        </button>
+        <div class="share-container">
+          <button class="share-button" title="Share demo">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M8 12V3M8 3L5 6M8 3l3 3"/>
+              <path d="M3 9v4a1 1 0 001 1h8a1 1 0 001-1V9"/>
+            </svg>
+            Share
+          </button>
+          <div class="share-menu">
+            ${navigator.share ? `
+              <button class="share-menu-item" data-action="share">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="4" r="2"/>
+                  <circle cx="4" cy="8" r="2"/>
+                  <circle cx="12" cy="12" r="2"/>
+                  <path d="M6 9l4 2M6 7l4-2"/>
+                </svg>
+                Share...
+              </button>
+            ` : ""}
+            <button class="share-menu-item" data-action="codepen">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M8 0L0 5v6l8 5 8-5V5L8 0zM7 10.5L2 7.5v-2l5 3v2zm1-3l-5-3L8 2l5 2.5-5 3zm1 3v-2l5-3v2l-5 3z"/>
+              </svg>
+              Open in CodePen
+            </button>
+          </div>
+        </div>
+        <a href="${this.escapeHtml(this.src)}" download class="download-button" title="Download demo HTML file">
+          <svg class="download-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8 1v10M8 11l-3-3M8 11l3-3"/>
+            <path d="M2 12v2a1 1 0 001 1h10a1 1 0 001-1v-2"/>
+          </svg>
+          Download
+        </a>
+      </div>
+    ` : "";
   }
   // --- Device scaling ---
   _setupDeviceScaling() {
@@ -1517,11 +1649,11 @@ class A extends HTMLElement {
     if (!e) return;
     const t = this.shadowRoot.querySelector(".device-wrapper"), o = this.shadowRoot.querySelector(".device-frame");
     if (!t || !o) return;
-    const i = this.clientWidth;
-    if (i === 0) return;
-    const n = this._getEffectiveDimensions(e), d = n.width + e.bezel * 2, s = Math.min(1, i / d);
+    const r = this.clientWidth;
+    if (r === 0) return;
+    const n = this._getEffectiveDimensions(e), c = n.width + e.bezel * 2, s = Math.min(1, r / c);
     this._currentScale = s, o.style.transform = `scale(${s})`;
-    const c = e.homeButton ? x : 0, a = n.height + e.bezel * 2 + c;
+    const d = e.homeButton ? y : 0, a = n.height + e.bezel * 2 + d;
     t.style.height = `${a * s}px`;
   }
   _teardownDeviceScaling() {
@@ -1532,7 +1664,7 @@ class A extends HTMLElement {
     return t.textContent = e, t.innerHTML;
   }
 }
-customElements.get("browser-window") || customElements.define("browser-window", A);
+customElements.get("browser-window") || customElements.define("browser-window", E);
 export {
-  A as BrowserWindow
+  E as BrowserWindow
 };

@@ -71,8 +71,8 @@ code {
 }
 
 browser-window code {
-  background: var(--browser-window-hover-bg, var(--code-bg));
-  color: var(--browser-window-text-color, inherit);
+  background: color-mix(in srgb, currentColor 10%, transparent);
+  color: inherit;
 }
 
 /* Site Header */

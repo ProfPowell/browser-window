@@ -524,6 +524,49 @@ test.describe('browser-window', () => {
     })
   })
 
+  test.describe('device mode toolbar', () => {
+    test('shows toolbar with source/share/download when src is set', async ({ page }) => {
+      const el = page.locator('#device-iphone')
+      const toolbar = el.locator('.device-toolbar')
+      await expect(toolbar).toBeVisible()
+
+      const viewSource = toolbar.locator('.view-source-button')
+      await expect(viewSource).toBeVisible()
+
+      const share = toolbar.locator('.share-button')
+      await expect(share).toBeVisible()
+
+      const download = toolbar.locator('.download-button')
+      await expect(download).toBeVisible()
+    })
+
+    test('toggling source hides device and shows code panel', async ({ page }) => {
+      const el = page.locator('#device-iphone')
+      await el.scrollIntoViewIfNeeded()
+
+      // Fetch source first
+      await el.evaluate(async (node) => {
+        await node.fetchSourceCode()
+      })
+
+      const viewSource = el.locator('.device-toolbar .view-source-button')
+      await viewSource.click()
+
+      // Device wrapper should be hidden
+      const wrapper = el.locator('.device-wrapper')
+      await expect(wrapper).toBeHidden()
+
+      // Source panel should be visible
+      const sourcePanel = el.locator('.device-source-panel')
+      await expect(sourcePanel).toBeVisible()
+
+      // Toggle back
+      await viewSource.click()
+      await expect(wrapper).toBeVisible()
+      await expect(sourcePanel).toBeHidden()
+    })
+  })
+
   test.describe('device mode phase 2', () => {
     test.describe('orientation', () => {
       test('landscape swaps iframe dimensions', async ({ page }) => {

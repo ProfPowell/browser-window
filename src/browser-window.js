@@ -537,15 +537,11 @@ export class BrowserWindow extends HTMLElement {
       this.toggleShareMenu();
     });
 
-    // Double-click on the header (outside buttons/URL bar) to maximize
+    // Double-click on the header to maximize (except on interactive elements)
     header?.addEventListener('dblclick', (e) => {
-      // Only trigger if clicking directly on the header, not on child elements
       const target = e.target;
-      const isHeaderArea =
-        target.classList.contains('browser-header') || target.classList.contains('controls');
-      if (isHeaderArea) {
-        this.toggleMaximize();
-      }
+      if (target.closest('button, a, .share-menu')) return;
+      this.toggleMaximize();
     });
 
     // Handle iframe load errors and sync color scheme
@@ -620,35 +616,26 @@ export class BrowserWindow extends HTMLElement {
   }
 
   updateContentView() {
-    const content = this.shadowRoot.querySelector('.browser-content');
     const viewSourceBtn = this.shadowRoot.querySelector('.view-source-button');
+    const isDeviceMode = !!this._getDevicePreset();
 
+    if (isDeviceMode) {
+      this._updateDeviceSourceView(viewSourceBtn);
+    } else {
+      this._updateBrowserSourceView(viewSourceBtn);
+    }
+  }
+
+  _updateBrowserSourceView(viewSourceBtn) {
+    const content = this.shadowRoot.querySelector('.browser-content');
     if (!content) return;
 
     if (this.showSource) {
-      // Show source code
-      content.innerHTML = `
-        <div class="source-view">
-          <div class="source-header">
-            <span class="source-label">Source Code</span>
-            <button class="copy-source-button" title="Copy source code">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="5" y="5" width="9" height="9" rx="1"/>
-                <path d="M3 11V3a1 1 0 011-1h8"/>
-              </svg>
-              Copy
-            </button>
-          </div>
-          <pre><code>${this.escapeHtml(this.sourceCode)}</code></pre>
-        </div>
-      `;
-      viewSourceBtn.classList.add('active');
-
-      // Re-attach copy button listener
-      const copyBtn = content.querySelector('.copy-source-button');
-      copyBtn?.addEventListener('click', () => this.copySourceCode());
+      content.innerHTML = this._sourceViewHTML();
+      viewSourceBtn?.classList.add('active');
+      content.querySelector('.copy-source-button')
+        ?.addEventListener('click', () => this.copySourceCode());
     } else {
-      // Restore original content
       if (this.src) {
         content.innerHTML = `<iframe src="${this.escapeHtml(this.src)}" loading="lazy"></iframe>`;
         const newIframe = content.querySelector('iframe');
@@ -656,8 +643,54 @@ export class BrowserWindow extends HTMLElement {
       } else {
         content.innerHTML = '<slot></slot>';
       }
-      viewSourceBtn.classList.remove('active');
+      viewSourceBtn?.classList.remove('active');
     }
+  }
+
+  _updateDeviceSourceView(viewSourceBtn) {
+    const wrapper = this.shadowRoot.querySelector('.device-wrapper');
+    let sourcePanel = this.shadowRoot.querySelector('.device-source-panel');
+
+    if (this.showSource) {
+      if (wrapper) wrapper.style.display = 'none';
+      if (!sourcePanel) {
+        sourcePanel = document.createElement('div');
+        sourcePanel.className = 'device-source-panel';
+        const toolbar = this.shadowRoot.querySelector('.device-toolbar');
+        if (toolbar) {
+          this.shadowRoot.insertBefore(sourcePanel, toolbar);
+        } else {
+          this.shadowRoot.appendChild(sourcePanel);
+        }
+      }
+      sourcePanel.innerHTML = this._sourceViewHTML();
+      sourcePanel.style.display = '';
+      viewSourceBtn?.classList.add('active');
+      sourcePanel.querySelector('.copy-source-button')
+        ?.addEventListener('click', () => this.copySourceCode());
+    } else {
+      if (wrapper) wrapper.style.display = '';
+      if (sourcePanel) sourcePanel.style.display = 'none';
+      viewSourceBtn?.classList.remove('active');
+    }
+  }
+
+  _sourceViewHTML() {
+    return `
+      <div class="source-view">
+        <div class="source-header">
+          <span class="source-label">Source Code</span>
+          <button class="copy-source-button" title="Copy source code">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="5" y="5" width="9" height="9" rx="1"/>
+              <path d="M3 11V3a1 1 0 011-1h8"/>
+            </svg>
+            Copy
+          </button>
+        </div>
+        <pre><code>${this.escapeHtml(this.sourceCode)}</code></pre>
+      </div>
+    `;
   }
 
   async copySourceCode() {
@@ -1083,6 +1116,7 @@ export class BrowserWindow extends HTMLElement {
           flex: 1;
           display: flex;
           flex-direction: column;
+          overflow: hidden;
         }
 
         /* Slot fills available space */
@@ -1118,7 +1152,7 @@ export class BrowserWindow extends HTMLElement {
         .source-view {
           padding: 0;
           background: var(--browser-window-header-bg, var(--_bw-header-bg));
-          min-height: 200px;
+          min-height: 0;
           flex: 1;
           overflow: auto;
           display: flex;
@@ -1660,6 +1694,7 @@ export class BrowserWindow extends HTMLElement {
           background: #000;
           flex-shrink: 0;
           transform-origin: top center;
+          box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 8px 24px rgba(0, 0, 0, 0.4);
         }
 
         .device-frame.home-button {
@@ -1975,6 +2010,66 @@ export class BrowserWindow extends HTMLElement {
           bottom: 0;
           width: var(--safe-left);
         }
+
+        .device-source-panel {
+          flex: 1;
+          min-height: 200px;
+          max-height: 60vh;
+          overflow: auto;
+          border-radius: 8px;
+          border: 1px solid var(--browser-window-border-color, var(--_bw-border-color));
+          background: var(--browser-window-content-bg, var(--_bw-content-bg));
+        }
+
+        .device-source-panel .source-view {
+          min-height: 100%;
+        }
+
+        .device-toolbar {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.5rem;
+          padding: 0.625rem 1rem;
+          margin-top: 0.75rem;
+          border-radius: 8px;
+          background: var(--browser-window-header-bg, var(--_bw-header-bg));
+          border: 1px solid var(--browser-window-border-color, var(--_bw-border-color));
+        }
+
+        .device-toolbar .view-source-button,
+        .device-toolbar .share-button,
+        .device-toolbar .download-button {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.375rem;
+          padding: 0.375rem 0.75rem;
+          background: none;
+          border: 1px solid var(--browser-window-border-color, var(--_bw-border-color));
+          border-radius: 6px;
+          color: var(--browser-window-text-color, var(--_bw-text-color));
+          font-size: 0.8125rem;
+          font-family: var(--browser-window-font-family);
+          cursor: pointer;
+          text-decoration: none;
+          transition: background 150ms ease;
+        }
+
+        .device-toolbar .view-source-button:hover,
+        .device-toolbar .share-button:hover,
+        .device-toolbar .download-button:hover {
+          background: var(--browser-window-hover-bg, var(--_bw-hover-bg));
+        }
+
+        .device-toolbar .view-source-button.active {
+          background: var(--browser-window-accent-color, #2563eb);
+          color: white;
+          border-color: var(--browser-window-accent-color, #2563eb);
+        }
+
+        .device-toolbar .share-container {
+          position: relative;
+        }
     `;
   }
 
@@ -2019,6 +2114,8 @@ export class BrowserWindow extends HTMLElement {
         </div>`
       : '';
 
+    const toolbar = this._deviceToolbar();
+
     // In landscape with notch, use sidebar layout for the notch
     if (isLandscape && hasNotch) {
       return `
@@ -2033,6 +2130,7 @@ export class BrowserWindow extends HTMLElement {
             ${safeAreaOverlays}
           </div>
         </div>
+        ${toolbar}
       `;
     }
 
@@ -2044,6 +2142,62 @@ export class BrowserWindow extends HTMLElement {
           ${homeIndicator}
           ${safeAreaOverlays}
         </div>
+      </div>
+      ${toolbar}
+    `;
+  }
+
+  _deviceToolbar() {
+    if (!this.src) return '';
+    return `
+      <div class="device-toolbar">
+        <button class="view-source-button" title="View source code">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="4,6 2,8 4,10"/>
+            <polyline points="12,6 14,8 12,10"/>
+            <line x1="10" y1="4" x2="6" y2="12"/>
+          </svg>
+          Source
+        </button>
+        <div class="share-container">
+          <button class="share-button" title="Share demo">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M8 12V3M8 3L5 6M8 3l3 3"/>
+              <path d="M3 9v4a1 1 0 001 1h8a1 1 0 001-1V9"/>
+            </svg>
+            Share
+          </button>
+          <div class="share-menu">
+            ${
+              navigator.share
+                ? `
+              <button class="share-menu-item" data-action="share">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="4" r="2"/>
+                  <circle cx="4" cy="8" r="2"/>
+                  <circle cx="12" cy="12" r="2"/>
+                  <path d="M6 9l4 2M6 7l4-2"/>
+                </svg>
+                Share...
+              </button>
+            `
+                : ''
+            }
+            <button class="share-menu-item" data-action="codepen">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M8 0L0 5v6l8 5 8-5V5L8 0zM7 10.5L2 7.5v-2l5 3v2zm1-3l-5-3L8 2l5 2.5-5 3zm1 3v-2l5-3v2l-5 3z"/>
+              </svg>
+              Open in CodePen
+            </button>
+          </div>
+        </div>
+        <a href="${this.escapeHtml(this.src)}" download class="download-button" title="Download demo HTML file">
+          <svg class="download-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M8 1v10M8 11l-3-3M8 11l3-3"/>
+            <path d="M2 12v2a1 1 0 001 1h10a1 1 0 001-1v-2"/>
+          </svg>
+          Download
+        </a>
       </div>
     `;
   }
