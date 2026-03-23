@@ -2071,6 +2071,13 @@ export class BrowserWindow extends HTMLElement {
           position: relative;
         }
 
+        .device-toolbar .share-menu {
+          bottom: calc(100% + 6px);
+          top: auto;
+          right: 50%;
+          transform: translateX(50%);
+        }
+
         .device-toolbar svg {
           width: 16px;
           height: 16px;
