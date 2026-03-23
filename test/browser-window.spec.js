@@ -80,7 +80,7 @@ test.describe('browser-window', () => {
         const styleEl = node.shadowRoot.querySelector('style')
         return styleEl?.textContent || ''
       })
-      expect(style).toContain('--browser-window-bg: #ffffff')
+      expect(style).toContain('--_bw-bg: var(--color-surface, #ffffff)')
     })
 
     test('applies dark mode styles when mode="dark"', async ({ page }) => {
@@ -90,7 +90,7 @@ test.describe('browser-window', () => {
         return styleEl?.textContent || ''
       })
       expect(style).toContain(':host([mode="dark"])')
-      expect(style).toContain('--browser-window-bg: #1c1c1e')
+      expect(style).toContain('--_bw-bg: var(--color-surface, #1c1c1e)')
     })
 
     test('includes prefers-color-scheme media query for auto detection', async ({ page }) => {
@@ -109,7 +109,7 @@ test.describe('browser-window', () => {
         const styleEl = node.shadowRoot.querySelector('style')
         return styleEl?.textContent || ''
       })
-      expect(style).toContain('color: var(--browser-window-text-color)')
+      expect(style).toContain('color: var(--browser-window-text-color, var(--_bw-text-color))')
     })
 
     test('base :host sets color-scheme: light', async ({ page }) => {

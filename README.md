@@ -88,6 +88,40 @@ The component is resizable by default. Drag the bottom-right corner to resize:
 | `src` | string | `''` | Path to HTML file to load in iframe (enables source viewing) |
 | `mode` | `'light'` \| `'dark'` | auto | Color scheme. Omit to follow system preference |
 | `shadow` | boolean | `false` | Add drop shadow to the window |
+| `device` | string | `''` | Device preset for phone/tablet bezel mode |
+| `device-color` | string | `'midnight'` | Bezel color: `midnight`, `silver`, `gold`, `blue`, `white` |
+| `orientation` | `'portrait'` \| `'landscape'` | `'portrait'` | Device orientation |
+| `show-safe-areas` | boolean | `false` | Show safe area overlay bands (device mode) |
+
+### Device Presets
+
+| Preset | Device | Screen |
+|--------|--------|--------|
+| `iphone-16` | iPhone 16 | 393 x 852 |
+| `iphone-16-pro-max` | iPhone 16 Pro Max | 440 x 956 |
+| `iphone-se` | iPhone SE | 375 x 667 |
+| `pixel-9` | Pixel 9 | 412 x 923 |
+| `pixel-9-pro-xl` | Pixel 9 Pro XL | 448 x 998 |
+| `galaxy-s24` | Galaxy S24 | 412 x 915 |
+| `ipad-air` | iPad Air | 820 x 1180 |
+| `ipad-pro-13` | iPad Pro 13" | 1024 x 1366 |
+| `ipad-mini` | iPad mini | 744 x 1133 |
+
+### Device Mode
+
+Render content inside a realistic phone or tablet bezel:
+
+```html
+<!-- iPhone 16 -->
+<browser-window device="iphone-16" src="app.html"></browser-window>
+
+<!-- Landscape Pixel 9 with silver bezel -->
+<browser-window device="pixel-9" orientation="landscape" device-color="silver" src="app.html">
+</browser-window>
+
+<!-- iPad Air with safe area overlays -->
+<browser-window device="ipad-air" show-safe-areas src="app.html"></browser-window>
+```
 
 ## Features
 
@@ -141,6 +175,17 @@ browser-window {
   --browser-window-content-bg: #ffffff;
   --browser-window-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --browser-window-mono-font: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+
+  /* Device mode */
+  --browser-window-bezel-color: #1a1a1a;
+  --browser-window-status-bar-color: rgba(255,255,255,0.9);
+  --browser-window-home-indicator-color: rgba(255,255,255,0.3);
+  --browser-window-safe-area-color: oklch(0.65 0.2 250 / 0.25);
+
+  /* Z-index (for stacking context control) */
+  --browser-window-z-index: 9999;
+  --browser-window-overlay-z-index: 9998;
+  --browser-window-menu-z-index: 1000;
 }
 ```
 
@@ -203,7 +248,7 @@ npm run analyze
 | `npm run lint:fix` | Run ESLint with auto-fix |
 | `npm run format` | Format code with Prettier |
 | `npm run test` | Run test suite |
-| `npm run test:watch` | Run tests in watch mode |
+| `npm run test:ui` | Run tests with interactive UI |
 | `npm run analyze` | Generate custom-elements.json manifest |
 
 ## Related Projects

@@ -6,16 +6,22 @@
  */
 export class BrowserWindow extends HTMLElement {
   /** URL to display in the address bar */
-  readonly url: string
+  url: string
 
   /** Title shown in the URL bar (defaults to hostname from url) */
-  readonly browserTitle: string
+  browserTitle: string
 
   /** Path to HTML file to load in iframe */
-  readonly src: string
+  src: string
 
-  /** Color scheme - 'light', 'dark', or undefined (auto) */
-  readonly mode: string
+  /** Color scheme - 'light', 'dark', or resolved from system/page signals */
+  mode: string
+
+  /** Named device preset (e.g., 'iphone-16', 'pixel-9', 'ipad-air') */
+  device: string
+
+  /** Device bezel color preset ('midnight', 'silver', 'gold', 'blue', 'white') */
+  deviceColor: string
 
   /** Whether the window has a drop shadow */
   readonly hasShadow: boolean

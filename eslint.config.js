@@ -43,11 +43,13 @@ export default [
         Element: 'readonly',
         DocumentFragment: 'readonly',
         CSSStyleSheet: 'readonly',
-        ShadowRoot: 'readonly'
+        ShadowRoot: 'readonly',
+        getComputedStyle: 'readonly',
+        matchMedia: 'readonly'
       }
     },
     rules: {
-      'no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      'no-unused-vars': ['error', { argsIgnorePattern: '^_', caughtErrorsIgnorePattern: '^_' }],
       'no-console': 'off'
     }
   },

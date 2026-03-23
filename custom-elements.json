@@ -13,23 +13,49 @@
           "members": [
             {
               "kind": "field",
-              "name": "url",
-              "readonly": true
+              "name": "url"
             },
             {
               "kind": "field",
-              "name": "src",
-              "readonly": true
+              "name": "src"
             },
             {
               "kind": "field",
-              "name": "browserTitle",
-              "readonly": true
+              "name": "browserTitle"
             },
             {
               "kind": "field",
-              "name": "mode",
-              "readonly": true
+              "name": "mode"
+            },
+            {
+              "kind": "field",
+              "name": "device"
+            },
+            {
+              "kind": "field",
+              "name": "deviceColor"
+            },
+            {
+              "kind": "method",
+              "name": "_getDevicePreset"
+            },
+            {
+              "kind": "method",
+              "name": "_getEffectiveDimensions",
+              "parameters": [
+                {
+                  "name": "preset"
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_getEffectiveSafeInsets",
+              "parameters": [
+                {
+                  "name": "preset"
+                }
+              ]
             },
             {
               "kind": "method",
@@ -43,6 +69,15 @@
             {
               "kind": "method",
               "name": "_syncIframeColorScheme"
+            },
+            {
+              "kind": "method",
+              "name": "_injectSafeAreas",
+              "parameters": [
+                {
+                  "name": "iframe"
+                }
+              ]
             },
             {
               "kind": "field",
@@ -137,6 +172,60 @@
             },
             {
               "kind": "method",
+              "name": "_darkPalette"
+            },
+            {
+              "kind": "method",
+              "name": "_lightPalette"
+            },
+            {
+              "kind": "method",
+              "name": "_sharedCSS"
+            },
+            {
+              "kind": "method",
+              "name": "_browserCSS"
+            },
+            {
+              "kind": "method",
+              "name": "_browserChrome"
+            },
+            {
+              "kind": "method",
+              "name": "_contentHTML"
+            },
+            {
+              "kind": "method",
+              "name": "_deviceCSS",
+              "parameters": [
+                {
+                  "name": "preset"
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_deviceChrome",
+              "parameters": [
+                {
+                  "name": "preset"
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_setupDeviceScaling"
+            },
+            {
+              "kind": "method",
+              "name": "_updateDeviceScale"
+            },
+            {
+              "kind": "method",
+              "name": "_teardownDeviceScaling"
+            },
+            {
+              "kind": "method",
               "name": "escapeHtml",
               "parameters": [
                 {
@@ -191,6 +280,38 @@
                 "text": "boolean"
               },
               "default": "false"
+            },
+            {
+              "kind": "field",
+              "name": "_resizeObserver",
+              "type": {
+                "text": "null"
+              },
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "_currentScale",
+              "type": {
+                "text": "number"
+              },
+              "default": "1"
+            },
+            {
+              "kind": "field",
+              "name": "_outsideClickTimer",
+              "type": {
+                "text": "null"
+              },
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "_copyFeedbackTimer",
+              "type": {
+                "text": "null"
+              },
+              "default": "null"
             }
           ],
           "attributes": [
@@ -208,6 +329,18 @@
             },
             {
               "name": "src"
+            },
+            {
+              "name": "device"
+            },
+            {
+              "name": "device-color"
+            },
+            {
+              "name": "orientation"
+            },
+            {
+              "name": "show-safe-areas"
             }
           ],
           "superclass": {

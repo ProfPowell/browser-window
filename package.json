@@ -13,6 +13,9 @@
       "default": "./dist/browser-window.js"
     }
   },
+  "publishConfig": {
+     "access": "public"
+  },
   "files": [
     "dist",
     "browser-window.d.ts",
@@ -31,7 +34,7 @@
     "format": "prettier --write \"src/**/*.js\"",
     "format:check": "prettier --check \"src/**/*.js\"",
     "analyze": "cem analyze --litelement",
-    "prepublishOnly": "npm run build && npm run analyze"
+    "prepublishOnly": "npm run lint && npm run test && npm run build && npm run analyze"
   },
   "customElements": "custom-elements.json",
   "keywords": [

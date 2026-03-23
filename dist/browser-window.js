@@ -3,8 +3,8 @@ if (typeof document < "u") {
   r.textContent = "browser-window:not(:defined){display:block;opacity:0}", document.head.appendChild(r);
 }
 const b = /* @__PURE__ */ new Set();
-let l = null, m = null;
-function f() {
+let l = null, w = null;
+function p() {
   const r = document.documentElement, e = document.body;
   if (!r || !e) return null;
   if (r.classList.contains("dark") || e.classList.contains("dark") || r.getAttribute("data-theme") === "dark" || e.getAttribute("data-theme") === "dark")
@@ -20,33 +20,33 @@ function f() {
   const t = getComputedStyle(r).colorScheme;
   return t === "dark" ? !0 : t === "light" ? !1 : null;
 }
-function y() {
-  const r = f();
-  if (r !== m) {
-    m = r;
+function k() {
+  const r = p();
+  if (r !== w) {
+    w = r;
     for (const e of b)
       e._onPageModeChange(r);
   }
 }
 function _() {
   if (l) return;
-  l = new MutationObserver(y);
+  l = new MutationObserver(k);
   const r = {
     attributes: !0,
     attributeFilter: ["class", "data-theme", "data-bs-theme", "data-mode", "style"]
   };
   l.observe(document.documentElement, r), document.body && l.observe(document.body, r);
 }
-function k() {
+function S() {
   l && (l.disconnect(), l = null);
 }
-function S(r) {
-  b.add(r), b.size === 1 && _();
-  const e = f();
-  m = e, r._onPageModeChange(e);
-}
 function z(r) {
-  b.delete(r), b.size === 0 && (k(), m = null);
+  b.add(r), b.size === 1 && _();
+  const e = p();
+  w = e, r._onPageModeChange(e);
+}
+function C(r) {
+  b.delete(r), b.size === 0 && (S(), w = null);
 }
 const v = {
   "iphone-16": {
@@ -145,20 +145,21 @@ const v = {
   gold: "#d4a574",
   blue: "#3a4f6f",
   white: "#f0f0f0"
-}, C = {
+}, M = {
   "dynamic-island": 54,
   "punch-hole": 36,
   none: 24
-}, M = 28, x = 80;
-class L extends HTMLElement {
+}, L = 28, x = 80;
+let y = !1;
+class A extends HTMLElement {
   constructor() {
-    super(), this.attachShadow({ mode: "open" }), this.isMinimized = !1, this.isMaximized = !1, this.overlay = null, this.showSource = !1, this.sourceCode = "", this.showShareMenu = !1, this.handleKeydown = this.handleKeydown.bind(this), this.handleOutsideClick = this.handleOutsideClick.bind(this), this._resizeObserver = null, this._currentScale = 1;
+    super(), this.attachShadow({ mode: "open" }), this.isMinimized = !1, this.isMaximized = !1, this.overlay = null, this.showSource = !1, this.sourceCode = "", this.showShareMenu = !1, this.handleKeydown = this.handleKeydown.bind(this), this.handleOutsideClick = this.handleOutsideClick.bind(this), this._resizeObserver = null, this._currentScale = 1, this._outsideClickTimer = null, this._copyFeedbackTimer = null;
   }
   async connectedCallback() {
-    this.render(), this.attachEventListeners(), this.src && await this.fetchSourceCode(), S(this), this._getDevicePreset() && this._setupDeviceScaling();
+    this.render(), this.attachEventListeners(), this.src && await this.fetchSourceCode(), z(this), this._getDevicePreset() && this._setupDeviceScaling();
   }
   disconnectedCallback() {
-    z(this), this.removeOverlay(), this._teardownDeviceScaling(), document.removeEventListener("keydown", this.handleKeydown), document.removeEventListener("click", this.handleOutsideClick);
+    C(this), this.removeOverlay(), this._teardownDeviceScaling(), clearTimeout(this._outsideClickTimer), clearTimeout(this._copyFeedbackTimer), document.removeEventListener("keydown", this.handleKeydown), document.removeEventListener("click", this.handleOutsideClick);
   }
   static get observedAttributes() {
     return [
@@ -174,25 +175,43 @@ class L extends HTMLElement {
     ];
   }
   attributeChangedCallback(e) {
-    this.shadowRoot && (this.render(), this.attachEventListeners()), (e === "device" || e === "orientation") && (this._teardownDeviceScaling(), this._getDevicePreset() && this._setupDeviceScaling()), e === "mode" && (this.hasAttribute("mode") ? this.removeAttribute("data-page-mode") : this._onPageModeChange(f()));
+    this.shadowRoot && (this.render(), this.attachEventListeners()), e === "src" && (this.showSource = !1, this.sourceCode = "", this.src && this.fetchSourceCode()), (e === "device" || e === "orientation") && (this._teardownDeviceScaling(), this._getDevicePreset() && this._setupDeviceScaling()), e === "mode" && (this.hasAttribute("mode") ? this.removeAttribute("data-page-mode") : this._onPageModeChange(p()));
   }
   get url() {
     return this.getAttribute("url") || "";
   }
+  set url(e) {
+    this.setAttribute("url", e);
+  }
   get src() {
     return this.getAttribute("src") || "";
+  }
+  set src(e) {
+    this.setAttribute("src", e);
   }
   get browserTitle() {
     return this.getAttribute("title") || this.getHostname();
   }
+  set browserTitle(e) {
+    this.setAttribute("title", e);
+  }
   get mode() {
-    return this.getAttribute("mode") || this.getAttribute("data-page-mode") || "light";
+    return this.getAttribute("mode") || this.getAttribute("data-page-mode") || (typeof window < "u" && window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  }
+  set mode(e) {
+    e ? this.setAttribute("mode", e) : this.removeAttribute("mode");
   }
   get device() {
     return this.getAttribute("device") || "";
   }
+  set device(e) {
+    e ? this.setAttribute("device", e) : this.removeAttribute("device");
+  }
   get deviceColor() {
     return this.getAttribute("device-color") || "midnight";
+  }
+  set deviceColor(e) {
+    this.setAttribute("device-color", e);
   }
   _getDevicePreset() {
     const e = this.getAttribute("device");
@@ -210,8 +229,8 @@ class L extends HTMLElement {
     };
   }
   _getEffectiveSafeInsets(e) {
-    const [t, o, i, s] = e.safeInsets;
-    return this.getAttribute("orientation") === "landscape" ? [s, t, o, i] : [t, o, i, s];
+    const [t, o, i, n] = e.safeInsets;
+    return this.getAttribute("orientation") === "landscape" ? [n, t, o, i] : [t, o, i, n];
   }
   _onPageModeChange(e) {
     if (this.hasAttribute("mode")) {
@@ -238,12 +257,12 @@ class L extends HTMLElement {
         if (!o) return;
         const i = o.querySelector("style[data-browser-window-safe-areas]");
         i && i.remove();
-        const [s, d, n, c] = this._getEffectiveSafeInsets(t), a = o.createElement("style");
+        const [n, d, s, c] = this._getEffectiveSafeInsets(t), a = o.createElement("style");
         a.setAttribute("data-browser-window-safe-areas", ""), a.textContent = `
         :root {
-          --safe-top: ${s}px;
+          --safe-top: ${n}px;
           --safe-right: ${d}px;
-          --safe-bottom: ${n}px;
+          --safe-bottom: ${s}px;
           --safe-left: ${c}px;
         }
       `, o.head.appendChild(a);
@@ -262,17 +281,17 @@ class L extends HTMLElement {
     }
   }
   attachEventListeners() {
-    const e = this.shadowRoot.querySelector(".control-button.close"), t = this.shadowRoot.querySelector(".control-button.minimize"), o = this.shadowRoot.querySelector(".control-button.maximize"), i = this.shadowRoot.querySelector(".view-source-button"), s = this.shadowRoot.querySelector(".copy-source-button"), d = this.shadowRoot.querySelector(".share-button"), n = this.shadowRoot.querySelector(".browser-header");
-    e?.addEventListener("click", () => this.handleClose()), t?.addEventListener("click", () => this.toggleMinimize()), o?.addEventListener("click", () => this.toggleMaximize()), i?.addEventListener("click", () => this.toggleViewSource()), s?.addEventListener("click", () => this.copySourceCode()), d?.addEventListener("click", (a) => {
+    const e = this.shadowRoot.querySelector(".control-button.close"), t = this.shadowRoot.querySelector(".control-button.minimize"), o = this.shadowRoot.querySelector(".control-button.maximize"), i = this.shadowRoot.querySelector(".view-source-button"), n = this.shadowRoot.querySelector(".copy-source-button"), d = this.shadowRoot.querySelector(".share-button"), s = this.shadowRoot.querySelector(".browser-header");
+    e?.addEventListener("click", () => this.handleClose()), t?.addEventListener("click", () => this.toggleMinimize()), o?.addEventListener("click", () => this.toggleMaximize()), i?.addEventListener("click", () => this.toggleViewSource()), n?.addEventListener("click", () => this.copySourceCode()), d?.addEventListener("click", (a) => {
       a.stopPropagation(), this.toggleShareMenu();
-    }), n?.addEventListener("dblclick", (a) => {
+    }), s?.addEventListener("dblclick", (a) => {
       const h = a.target;
       (h.classList.contains("browser-header") || h.classList.contains("controls")) && this.toggleMaximize();
     });
     const c = this.shadowRoot.querySelector("iframe");
     c?.addEventListener("error", () => this.handleIframeError()), c?.addEventListener("load", () => {
       this._syncIframeColorScheme(), this._getDevicePreset() && this._injectSafeAreas(c);
-    });
+    }), this.shadowRoot.querySelector('[data-action="share"]')?.addEventListener("click", () => this.shareViaWebAPI()), this.shadowRoot.querySelector('[data-action="codepen"]')?.addEventListener("click", () => this.openInCodePen()), this.shadowRoot.querySelector(".retry-button")?.addEventListener("click", () => this.retryLoad());
   }
   handleIframeError() {
     const e = this.shadowRoot.querySelector(".browser-content");
@@ -284,9 +303,9 @@ class L extends HTMLElement {
           <line x1="12" y1="16" x2="12.01" y2="16"/>
         </svg>
         <p>Failed to load content</p>
-        <button class="retry-button" onclick="this.getRootNode().host.retryLoad()">Retry</button>
+        <button class="retry-button">Retry</button>
       </div>
-    `);
+    `, e.querySelector(".retry-button")?.addEventListener("click", () => this.retryLoad()));
   }
   retryLoad() {
     const e = this.shadowRoot.querySelector(".browser-content");
@@ -337,7 +356,7 @@ class L extends HTMLElement {
             <polyline points="3,8 6,11 13,4"/>
           </svg>
           Copied!
-        `, e.classList.add("copied"), setTimeout(() => {
+        `, e.classList.add("copied"), clearTimeout(this._copyFeedbackTimer), this._copyFeedbackTimer = setTimeout(() => {
             e.innerHTML = t, e.classList.remove("copied");
           }, 2e3);
         }
@@ -347,10 +366,10 @@ class L extends HTMLElement {
   }
   toggleShareMenu() {
     this.showShareMenu = !this.showShareMenu;
-    const e = this.shadowRoot.querySelector(".share-menu"), t = this.shadowRoot.querySelector(".share-button");
-    this.showShareMenu ? (e.style.display = "block", t.classList.add("active"), setTimeout(() => {
+    const e = this.shadowRoot?.querySelector(".share-menu"), t = this.shadowRoot?.querySelector(".share-button");
+    !e || !t || (this.showShareMenu ? (e.style.display = "block", t.classList.add("active"), clearTimeout(this._outsideClickTimer), this._outsideClickTimer = setTimeout(() => {
       document.addEventListener("click", this.handleOutsideClick);
-    }, 0)) : (e.style.display = "none", t.classList.remove("active"), document.removeEventListener("click", this.handleOutsideClick));
+    }, 0)) : (e.style.display = "none", t.classList.remove("active"), clearTimeout(this._outsideClickTimer), document.removeEventListener("click", this.handleOutsideClick)));
   }
   handleOutsideClick(e) {
     const t = this.shadowRoot.querySelector(".share-menu");
@@ -374,13 +393,13 @@ class L extends HTMLElement {
   }
   parseHTMLForCodePen() {
     if (!this.sourceCode) return null;
-    const t = new DOMParser().parseFromString(this.sourceCode, "text/html"), o = Array.from(t.querySelectorAll("style")).map((n) => n.textContent).join(`
+    const t = new DOMParser().parseFromString(this.sourceCode, "text/html"), o = Array.from(t.querySelectorAll("style")).map((s) => s.textContent).join(`
 
-`), i = Array.from(t.querySelectorAll("script")).filter((n) => !n.src && n.type !== "module").map((n) => n.textContent).join(`
+`), i = Array.from(t.querySelectorAll("script")).filter((s) => !s.src && s.type !== "module").map((s) => s.textContent).join(`
 
-`), s = t.body.cloneNode(!0);
-    return s.querySelectorAll("script, style").forEach((n) => n.remove()), {
-      html: s.innerHTML.trim(),
+`), n = t.body.cloneNode(!0);
+    return n.querySelectorAll("script, style").forEach((s) => s.remove()), {
+      html: n.innerHTML.trim(),
       css: o.trim(),
       js: i.trim()
     };
@@ -402,31 +421,34 @@ class L extends HTMLElement {
     i.type = "hidden", i.name = "data", i.value = JSON.stringify(t), o.appendChild(i), document.body.appendChild(o), o.submit(), document.body.removeChild(o), this.toggleShareMenu();
   }
   handleClose() {
-    this.isMaximized && this.toggleMaximize();
+    this.isMaximized && this.toggleMaximize(), this.isMinimized || this.toggleMinimize();
   }
   handleKeydown(e) {
     e.key === "Escape" && (this.showShareMenu ? this.toggleShareMenu() : this.isMaximized && this.toggleMaximize());
   }
   createOverlay() {
-    if (this.overlay) return;
-    this.overlay = document.createElement("div"), this.overlay.style.cssText = `
+    if (!this.overlay) {
+      if (this.overlay = document.createElement("div"), this.overlay.style.cssText = `
       position: fixed;
       top: 0;
       left: 0;
       width: 100vw;
       height: 100vh;
       background: rgba(0, 0, 0, 0.5);
-      z-index: 9998;
+      z-index: var(--browser-window-overlay-z-index, 9998);
       cursor: pointer;
       animation: fadeIn 200ms ease;
-    `;
-    const e = document.createElement("style");
-    e.textContent = `
-      @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
+    `, !y) {
+        const e = document.createElement("style");
+        e.textContent = `
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+      `, document.head.appendChild(e), y = !0;
       }
-    `, document.head.appendChild(e), this.overlay.addEventListener("click", () => this.toggleMaximize()), document.body.appendChild(this.overlay), document.addEventListener("keydown", this.handleKeydown);
+      this.overlay.addEventListener("click", () => this.toggleMaximize()), document.body.appendChild(this.overlay), document.addEventListener("keydown", this.handleKeydown);
+    }
   }
   removeOverlay() {
     this.overlay && (this.overlay.remove(), this.overlay = null), document.removeEventListener("keydown", this.handleKeydown);
@@ -438,13 +460,13 @@ class L extends HTMLElement {
   toggleMaximize() {
     const e = this.shadowRoot.querySelector(".control-button.maximize");
     if (this.isMaximized) {
-      this.classList.remove("browser-window-maximized"), this.removeAttribute("role"), this.removeAttribute("aria-modal");
+      this.classList.remove("browser-window-maximized"), this.removeAttribute("role"), this.removeAttribute("aria-modal"), this.removeAttribute("tabindex");
       const t = this.shadowRoot.querySelector("iframe");
-      t && (t.style.minHeight = ""), this.removeOverlay(), this.isMaximized = !1, e && (e.setAttribute("aria-label", "Maximize window"), e.setAttribute("aria-expanded", "false"));
+      t && (t.style.minHeight = ""), this.removeOverlay(), this.isMaximized = !1, this._previousFocus && typeof this._previousFocus.focus == "function" && (this._previousFocus.focus(), this._previousFocus = null), e && (e.setAttribute("aria-label", "Maximize window"), e.setAttribute("aria-expanded", "false"));
     } else {
       this.isMinimized && this.toggleMinimize(), this.createOverlay(), this.classList.add("browser-window-maximized"), this.setAttribute("role", "dialog"), this.setAttribute("aria-modal", "true");
       const t = this.shadowRoot.querySelector("iframe");
-      t && (t.style.minHeight = "calc(90vh - 50px)"), this.isMaximized = !0, e && (e.setAttribute("aria-label", "Restore window"), e.setAttribute("aria-expanded", "true"));
+      t && (t.style.minHeight = "calc(90vh - 50px)"), this.isMaximized = !0, this._previousFocus = document.activeElement, this.setAttribute("tabindex", "-1"), this.focus(), e && (e.setAttribute("aria-label", "Restore window"), e.setAttribute("aria-expanded", "true"));
     }
   }
   // --- Render pipeline ---
@@ -455,6 +477,30 @@ class L extends HTMLElement {
       ${o}
       ${e ? "" : this._contentHTML()}
     `, e && this._updateDeviceScale();
+  }
+  _darkPalette() {
+    return `
+            --_bw-bg: var(--color-surface, #1c1c1e);
+            --_bw-header-bg: var(--color-surface-raised, #2c2c2e);
+            --_bw-border-color: var(--color-border, #3a3a3c);
+            --_bw-text-color: var(--color-text, #e5e5e7);
+            --_bw-text-muted: var(--color-text-muted, #98989d);
+            --_bw-url-bg: var(--color-surface, #1c1c1e);
+            --_bw-hover-bg: #3a3a3c;
+            --_bw-content-bg: var(--color-surface, #000000);
+            color-scheme: dark;`;
+  }
+  _lightPalette() {
+    return `
+            --_bw-bg: var(--color-surface, #ffffff);
+            --_bw-header-bg: var(--color-surface-raised, #f6f8fa);
+            --_bw-border-color: var(--color-border, #d1d5da);
+            --_bw-text-color: var(--color-text, #24292e);
+            --_bw-text-muted: var(--color-text-muted, #586069);
+            --_bw-url-bg: var(--color-surface, #ffffff);
+            --_bw-hover-bg: #f3f4f6;
+            --_bw-content-bg: var(--color-surface, #ffffff);
+            color-scheme: light;`;
   }
   _sharedCSS() {
     return `
@@ -503,67 +549,27 @@ class L extends HTMLElement {
         /* Auto dark mode based on system preference (when no mode attribute) */
         @media (prefers-color-scheme: dark) {
           :host(:not([mode])) {
-            --_bw-bg: var(--color-surface, #1c1c1e);
-            --_bw-header-bg: var(--color-surface-raised, #2c2c2e);
-            --_bw-border-color: var(--color-border, #3a3a3c);
-            --_bw-text-color: var(--color-text, #e5e5e7);
-            --_bw-text-muted: var(--color-text-muted, #98989d);
-            --_bw-url-bg: var(--color-surface, #1c1c1e);
-            --_bw-hover-bg: #3a3a3c;
-            --_bw-content-bg: var(--color-surface, #000000);
-            color-scheme: dark;
+            ${this._darkPalette()}
           }
         }
 
         /* Page-level dark mode detection (overrides media query via higher specificity) */
         :host([data-page-mode="dark"]:not([mode])) {
-          --_bw-bg: var(--color-surface, #1c1c1e);
-          --_bw-header-bg: var(--color-surface-raised, #2c2c2e);
-          --_bw-border-color: var(--color-border, #3a3a3c);
-          --_bw-text-color: var(--color-text, #e5e5e7);
-          --_bw-text-muted: var(--color-text-muted, #98989d);
-          --_bw-url-bg: var(--color-surface, #1c1c1e);
-          --_bw-hover-bg: #3a3a3c;
-          --_bw-content-bg: var(--color-surface, #000000);
-          color-scheme: dark;
+          ${this._darkPalette()}
         }
 
         :host([data-page-mode="light"]:not([mode])) {
-          --_bw-bg: var(--color-surface, #ffffff);
-          --_bw-header-bg: var(--color-surface-raised, #f6f8fa);
-          --_bw-border-color: var(--color-border, #d1d5da);
-          --_bw-text-color: var(--color-text, #24292e);
-          --_bw-text-muted: var(--color-text-muted, #586069);
-          --_bw-url-bg: var(--color-surface, #ffffff);
-          --_bw-hover-bg: #f3f4f6;
-          --_bw-content-bg: var(--color-surface, #ffffff);
-          color-scheme: light;
+          ${this._lightPalette()}
         }
 
         /* Explicit dark mode override */
         :host([mode="dark"]) {
-          --_bw-bg: var(--color-surface, #1c1c1e);
-          --_bw-header-bg: var(--color-surface-raised, #2c2c2e);
-          --_bw-border-color: var(--color-border, #3a3a3c);
-          --_bw-text-color: var(--color-text, #e5e5e7);
-          --_bw-text-muted: var(--color-text-muted, #98989d);
-          --_bw-url-bg: var(--color-surface, #1c1c1e);
-          --_bw-hover-bg: #3a3a3c;
-          --_bw-content-bg: var(--color-surface, #000000);
-          color-scheme: dark;
+          ${this._darkPalette()}
         }
 
         /* Explicit light mode override (for users on dark system who want light) */
         :host([mode="light"]) {
-          --_bw-bg: var(--color-surface, #ffffff);
-          --_bw-header-bg: var(--color-surface-raised, #f6f8fa);
-          --_bw-border-color: var(--color-border, #d1d5da);
-          --_bw-text-color: var(--color-text, #24292e);
-          --_bw-text-muted: var(--color-text-muted, #586069);
-          --_bw-url-bg: var(--color-surface, #ffffff);
-          --_bw-hover-bg: #f3f4f6;
-          --_bw-content-bg: var(--color-surface, #ffffff);
-          color-scheme: light;
+          ${this._lightPalette()}
         }
 
         :host(.browser-window-maximized) {
@@ -572,7 +578,7 @@ class L extends HTMLElement {
           left: 5vw !important;
           width: 90vw !important;
           height: 90vh !important;
-          z-index: 9999 !important;
+          z-index: var(--browser-window-z-index, 9999) !important;
           margin: 0 !important;
           resize: none !important;
         }
@@ -626,8 +632,6 @@ class L extends HTMLElement {
           padding: 0;
           background: var(--browser-window-header-bg, var(--_bw-header-bg));
           min-height: 200px;
-          /* Constrain source view height to prevent container expansion */
-          max-height: 50vh;
           flex: 1;
           overflow: auto;
           display: flex;
@@ -688,9 +692,10 @@ class L extends HTMLElement {
           margin: 0;
           padding: 1rem;
           background: var(--browser-window-content-bg, var(--_bw-content-bg));
-          border: 1px solid var(--browser-window-border-color, var(--_bw-border-color));
-          border-radius: 6px;
+          border: none;
+          border-radius: 0;
           overflow-x: auto;
+          flex: 1;
           font-family: var(--browser-window-mono-font);
           font-size: 0.875rem;
           line-height: 1.6;
@@ -944,7 +949,7 @@ class L extends HTMLElement {
           border-radius: 8px;
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
           min-width: 180px;
-          z-index: 1000;
+          z-index: var(--browser-window-menu-z-index, 1000);
           overflow: hidden;
         }
 
@@ -1038,9 +1043,9 @@ class L extends HTMLElement {
   }
   _browserChrome() {
     return `
-      <div class="browser-header" role="toolbar" aria-label="Window controls">
+      <div class="browser-header" part="header" role="toolbar" aria-label="Window controls">
         <div class="controls">
-          <button class="control-button close" aria-label="Close window" tabindex="0"></button>
+          <button class="control-button close" aria-label="Minimize window" tabindex="0"></button>
           <button class="control-button minimize" aria-label="Minimize window" tabindex="0"></button>
           <button class="control-button maximize" aria-label="${this.isMaximized ? "Restore window" : "Maximize window"}" aria-expanded="${this.isMaximized}" tabindex="0"></button>
         </div>
@@ -1064,7 +1069,7 @@ class L extends HTMLElement {
               </button>
               <div class="share-menu">
                 ${navigator.share ? `
-                  <button class="share-menu-item" onclick="this.getRootNode().host.shareViaWebAPI()">
+                  <button class="share-menu-item" data-action="share">
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                       <circle cx="12" cy="4" r="2"/>
                       <circle cx="4" cy="8" r="2"/>
@@ -1074,7 +1079,7 @@ class L extends HTMLElement {
                     Share...
                   </button>
                 ` : ""}
-                <button class="share-menu-item" onclick="this.getRootNode().host.openInCodePen()">
+                <button class="share-menu-item" data-action="codepen">
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
                     <path d="M8 0L0 5v6l8 5 8-5V5L8 0zM7 10.5L2 7.5v-2l5 3v2zm1-3l-5-3L8 2l5 2.5-5 3zm1 3v-2l5-3v2l-5 3z"/>
                   </svg>
@@ -1102,7 +1107,7 @@ class L extends HTMLElement {
   }
   // --- Device mode ---
   _deviceCSS(e) {
-    const t = g[this.deviceColor] || g.midnight, o = this.getAttribute("orientation") === "landscape", i = this._getEffectiveDimensions(e), [s, d, n, c] = this._getEffectiveSafeInsets(e), a = C[e.notch] || 24, h = e.homeIndicator && !e.homeButton ? M : 0, u = e.homeButton ? x : 0, w = e.notch !== "none";
+    const t = g[this.deviceColor] || g.midnight, o = this.getAttribute("orientation") === "landscape", i = this._getEffectiveDimensions(e), [n, d, s, c] = this._getEffectiveSafeInsets(e), a = M[e.notch] || 24, h = e.homeIndicator && !e.homeButton ? L : 0, u = e.homeButton ? x : 0, m = e.notch !== "none";
     return `
         :host([device]) {
           --device-width: ${i.width}px;
@@ -1110,12 +1115,12 @@ class L extends HTMLElement {
           --device-bezel: ${e.bezel}px;
           --device-corner-radius: ${e.cornerRadius}px;
           --browser-window-bezel-color: ${t};
-          --status-bar-height: ${o && w ? 24 : a}px;
+          --status-bar-height: ${o && m ? 24 : a}px;
           --home-indicator-height: ${h}px;
           --home-button-area: ${u}px;
-          --safe-top: ${s}px;
+          --safe-top: ${n}px;
           --safe-right: ${d}px;
-          --safe-bottom: ${n}px;
+          --safe-bottom: ${s}px;
           --safe-left: ${c}px;
 
           border: none;
@@ -1465,7 +1470,7 @@ class L extends HTMLElement {
     `;
   }
   _deviceChrome(e) {
-    const t = this.getAttribute("orientation") === "landscape", o = e.notch !== "none", i = o ? e.notch : "", s = e.homeButton ? "home-button" : "", n = ["silver", "gold", "white"].includes(this.deviceColor) ? "light-bezel" : "", a = ["device-frame", i, s, n, t ? "landscape" : ""].filter(Boolean).join(" "), u = `
+    const t = this.getAttribute("orientation") === "landscape", o = e.notch !== "none", i = o ? e.notch : "", n = e.homeButton ? "home-button" : "", s = ["silver", "gold", "white"].includes(this.deviceColor) ? "light-bezel" : "", a = ["device-frame", i, n, s, t ? "landscape" : ""].filter(Boolean).join(" "), u = `
       <div class="status-bar ${t && o ? "" : i}">
         <span class="status-time">9:41</span>
         <div class="status-icons">
@@ -1474,7 +1479,7 @@ class L extends HTMLElement {
           <span class="battery-icon" aria-hidden="true"></span>
         </div>
       </div>
-    `, w = e.homeIndicator && !e.homeButton ? '<div class="home-indicator"><div class="home-indicator-pill"></div></div>' : "", p = this.hasAttribute("show-safe-areas") ? `<div class="safe-area-overlays">
+    `, m = e.homeIndicator && !e.homeButton ? '<div class="home-indicator"><div class="home-indicator-pill"></div></div>' : "", f = this.hasAttribute("show-safe-areas") ? `<div class="safe-area-overlays">
           <div class="safe-area-overlay safe-area-top"></div>
           <div class="safe-area-overlay safe-area-right"></div>
           <div class="safe-area-overlay safe-area-bottom"></div>
@@ -1487,9 +1492,9 @@ class L extends HTMLElement {
             <div class="device-main">
               ${u}
               ${this._contentHTML()}
-              ${w}
+              ${m}
             </div>
-            ${p}
+            ${f}
           </div>
         </div>
       ` : `
@@ -1497,8 +1502,8 @@ class L extends HTMLElement {
         <div class="${a}">
           ${u}
           ${this._contentHTML()}
-          ${w}
-          ${p}
+          ${m}
+          ${f}
         </div>
       </div>
     `;
@@ -1514,10 +1519,10 @@ class L extends HTMLElement {
     if (!t || !o) return;
     const i = this.clientWidth;
     if (i === 0) return;
-    const s = this._getEffectiveDimensions(e), d = s.width + e.bezel * 2, n = Math.min(1, i / d);
-    this._currentScale = n, o.style.transform = `scale(${n})`;
-    const c = e.homeButton ? x : 0, a = s.height + e.bezel * 2 + c;
-    t.style.height = `${a * n}px`;
+    const n = this._getEffectiveDimensions(e), d = n.width + e.bezel * 2, s = Math.min(1, i / d);
+    this._currentScale = s, o.style.transform = `scale(${s})`;
+    const c = e.homeButton ? x : 0, a = n.height + e.bezel * 2 + c;
+    t.style.height = `${a * s}px`;
   }
   _teardownDeviceScaling() {
     this._resizeObserver && (this._resizeObserver.disconnect(), this._resizeObserver = null), this._currentScale = 1;
@@ -1527,7 +1532,7 @@ class L extends HTMLElement {
     return t.textContent = e, t.innerHTML;
   }
 }
-customElements.define("browser-window", L);
+customElements.get("browser-window") || customElements.define("browser-window", A);
 export {
-  L as BrowserWindow
+  A as BrowserWindow
 };

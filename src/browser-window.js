@@ -262,6 +262,9 @@ const STATUS_BAR_HEIGHT = {
 const HOME_INDICATOR_HEIGHT = 28;
 const HOME_BUTTON_AREA = 80;
 
+// Shared fadeIn animation — injected once into document.head
+let _fadeInStyleInjected = false;
+
 export class BrowserWindow extends HTMLElement {
   constructor() {
     super();
@@ -276,6 +279,8 @@ export class BrowserWindow extends HTMLElement {
     this.handleOutsideClick = this.handleOutsideClick.bind(this);
     this._resizeObserver = null;
     this._currentScale = 1;
+    this._outsideClickTimer = null;
+    this._copyFeedbackTimer = null;
   }
 
   async connectedCallback() {
@@ -298,6 +303,8 @@ export class BrowserWindow extends HTMLElement {
     _unregisterInstance(this);
     this.removeOverlay();
     this._teardownDeviceScaling();
+    clearTimeout(this._outsideClickTimer);
+    clearTimeout(this._copyFeedbackTimer);
     document.removeEventListener('keydown', this.handleKeydown);
     document.removeEventListener('click', this.handleOutsideClick);
   }
@@ -322,6 +329,14 @@ export class BrowserWindow extends HTMLElement {
       this.attachEventListeners();
     }
 
+    if (name === 'src') {
+      this.showSource = false;
+      this.sourceCode = '';
+      if (this.src) {
+        this.fetchSourceCode();
+      }
+    }
+
     if (name === 'device' || name === 'orientation') {
       this._teardownDeviceScaling();
       if (this._getDevicePreset()) {
@@ -344,24 +359,62 @@ export class BrowserWindow extends HTMLElement {
     return this.getAttribute('url') || '';
   }
 
+  set url(value) {
+    this.setAttribute('url', value);
+  }
+
   get src() {
     return this.getAttribute('src') || '';
+  }
+
+  set src(value) {
+    this.setAttribute('src', value);
   }
 
   get browserTitle() {
     return this.getAttribute('title') || this.getHostname();
   }
 
+  set browserTitle(value) {
+    this.setAttribute('title', value);
+  }
+
   get mode() {
-    return this.getAttribute('mode') || this.getAttribute('data-page-mode') || 'light';
+    return (
+      this.getAttribute('mode') ||
+      this.getAttribute('data-page-mode') ||
+      (typeof window !== 'undefined' && window.matchMedia?.('(prefers-color-scheme: dark)').matches
+        ? 'dark'
+        : 'light')
+    );
+  }
+
+  set mode(value) {
+    if (value) {
+      this.setAttribute('mode', value);
+    } else {
+      this.removeAttribute('mode');
+    }
   }
 
   get device() {
     return this.getAttribute('device') || '';
   }
 
+  set device(value) {
+    if (value) {
+      this.setAttribute('device', value);
+    } else {
+      this.removeAttribute('device');
+    }
+  }
+
   get deviceColor() {
     return this.getAttribute('device-color') || 'midnight';
+  }
+
+  set deviceColor(value) {
+    this.setAttribute('device-color', value);
   }
 
   _getDevicePreset() {
@@ -417,7 +470,7 @@ export class BrowserWindow extends HTMLElement {
       if (doc?.documentElement) {
         doc.documentElement.style.colorScheme = isDark ? 'dark' : 'light';
       }
-    } catch (e) {
+    } catch (_e) {
       // Cross-origin iframe — silently ignore
     }
   }
@@ -446,7 +499,7 @@ export class BrowserWindow extends HTMLElement {
         }
       `;
       doc.head.appendChild(style);
-    } catch (e) {
+    } catch (_e) {
       // Cross-origin iframe — skip silently
       console.info('<browser-window>: Cannot inject safe areas into cross-origin iframe');
     }
@@ -504,6 +557,16 @@ export class BrowserWindow extends HTMLElement {
         this._injectSafeAreas(iframe);
       }
     });
+
+    // Share menu actions (CSP-safe — no inline onclick)
+    this.shadowRoot.querySelector('[data-action="share"]')
+      ?.addEventListener('click', () => this.shareViaWebAPI());
+    this.shadowRoot.querySelector('[data-action="codepen"]')
+      ?.addEventListener('click', () => this.openInCodePen());
+
+    // Retry button in error state
+    this.shadowRoot.querySelector('.retry-button')
+      ?.addEventListener('click', () => this.retryLoad());
   }
 
   handleIframeError() {
@@ -518,9 +581,11 @@ export class BrowserWindow extends HTMLElement {
           <line x1="12" y1="16" x2="12.01" y2="16"/>
         </svg>
         <p>Failed to load content</p>
-        <button class="retry-button" onclick="this.getRootNode().host.retryLoad()">Retry</button>
+        <button class="retry-button">Retry</button>
       </div>
     `;
+    content.querySelector('.retry-button')
+      ?.addEventListener('click', () => this.retryLoad());
   }
 
   retryLoad() {
@@ -613,7 +678,8 @@ export class BrowserWindow extends HTMLElement {
         `;
         copyBtn.classList.add('copied');
 
-        setTimeout(() => {
+        clearTimeout(this._copyFeedbackTimer);
+        this._copyFeedbackTimer = setTimeout(() => {
           copyBtn.innerHTML = originalText;
           copyBtn.classList.remove('copied');
         }, 2000);
@@ -625,18 +691,22 @@ export class BrowserWindow extends HTMLElement {
 
   toggleShareMenu() {
     this.showShareMenu = !this.showShareMenu;
-    const menu = this.shadowRoot.querySelector('.share-menu');
-    const shareBtn = this.shadowRoot.querySelector('.share-button');
+    const menu = this.shadowRoot?.querySelector('.share-menu');
+    const shareBtn = this.shadowRoot?.querySelector('.share-button');
+
+    if (!menu || !shareBtn) return;
 
     if (this.showShareMenu) {
       menu.style.display = 'block';
       shareBtn.classList.add('active');
-      setTimeout(() => {
+      clearTimeout(this._outsideClickTimer);
+      this._outsideClickTimer = setTimeout(() => {
         document.addEventListener('click', this.handleOutsideClick);
       }, 0);
     } else {
       menu.style.display = 'none';
       shareBtn.classList.remove('active');
+      clearTimeout(this._outsideClickTimer);
       document.removeEventListener('click', this.handleOutsideClick);
     }
   }
@@ -732,9 +802,12 @@ export class BrowserWindow extends HTMLElement {
   }
 
   handleClose() {
-    // If maximized, restore to normal size
     if (this.isMaximized) {
       this.toggleMaximize();
+    }
+    // Minimize (collapse) the content area
+    if (!this.isMinimized) {
+      this.toggleMinimize();
     }
   }
 
@@ -759,20 +832,23 @@ export class BrowserWindow extends HTMLElement {
       width: 100vw;
       height: 100vh;
       background: rgba(0, 0, 0, 0.5);
-      z-index: 9998;
+      z-index: var(--browser-window-overlay-z-index, 9998);
       cursor: pointer;
       animation: fadeIn 200ms ease;
     `;
 
-    // Add fade-in animation
-    const style = document.createElement('style');
-    style.textContent = `
-      @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
-      }
-    `;
-    document.head.appendChild(style);
+    // Add fade-in animation (once per page)
+    if (!_fadeInStyleInjected) {
+      const style = document.createElement('style');
+      style.textContent = `
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+      `;
+      document.head.appendChild(style);
+      _fadeInStyleInjected = true;
+    }
 
     this.overlay.addEventListener('click', () => this.toggleMaximize());
     document.body.appendChild(this.overlay);
@@ -812,6 +888,7 @@ export class BrowserWindow extends HTMLElement {
       this.classList.remove('browser-window-maximized');
       this.removeAttribute('role');
       this.removeAttribute('aria-modal');
+      this.removeAttribute('tabindex');
 
       // Reset iframe height if present
       const iframe = this.shadowRoot.querySelector('iframe');
@@ -823,6 +900,12 @@ export class BrowserWindow extends HTMLElement {
       this.removeOverlay();
 
       this.isMaximized = false;
+
+      // Restore focus to the element that triggered maximize
+      if (this._previousFocus && typeof this._previousFocus.focus === 'function') {
+        this._previousFocus.focus();
+        this._previousFocus = null;
+      }
 
       // Update ARIA attributes
       if (maximizeBtn) {
@@ -850,6 +933,9 @@ export class BrowserWindow extends HTMLElement {
       }
 
       this.isMaximized = true;
+      this._previousFocus = document.activeElement;
+      this.setAttribute('tabindex', '-1');
+      this.focus();
 
       // Update ARIA attributes
       if (maximizeBtn) {
@@ -875,6 +961,32 @@ export class BrowserWindow extends HTMLElement {
     if (preset) {
       this._updateDeviceScale();
     }
+  }
+
+  _darkPalette() {
+    return `
+            --_bw-bg: var(--color-surface, #1c1c1e);
+            --_bw-header-bg: var(--color-surface-raised, #2c2c2e);
+            --_bw-border-color: var(--color-border, #3a3a3c);
+            --_bw-text-color: var(--color-text, #e5e5e7);
+            --_bw-text-muted: var(--color-text-muted, #98989d);
+            --_bw-url-bg: var(--color-surface, #1c1c1e);
+            --_bw-hover-bg: #3a3a3c;
+            --_bw-content-bg: var(--color-surface, #000000);
+            color-scheme: dark;`;
+  }
+
+  _lightPalette() {
+    return `
+            --_bw-bg: var(--color-surface, #ffffff);
+            --_bw-header-bg: var(--color-surface-raised, #f6f8fa);
+            --_bw-border-color: var(--color-border, #d1d5da);
+            --_bw-text-color: var(--color-text, #24292e);
+            --_bw-text-muted: var(--color-text-muted, #586069);
+            --_bw-url-bg: var(--color-surface, #ffffff);
+            --_bw-hover-bg: #f3f4f6;
+            --_bw-content-bg: var(--color-surface, #ffffff);
+            color-scheme: light;`;
   }
 
   _sharedCSS() {
@@ -924,67 +1036,27 @@ export class BrowserWindow extends HTMLElement {
         /* Auto dark mode based on system preference (when no mode attribute) */
         @media (prefers-color-scheme: dark) {
           :host(:not([mode])) {
-            --_bw-bg: var(--color-surface, #1c1c1e);
-            --_bw-header-bg: var(--color-surface-raised, #2c2c2e);
-            --_bw-border-color: var(--color-border, #3a3a3c);
-            --_bw-text-color: var(--color-text, #e5e5e7);
-            --_bw-text-muted: var(--color-text-muted, #98989d);
-            --_bw-url-bg: var(--color-surface, #1c1c1e);
-            --_bw-hover-bg: #3a3a3c;
-            --_bw-content-bg: var(--color-surface, #000000);
-            color-scheme: dark;
+            ${this._darkPalette()}
           }
         }
 
         /* Page-level dark mode detection (overrides media query via higher specificity) */
         :host([data-page-mode="dark"]:not([mode])) {
-          --_bw-bg: var(--color-surface, #1c1c1e);
-          --_bw-header-bg: var(--color-surface-raised, #2c2c2e);
-          --_bw-border-color: var(--color-border, #3a3a3c);
-          --_bw-text-color: var(--color-text, #e5e5e7);
-          --_bw-text-muted: var(--color-text-muted, #98989d);
-          --_bw-url-bg: var(--color-surface, #1c1c1e);
-          --_bw-hover-bg: #3a3a3c;
-          --_bw-content-bg: var(--color-surface, #000000);
-          color-scheme: dark;
+          ${this._darkPalette()}
         }
 
         :host([data-page-mode="light"]:not([mode])) {
-          --_bw-bg: var(--color-surface, #ffffff);
-          --_bw-header-bg: var(--color-surface-raised, #f6f8fa);
-          --_bw-border-color: var(--color-border, #d1d5da);
-          --_bw-text-color: var(--color-text, #24292e);
-          --_bw-text-muted: var(--color-text-muted, #586069);
-          --_bw-url-bg: var(--color-surface, #ffffff);
-          --_bw-hover-bg: #f3f4f6;
-          --_bw-content-bg: var(--color-surface, #ffffff);
-          color-scheme: light;
+          ${this._lightPalette()}
         }
 
         /* Explicit dark mode override */
         :host([mode="dark"]) {
-          --_bw-bg: var(--color-surface, #1c1c1e);
-          --_bw-header-bg: var(--color-surface-raised, #2c2c2e);
-          --_bw-border-color: var(--color-border, #3a3a3c);
-          --_bw-text-color: var(--color-text, #e5e5e7);
-          --_bw-text-muted: var(--color-text-muted, #98989d);
-          --_bw-url-bg: var(--color-surface, #1c1c1e);
-          --_bw-hover-bg: #3a3a3c;
-          --_bw-content-bg: var(--color-surface, #000000);
-          color-scheme: dark;
+          ${this._darkPalette()}
         }
 
         /* Explicit light mode override (for users on dark system who want light) */
         :host([mode="light"]) {
-          --_bw-bg: var(--color-surface, #ffffff);
-          --_bw-header-bg: var(--color-surface-raised, #f6f8fa);
-          --_bw-border-color: var(--color-border, #d1d5da);
-          --_bw-text-color: var(--color-text, #24292e);
-          --_bw-text-muted: var(--color-text-muted, #586069);
-          --_bw-url-bg: var(--color-surface, #ffffff);
-          --_bw-hover-bg: #f3f4f6;
-          --_bw-content-bg: var(--color-surface, #ffffff);
-          color-scheme: light;
+          ${this._lightPalette()}
         }
 
         :host(.browser-window-maximized) {
@@ -993,7 +1065,7 @@ export class BrowserWindow extends HTMLElement {
           left: 5vw !important;
           width: 90vw !important;
           height: 90vh !important;
-          z-index: 9999 !important;
+          z-index: var(--browser-window-z-index, 9999) !important;
           margin: 0 !important;
           resize: none !important;
         }
@@ -1047,8 +1119,6 @@ export class BrowserWindow extends HTMLElement {
           padding: 0;
           background: var(--browser-window-header-bg, var(--_bw-header-bg));
           min-height: 200px;
-          /* Constrain source view height to prevent container expansion */
-          max-height: 50vh;
           flex: 1;
           overflow: auto;
           display: flex;
@@ -1109,9 +1179,10 @@ export class BrowserWindow extends HTMLElement {
           margin: 0;
           padding: 1rem;
           background: var(--browser-window-content-bg, var(--_bw-content-bg));
-          border: 1px solid var(--browser-window-border-color, var(--_bw-border-color));
-          border-radius: 6px;
+          border: none;
+          border-radius: 0;
           overflow-x: auto;
+          flex: 1;
           font-family: var(--browser-window-mono-font);
           font-size: 0.875rem;
           line-height: 1.6;
@@ -1366,7 +1437,7 @@ export class BrowserWindow extends HTMLElement {
           border-radius: 8px;
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
           min-width: 180px;
-          z-index: 1000;
+          z-index: var(--browser-window-menu-z-index, 1000);
           overflow: hidden;
         }
 
@@ -1461,9 +1532,9 @@ export class BrowserWindow extends HTMLElement {
 
   _browserChrome() {
     return `
-      <div class="browser-header" role="toolbar" aria-label="Window controls">
+      <div class="browser-header" part="header" role="toolbar" aria-label="Window controls">
         <div class="controls">
-          <button class="control-button close" aria-label="Close window" tabindex="0"></button>
+          <button class="control-button close" aria-label="Minimize window" tabindex="0"></button>
           <button class="control-button minimize" aria-label="Minimize window" tabindex="0"></button>
           <button class="control-button maximize" aria-label="${this.isMaximized ? 'Restore window' : 'Maximize window'}" aria-expanded="${this.isMaximized}" tabindex="0"></button>
         </div>
@@ -1491,7 +1562,7 @@ export class BrowserWindow extends HTMLElement {
                 ${
                   navigator.share
                     ? `
-                  <button class="share-menu-item" onclick="this.getRootNode().host.shareViaWebAPI()">
+                  <button class="share-menu-item" data-action="share">
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                       <circle cx="12" cy="4" r="2"/>
                       <circle cx="4" cy="8" r="2"/>
@@ -1503,7 +1574,7 @@ export class BrowserWindow extends HTMLElement {
                 `
                     : ''
                 }
-                <button class="share-menu-item" onclick="this.getRootNode().host.openInCodePen()">
+                <button class="share-menu-item" data-action="codepen">
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
                     <path d="M8 0L0 5v6l8 5 8-5V5L8 0zM7 10.5L2 7.5v-2l5 3v2zm1-3l-5-3L8 2l5 2.5-5 3zm1 3v-2l5-3v2l-5 3z"/>
                   </svg>
@@ -2023,4 +2094,6 @@ export class BrowserWindow extends HTMLElement {
   }
 }
 
-customElements.define('browser-window', BrowserWindow);
+if (!customElements.get('browser-window')) {
+  customElements.define('browser-window', BrowserWindow);
+}
