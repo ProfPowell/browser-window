@@ -2026,13 +2026,13 @@ export class BrowserWindow extends HTMLElement {
         }
 
         .device-toolbar {
-          display: flex;
+          display: inline-flex;
           align-items: center;
-          justify-content: center;
-          gap: 0.5rem;
-          padding: 0.625rem 1rem;
-          margin-top: 0.75rem;
-          border-radius: 8px;
+          align-self: center;
+          gap: 2px;
+          padding: 3px;
+          margin-top: 0.5rem;
+          border-radius: 20px;
           background: var(--browser-window-header-bg, var(--_bw-header-bg));
           border: 1px solid var(--browser-window-border-color, var(--_bw-border-color));
         }
@@ -2040,35 +2040,40 @@ export class BrowserWindow extends HTMLElement {
         .device-toolbar .view-source-button,
         .device-toolbar .share-button,
         .device-toolbar .download-button {
-          display: inline-flex;
+          display: flex;
           align-items: center;
-          gap: 0.375rem;
-          padding: 0.375rem 0.75rem;
+          justify-content: center;
+          width: 32px;
+          height: 32px;
+          padding: 0;
           background: none;
-          border: 1px solid var(--browser-window-border-color, var(--_bw-border-color));
-          border-radius: 6px;
-          color: var(--browser-window-text-color, var(--_bw-text-color));
-          font-size: 0.8125rem;
-          font-family: var(--browser-window-font-family);
+          border: none;
+          border-radius: 50%;
+          color: var(--browser-window-text-muted, var(--_bw-text-muted));
           cursor: pointer;
           text-decoration: none;
-          transition: background 150ms ease;
+          transition: all 150ms ease;
         }
 
         .device-toolbar .view-source-button:hover,
         .device-toolbar .share-button:hover,
         .device-toolbar .download-button:hover {
           background: var(--browser-window-hover-bg, var(--_bw-hover-bg));
+          color: var(--browser-window-text-color, var(--_bw-text-color));
         }
 
         .device-toolbar .view-source-button.active {
           background: var(--browser-window-accent-color, #2563eb);
           color: white;
-          border-color: var(--browser-window-accent-color, #2563eb);
         }
 
         .device-toolbar .share-container {
           position: relative;
+        }
+
+        .device-toolbar svg {
+          width: 16px;
+          height: 16px;
         }
     `;
   }
@@ -2157,7 +2162,6 @@ export class BrowserWindow extends HTMLElement {
             <polyline points="12,6 14,8 12,10"/>
             <line x1="10" y1="4" x2="6" y2="12"/>
           </svg>
-          Source
         </button>
         <div class="share-container">
           <button class="share-button" title="Share demo">
@@ -2165,7 +2169,6 @@ export class BrowserWindow extends HTMLElement {
               <path d="M8 12V3M8 3L5 6M8 3l3 3"/>
               <path d="M3 9v4a1 1 0 001 1h8a1 1 0 001-1V9"/>
             </svg>
-            Share
           </button>
           <div class="share-menu">
             ${
@@ -2192,11 +2195,10 @@ export class BrowserWindow extends HTMLElement {
           </div>
         </div>
         <a href="${this.escapeHtml(this.src)}" download class="download-button" title="Download demo HTML file">
-          <svg class="download-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M8 1v10M8 11l-3-3M8 11l3-3"/>
             <path d="M2 12v2a1 1 0 001 1h10a1 1 0 001-1v-2"/>
           </svg>
-          Download
         </a>
       </div>
     `;
