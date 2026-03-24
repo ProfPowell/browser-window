@@ -1268,6 +1268,60 @@ export class BrowserWindow extends HTMLElement {
         .retry-button:active {
           transform: scale(0.98);
         }
+
+        .share-container {
+          position: relative;
+          display: inline-block;
+        }
+
+        .share-menu {
+          display: none;
+          position: absolute;
+          top: calc(100% + 4px);
+          right: 0;
+          background: var(--browser-window-header-bg, var(--_bw-header-bg));
+          border: 1px solid var(--browser-window-border-color, var(--_bw-border-color));
+          border-radius: 8px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          min-width: 180px;
+          z-index: var(--browser-window-menu-z-index, 1000);
+          overflow: hidden;
+        }
+
+        .share-menu-item {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          width: 100%;
+          padding: 0.625rem 1rem;
+          background: none;
+          border: none;
+          color: var(--browser-window-text-color, var(--_bw-text-color));
+          font-size: 0.875rem;
+          font-weight: 500;
+          text-align: left;
+          cursor: pointer;
+          transition: background 150ms ease;
+          border-bottom: 1px solid var(--browser-window-border-color, var(--_bw-border-color));
+        }
+
+        .share-menu-item:last-child {
+          border-bottom: none;
+        }
+
+        .share-menu-item:hover {
+          background: var(--browser-window-hover-bg, var(--_bw-hover-bg));
+        }
+
+        .share-menu-item:active {
+          background: var(--browser-window-active-bg);
+        }
+
+        .share-menu-item svg {
+          width: 16px;
+          height: 16px;
+          flex-shrink: 0;
+        }
     `;
   }
 
@@ -1429,11 +1483,6 @@ export class BrowserWindow extends HTMLElement {
           height: 16px;
         }
 
-        .share-container {
-          position: relative;
-          display: inline-block;
-        }
-
         .share-button {
           background: none;
           border: none;
@@ -1459,55 +1508,6 @@ export class BrowserWindow extends HTMLElement {
         .share-button.active {
           color: var(--browser-window-accent-color);
           background: var(--browser-window-active-bg);
-        }
-
-        .share-menu {
-          display: none;
-          position: absolute;
-          top: calc(100% + 4px);
-          right: 0;
-          background: var(--browser-window-header-bg, var(--_bw-header-bg));
-          border: 1px solid var(--browser-window-border-color, var(--_bw-border-color));
-          border-radius: 8px;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-          min-width: 180px;
-          z-index: var(--browser-window-menu-z-index, 1000);
-          overflow: hidden;
-        }
-
-        .share-menu-item {
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
-          width: 100%;
-          padding: 0.625rem 1rem;
-          background: none;
-          border: none;
-          color: var(--browser-window-text-color, var(--_bw-text-color));
-          font-size: 0.875rem;
-          font-weight: 500;
-          text-align: left;
-          cursor: pointer;
-          transition: background 150ms ease;
-          border-bottom: 1px solid var(--browser-window-border-color, var(--_bw-border-color));
-        }
-
-        .share-menu-item:last-child {
-          border-bottom: none;
-        }
-
-        .share-menu-item:hover {
-          background: var(--browser-window-hover-bg, var(--_bw-hover-bg));
-        }
-
-        .share-menu-item:active {
-          background: var(--browser-window-active-bg);
-        }
-
-        .share-menu-item svg {
-          width: 16px;
-          height: 16px;
-          flex-shrink: 0;
         }
 
         /* Responsive: narrow screens */
