@@ -46,18 +46,6 @@
             },
             {
               "kind": "method",
-              "name": "attachEventListeners"
-            },
-            {
-              "kind": "method",
-              "name": "handleIframeError"
-            },
-            {
-              "kind": "method",
-              "name": "retryLoad"
-            },
-            {
-              "kind": "method",
               "name": "fetchSourceCode"
             },
             {
@@ -66,24 +54,11 @@
             },
             {
               "kind": "method",
-              "name": "updateContentView"
-            },
-            {
-              "kind": "method",
               "name": "copySourceCode"
             },
             {
               "kind": "method",
               "name": "toggleShareMenu"
-            },
-            {
-              "kind": "method",
-              "name": "handleOutsideClick",
-              "parameters": [
-                {
-                  "name": "e"
-                }
-              ]
             },
             {
               "kind": "method",
@@ -99,27 +74,6 @@
             },
             {
               "kind": "method",
-              "name": "handleClose"
-            },
-            {
-              "kind": "method",
-              "name": "handleKeydown",
-              "parameters": [
-                {
-                  "name": "event"
-                }
-              ]
-            },
-            {
-              "kind": "method",
-              "name": "createOverlay"
-            },
-            {
-              "kind": "method",
-              "name": "removeOverlay"
-            },
-            {
-              "kind": "method",
               "name": "toggleMinimize"
             },
             {
@@ -129,15 +83,6 @@
             {
               "kind": "method",
               "name": "render"
-            },
-            {
-              "kind": "method",
-              "name": "escapeHtml",
-              "parameters": [
-                {
-                  "name": "text"
-                }
-              ]
             },
             {
               "kind": "field",

@@ -20,7 +20,7 @@ function v() {
   const t = getComputedStyle(r).colorScheme;
   return t === "dark" ? !0 : t === "light" ? !1 : null;
 }
-function _() {
+function k() {
   const r = v();
   if (r !== w) {
     w = r;
@@ -30,7 +30,7 @@ function _() {
 }
 function S() {
   if (l) return;
-  l = new MutationObserver(_);
+  l = new MutationObserver(k);
   const r = {
     attributes: !0,
     attributeFilter: ["class", "data-theme", "data-bs-theme", "data-mode", "style"]
@@ -150,16 +150,16 @@ const g = {
   "punch-hole": 36,
   none: 24
 }, A = 28, y = 80;
-let k = !1;
+let _ = !1;
 class E extends HTMLElement {
   constructor() {
-    super(), this.attachShadow({ mode: "open" }), this.isMinimized = !1, this.isMaximized = !1, this.overlay = null, this.showSource = !1, this.sourceCode = "", this.showShareMenu = !1, this.handleKeydown = this.handleKeydown.bind(this), this.handleOutsideClick = this.handleOutsideClick.bind(this), this._resizeObserver = null, this._currentScale = 1, this._outsideClickTimer = null, this._copyFeedbackTimer = null, this._fetchController = null;
+    super(), this.attachShadow({ mode: "open" }), this.isMinimized = !1, this.isMaximized = !1, this.overlay = null, this.showSource = !1, this.sourceCode = "", this.showShareMenu = !1, this._handleKeydown = this._handleKeydown.bind(this), this._handleOutsideClick = this._handleOutsideClick.bind(this), this._resizeObserver = null, this._currentScale = 1, this._outsideClickTimer = null, this._copyFeedbackTimer = null, this._fetchController = null;
   }
   async connectedCallback() {
-    this.render(), this.attachEventListeners(), this.src && await this.fetchSourceCode(), C(this), this._getDevicePreset() && this._setupDeviceScaling();
+    this.render(), this._attachEventListeners(), this.src && await this.fetchSourceCode(), C(this), this._getDevicePreset() && this._setupDeviceScaling();
   }
   disconnectedCallback() {
-    M(this), this.removeOverlay(), this._teardownDeviceScaling(), clearTimeout(this._outsideClickTimer), clearTimeout(this._copyFeedbackTimer), this._fetchController?.abort(), document.removeEventListener("keydown", this.handleKeydown), document.removeEventListener("click", this.handleOutsideClick);
+    M(this), this._removeOverlay(), this._teardownDeviceScaling(), clearTimeout(this._outsideClickTimer), clearTimeout(this._copyFeedbackTimer), this._fetchController?.abort(), document.removeEventListener("keydown", this._handleKeydown), document.removeEventListener("click", this._handleOutsideClick);
   }
   static get observedAttributes() {
     return [
@@ -175,7 +175,7 @@ class E extends HTMLElement {
     ];
   }
   attributeChangedCallback(e) {
-    this.shadowRoot && (this.render(), this.attachEventListeners()), e === "src" && (this.showSource = !1, this.sourceCode = "", this.src && this.fetchSourceCode()), (e === "device" || e === "orientation") && (this._teardownDeviceScaling(), this._getDevicePreset() && this._setupDeviceScaling()), e === "mode" && (this.hasAttribute("mode") ? this.removeAttribute("data-page-mode") : this._onPageModeChange(v()));
+    this.shadowRoot && (this.render(), this._attachEventListeners()), e === "src" && (this.showSource = !1, this.sourceCode = "", this.src && this.fetchSourceCode()), (e === "device" || e === "orientation") && (this._teardownDeviceScaling(), this._getDevicePreset() && this._setupDeviceScaling()), e === "mode" && (this.hasAttribute("mode") ? this.removeAttribute("data-page-mode") : this._onPageModeChange(v()));
   }
   get url() {
     return this.getAttribute("url") || "";
@@ -229,8 +229,8 @@ class E extends HTMLElement {
     };
   }
   _getEffectiveSafeInsets(e) {
-    const [t, o, i, n] = e.safeInsets;
-    return this.getAttribute("orientation") === "landscape" ? [n, t, o, i] : [t, o, i, n];
+    const [t, o, i, a] = e.safeInsets;
+    return this.getAttribute("orientation") === "landscape" ? [a, t, o, i] : [t, o, i, a];
   }
   _onPageModeChange(e) {
     if (this.hasAttribute("mode")) {
@@ -257,15 +257,15 @@ class E extends HTMLElement {
         if (!o) return;
         const i = o.querySelector("style[data-browser-window-safe-areas]");
         i && i.remove();
-        const [n, c, s, d] = this._getEffectiveSafeInsets(t), a = o.createElement("style");
-        a.setAttribute("data-browser-window-safe-areas", ""), a.textContent = `
+        const [a, c, s, d] = this._getEffectiveSafeInsets(t), n = o.createElement("style");
+        n.setAttribute("data-browser-window-safe-areas", ""), n.textContent = `
         :root {
-          --safe-top: ${n}px;
+          --safe-top: ${a}px;
           --safe-right: ${c}px;
           --safe-bottom: ${s}px;
           --safe-left: ${d}px;
         }
-      `, o.head.appendChild(a);
+      `, o.head.appendChild(n);
       } catch {
         console.info("<browser-window>: Cannot inject safe areas into cross-origin iframe");
       }
@@ -280,19 +280,23 @@ class E extends HTMLElement {
       return this.url;
     }
   }
-  attachEventListeners() {
-    const e = this.shadowRoot.querySelector(".control-button.close"), t = this.shadowRoot.querySelector(".control-button.minimize"), o = this.shadowRoot.querySelector(".control-button.maximize"), i = this.shadowRoot.querySelector(".view-source-button"), n = this.shadowRoot.querySelector(".copy-source-button"), c = this.shadowRoot.querySelector(".share-button"), s = this.shadowRoot.querySelector(".browser-header");
-    e?.addEventListener("click", () => this.handleClose()), t?.addEventListener("click", () => this.toggleMinimize()), o?.addEventListener("click", () => this.toggleMaximize()), i?.addEventListener("click", () => this.toggleViewSource()), n?.addEventListener("click", () => this.copySourceCode()), c?.addEventListener("click", (a) => {
-      a.stopPropagation(), this.toggleShareMenu();
-    }), s?.addEventListener("dblclick", (a) => {
-      a.target.closest("button, a, .share-menu") || this.toggleMaximize();
+  _attachEventListeners() {
+    const e = this.shadowRoot.querySelector(".control-button.close"), t = this.shadowRoot.querySelector(".control-button.minimize"), o = this.shadowRoot.querySelector(".control-button.maximize"), i = this.shadowRoot.querySelector(".view-source-button"), a = this.shadowRoot.querySelector(".copy-source-button"), c = this.shadowRoot.querySelector(".share-button"), s = this.shadowRoot.querySelector(".browser-header");
+    e?.addEventListener("click", () => this._handleClose()), t?.addEventListener("click", () => this.toggleMinimize()), o?.addEventListener("click", () => this.toggleMaximize()), i?.addEventListener("click", () => this.toggleViewSource()), a?.addEventListener("click", () => this.copySourceCode()), c?.addEventListener("click", (n) => {
+      n.stopPropagation(), this.toggleShareMenu();
+    }), s?.addEventListener("dblclick", (n) => {
+      n.target.closest("button, a, .share-menu") || this.toggleMaximize();
     });
     const d = this.shadowRoot.querySelector("iframe");
-    d?.addEventListener("error", () => this.handleIframeError()), d?.addEventListener("load", () => {
-      this._syncIframeColorScheme(), this._getDevicePreset() && this._injectSafeAreas(d);
-    }), this.shadowRoot.querySelector('[data-action="share"]')?.addEventListener("click", () => this.shareViaWebAPI()), this.shadowRoot.querySelector('[data-action="codepen"]')?.addEventListener("click", () => this.openInCodePen()), this.shadowRoot.querySelector(".retry-button")?.addEventListener("click", () => this.retryLoad());
+    if (d) {
+      const n = () => {
+        this._syncIframeColorScheme(), this._getDevicePreset() && this._injectSafeAreas(d);
+      };
+      d.addEventListener("error", () => this._handleIframeError()), d.addEventListener("load", n), d.contentDocument?.readyState === "complete" && d.src && n();
+    }
+    this.shadowRoot.querySelector('[data-action="share"]')?.addEventListener("click", () => this.shareViaWebAPI()), this.shadowRoot.querySelector('[data-action="codepen"]')?.addEventListener("click", () => this.openInCodePen()), this.shadowRoot.querySelector(".retry-button")?.addEventListener("click", () => this._retryLoad());
   }
-  handleIframeError() {
+  _handleIframeError() {
     const e = this.shadowRoot.querySelector(".browser-content");
     e && (e.innerHTML = `
       <div class="error-state">
@@ -304,14 +308,14 @@ class E extends HTMLElement {
         <p>Failed to load content</p>
         <button class="retry-button">Retry</button>
       </div>
-    `, e.querySelector(".retry-button")?.addEventListener("click", () => this.retryLoad()));
+    `, e.querySelector(".retry-button")?.addEventListener("click", () => this._retryLoad()));
   }
-  retryLoad() {
+  _retryLoad() {
     const e = this.shadowRoot.querySelector(".browser-content");
     if (!e || !this.src) return;
-    e.innerHTML = `<iframe src="${this.escapeHtml(this.src)}" loading="lazy"></iframe>`;
+    e.innerHTML = `<iframe src="${this._escapeHtml(this.src)}" loading="lazy"></iframe>`;
     const t = e.querySelector("iframe");
-    t?.addEventListener("error", () => this.handleIframeError()), t?.addEventListener("load", () => {
+    t?.addEventListener("error", () => this._handleIframeError()), t?.addEventListener("load", () => {
       this._syncIframeColorScheme(), this._getDevicePreset() && this._injectSafeAreas(t);
     });
   }
@@ -327,15 +331,15 @@ class E extends HTMLElement {
     }
   }
   toggleViewSource() {
-    this.showSource = !this.showSource, this.updateContentView();
+    this.showSource = !this.showSource, this._updateContentView();
   }
-  updateContentView() {
+  _updateContentView() {
     const e = this.shadowRoot.querySelector(".view-source-button");
     !!this._getDevicePreset() ? this._updateDeviceSourceView(e) : this._updateBrowserSourceView(e);
   }
   _updateBrowserSourceView(e) {
     const t = this.shadowRoot.querySelector(".browser-content");
-    t && (this.showSource ? (t.innerHTML = this._sourceViewHTML(), e?.classList.add("active"), t.querySelector(".copy-source-button")?.addEventListener("click", () => this.copySourceCode())) : (this.src ? (t.innerHTML = `<iframe src="${this.escapeHtml(this.src)}" loading="lazy"></iframe>`, t.querySelector("iframe")?.addEventListener("load", () => this._syncIframeColorScheme())) : t.innerHTML = "<slot></slot>", e?.classList.remove("active")));
+    t && (this.showSource ? (t.innerHTML = this._sourceViewHTML(), e?.classList.add("active"), t.querySelector(".copy-source-button")?.addEventListener("click", () => this.copySourceCode())) : (this.src ? (t.innerHTML = `<iframe src="${this._escapeHtml(this.src)}" loading="lazy"></iframe>`, t.querySelector("iframe")?.addEventListener("load", () => this._syncIframeColorScheme())) : t.innerHTML = "<slot></slot>", e?.classList.remove("active")));
   }
   _updateDeviceSourceView(e) {
     const t = this.shadowRoot.querySelector(".browser-content");
@@ -344,7 +348,7 @@ class E extends HTMLElement {
         t.innerHTML = this._sourceViewHTML(), e?.classList.add("active"), t.querySelector(".copy-source-button")?.addEventListener("click", () => this.copySourceCode());
       else {
         if (this.src) {
-          t.innerHTML = `<iframe src="${this.escapeHtml(this.src)}" loading="lazy"></iframe>`;
+          t.innerHTML = `<iframe src="${this._escapeHtml(this.src)}" loading="lazy"></iframe>`;
           const o = t.querySelector("iframe");
           o?.addEventListener("load", () => {
             this._syncIframeColorScheme(), this._getDevicePreset() && this._injectSafeAreas(o);
@@ -367,7 +371,7 @@ class E extends HTMLElement {
             Copy
           </button>
         </div>
-        <pre><code>${this.escapeHtml(this.sourceCode)}</code></pre>
+        <pre><code>${this._escapeHtml(this.sourceCode)}</code></pre>
       </div>
     `;
   }
@@ -395,10 +399,10 @@ class E extends HTMLElement {
     this.showShareMenu = !this.showShareMenu;
     const e = this.shadowRoot?.querySelector(".share-menu"), t = this.shadowRoot?.querySelector(".share-button");
     !e || !t || (this.showShareMenu ? (e.style.display = "block", t.classList.add("active"), clearTimeout(this._outsideClickTimer), this._outsideClickTimer = setTimeout(() => {
-      document.addEventListener("click", this.handleOutsideClick);
-    }, 0)) : (e.style.display = "none", t.classList.remove("active"), clearTimeout(this._outsideClickTimer), document.removeEventListener("click", this.handleOutsideClick)));
+      document.addEventListener("click", this._handleOutsideClick);
+    }, 0)) : (e.style.display = "none", t.classList.remove("active"), clearTimeout(this._outsideClickTimer), document.removeEventListener("click", this._handleOutsideClick)));
   }
-  handleOutsideClick(e) {
+  _handleOutsideClick(e) {
     const t = this.shadowRoot.querySelector(".share-menu");
     t && !t.contains(e.target) && this.toggleShareMenu();
   }
@@ -424,9 +428,9 @@ class E extends HTMLElement {
 
 `), i = Array.from(t.querySelectorAll("script")).filter((s) => !s.src && s.type !== "module").map((s) => s.textContent).join(`
 
-`), n = t.body.cloneNode(!0);
-    return n.querySelectorAll("script, style").forEach((s) => s.remove()), {
-      html: n.innerHTML.trim(),
+`), a = t.body.cloneNode(!0);
+    return a.querySelectorAll("script, style").forEach((s) => s.remove()), {
+      html: a.innerHTML.trim(),
       css: o.trim(),
       js: i.trim()
     };
@@ -447,13 +451,13 @@ class E extends HTMLElement {
     const i = document.createElement("input");
     i.type = "hidden", i.name = "data", i.value = JSON.stringify(t), o.appendChild(i), document.body.appendChild(o), o.submit(), document.body.removeChild(o), this.toggleShareMenu();
   }
-  handleClose() {
+  _handleClose() {
     this.isMaximized && this.toggleMaximize(), this.isMinimized || this.toggleMinimize();
   }
-  handleKeydown(e) {
+  _handleKeydown(e) {
     e.key === "Escape" && (this.showShareMenu ? this.toggleShareMenu() : this.isMaximized && this.toggleMaximize());
   }
-  createOverlay() {
+  _createOverlay() {
     if (!this.overlay) {
       if (this.overlay = document.createElement("div"), this.overlay.style.cssText = `
       position: fixed;
@@ -465,20 +469,20 @@ class E extends HTMLElement {
       z-index: var(--browser-window-overlay-z-index, 9998);
       cursor: pointer;
       animation: fadeIn 200ms ease;
-    `, !k) {
+    `, !_) {
         const e = document.createElement("style");
         e.textContent = `
         @keyframes fadeIn {
           from { opacity: 0; }
           to { opacity: 1; }
         }
-      `, document.head.appendChild(e), k = !0;
+      `, document.head.appendChild(e), _ = !0;
       }
-      this.overlay.addEventListener("click", () => this.toggleMaximize()), document.body.appendChild(this.overlay), document.addEventListener("keydown", this.handleKeydown);
+      this.overlay.addEventListener("click", () => this.toggleMaximize()), document.body.appendChild(this.overlay), document.addEventListener("keydown", this._handleKeydown);
     }
   }
-  removeOverlay() {
-    this.overlay && (this.overlay.remove(), this.overlay = null), document.removeEventListener("keydown", this.handleKeydown);
+  _removeOverlay() {
+    this.overlay && (this.overlay.remove(), this.overlay = null), document.removeEventListener("keydown", this._handleKeydown);
   }
   toggleMinimize() {
     const e = this.shadowRoot.querySelector(".browser-content");
@@ -489,9 +493,9 @@ class E extends HTMLElement {
     if (this.isMaximized) {
       this.classList.remove("browser-window-maximized"), this.removeAttribute("role"), this.removeAttribute("aria-modal"), this.removeAttribute("tabindex");
       const t = this.shadowRoot.querySelector("iframe");
-      t && (t.style.minHeight = ""), this.removeOverlay(), this.isMaximized = !1, this._previousFocus && typeof this._previousFocus.focus == "function" && (this._previousFocus.focus(), this._previousFocus = null), e && (e.setAttribute("aria-label", "Maximize window"), e.setAttribute("aria-expanded", "false"));
+      t && (t.style.minHeight = ""), this._removeOverlay(), this.isMaximized = !1, this._previousFocus && typeof this._previousFocus.focus == "function" && (this._previousFocus.focus(), this._previousFocus = null), e && (e.setAttribute("aria-label", "Maximize window"), e.setAttribute("aria-expanded", "false"));
     } else {
-      this.isMinimized && this.toggleMinimize(), this.createOverlay(), this.classList.add("browser-window-maximized"), this.setAttribute("role", "dialog"), this.setAttribute("aria-modal", "true");
+      this.isMinimized && this.toggleMinimize(), this._createOverlay(), this.classList.add("browser-window-maximized"), this.setAttribute("role", "dialog"), this.setAttribute("aria-modal", "true");
       const t = this.shadowRoot.querySelector("iframe");
       t && (t.style.minHeight = "calc(90vh - 50px)"), this.isMaximized = !0, this._previousFocus = document.activeElement, this.setAttribute("tabindex", "-1"), this.focus(), e && (e.setAttribute("aria-label", "Restore window"), e.setAttribute("aria-expanded", "true"));
     }
@@ -556,7 +560,7 @@ class E extends HTMLElement {
 
           display: flex;
           flex-direction: column;
-          margin: 1rem 0;
+          margin: var(--browser-window-margin, 1rem 0);
           border-radius: var(--browser-window-border-radius);
           overflow: hidden;
           border-width: var(--browser-window-border-width, 1px);
@@ -1082,7 +1086,7 @@ class E extends HTMLElement {
         </div>
         <div class="url-bar">
           ${this.url.startsWith("https") ? '<span class="lock-icon">🔒</span>' : ""}
-          <span class="url-text" title="${this.escapeHtml(this.url)}">${this.escapeHtml(this.browserTitle)}</span>
+          <span class="url-text" title="${this._escapeHtml(this.url)}">${this._escapeHtml(this.browserTitle)}</span>
           ${this.src ? `
             <button class="view-source-button" title="View source code">
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1118,7 +1122,7 @@ class E extends HTMLElement {
                 </button>
               </div>
             </div>
-            <a href="${this.escapeHtml(this.src)}" download class="download-button" title="Download demo HTML file">
+            <a href="${this._escapeHtml(this.src)}" download class="download-button" title="Download demo HTML file">
               <svg class="download-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M8 1v10M8 11l-3-3M8 11l3-3"/>
                 <path d="M2 12v2a1 1 0 001 1h10a1 1 0 001-1v-2"/>
@@ -1132,13 +1136,13 @@ class E extends HTMLElement {
   _contentHTML() {
     return `
       <div class="browser-content" part="content">
-        ${this.src ? `<iframe src="${this.escapeHtml(this.src)}" loading="lazy"></iframe>` : "<slot></slot>"}
+        ${this.src ? `<iframe src="${this._escapeHtml(this.src)}" loading="lazy"></iframe>` : "<slot></slot>"}
       </div>
     `;
   }
   // --- Device mode ---
   _deviceCSS(e) {
-    const t = x[this.deviceColor] || x.midnight, o = this.getAttribute("orientation") === "landscape", i = this._getEffectiveDimensions(e), [n, c, s, d] = this._getEffectiveSafeInsets(e), a = L[e.notch] || 24, m = e.homeIndicator && !e.homeButton ? A : 0, u = e.homeButton ? y : 0, b = e.notch !== "none";
+    const t = x[this.deviceColor] || x.midnight, o = this.getAttribute("orientation") === "landscape", i = this._getEffectiveDimensions(e), [a, c, s, d] = this._getEffectiveSafeInsets(e), n = L[e.notch] || 24, m = e.homeIndicator && !e.homeButton ? A : 0, u = e.homeButton ? y : 0, b = e.notch !== "none";
     return `
         :host([device]) {
           --device-width: ${i.width}px;
@@ -1146,10 +1150,10 @@ class E extends HTMLElement {
           --device-bezel: ${e.bezel}px;
           --device-corner-radius: ${e.cornerRadius}px;
           --browser-window-bezel-color: ${t};
-          --status-bar-height: ${o && b ? 24 : a}px;
+          --status-bar-height: ${o && b ? 24 : n}px;
           --home-indicator-height: ${m}px;
           --home-button-area: ${u}px;
-          --safe-top: ${n}px;
+          --safe-top: ${a}px;
           --safe-right: ${c}px;
           --safe-bottom: ${s}px;
           --safe-left: ${d}px;
@@ -1575,7 +1579,7 @@ class E extends HTMLElement {
     `;
   }
   _deviceChrome(e) {
-    const t = this.getAttribute("orientation") === "landscape", o = e.notch !== "none", i = o ? e.notch : "", n = e.homeButton ? "home-button" : "", s = ["silver", "gold", "white"].includes(this.deviceColor) ? "light-bezel" : "", a = ["device-frame", i, n, s, t ? "landscape" : ""].filter(Boolean).join(" "), u = `
+    const t = this.getAttribute("orientation") === "landscape", o = e.notch !== "none", i = o ? e.notch : "", a = e.homeButton ? "home-button" : "", s = ["silver", "gold", "white"].includes(this.deviceColor) ? "light-bezel" : "", n = ["device-frame", i, a, s, t ? "landscape" : ""].filter(Boolean).join(" "), u = `
       <div class="status-bar ${t && o ? "" : i}">
         <span class="status-time">9:41</span>
         <div class="status-icons">
@@ -1592,7 +1596,7 @@ class E extends HTMLElement {
         </div>` : "", f = this._deviceToolbar();
     return t && o ? `
         <div class="device-wrapper">
-          <div class="${a}">
+          <div class="${n}">
             <div class="notch-sidebar ${i}"></div>
             <div class="device-main">
               ${u}
@@ -1605,7 +1609,7 @@ class E extends HTMLElement {
         ${f}
       ` : `
       <div class="device-wrapper">
-        <div class="${a}">
+        <div class="${n}">
           ${u}
           ${this._contentHTML()}
           ${b}
@@ -1652,7 +1656,7 @@ class E extends HTMLElement {
             </button>
           </div>
         </div>
-        <a href="${this.escapeHtml(this.src)}" download class="download-button" title="Download demo HTML file">
+        <a href="${this._escapeHtml(this.src)}" download class="download-button" title="Download demo HTML file">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M8 1v10M8 11l-3-3M8 11l3-3"/>
             <path d="M2 12v2a1 1 0 001 1h10a1 1 0 001-1v-2"/>
@@ -1672,15 +1676,15 @@ class E extends HTMLElement {
     if (!t || !o) return;
     const i = this.clientWidth;
     if (i === 0) return;
-    const n = this._getEffectiveDimensions(e), c = n.width + e.bezel * 2, s = Math.min(1, i / c);
+    const a = this._getEffectiveDimensions(e), c = a.width + e.bezel * 2, s = Math.max(0.5, Math.min(1, i / c));
     this._currentScale = s, o.style.transform = `scale(${s})`;
-    const d = e.homeButton ? y : 0, a = n.height + e.bezel * 2 + d;
-    t.style.height = `${a * s}px`;
+    const d = e.homeButton ? y : 0, n = a.height + e.bezel * 2 + d;
+    t.style.height = `${n * s}px`;
   }
   _teardownDeviceScaling() {
     this._resizeObserver && (this._resizeObserver.disconnect(), this._resizeObserver = null), this._currentScale = 1;
   }
-  escapeHtml(e) {
+  _escapeHtml(e) {
     const t = document.createElement("div");
     return t.textContent = e, t.innerHTML;
   }

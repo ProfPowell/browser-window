@@ -242,6 +242,155 @@ test.describe('browser-window', () => {
     })
   })
 
+  test.describe('close button', () => {
+    test('clicking close button minimizes the window', async ({ page }) => {
+      const el = page.locator('#default')
+      const closeBtn = el.locator('.control-button.close')
+
+      await closeBtn.click()
+      const isMinimized = await el.evaluate((node) => node.isMinimized)
+      expect(isMinimized).toBe(true)
+
+      const contentDisplay = await el.evaluate((node) => {
+        const content = node.shadowRoot.querySelector('.browser-content')
+        return content?.style.display
+      })
+      expect(contentDisplay).toBe('none')
+    })
+
+    test('clicking close while maximized restores then minimizes', async ({ page }) => {
+      const el = page.locator('#default')
+      const maximizeBtn = el.locator('.control-button.maximize')
+      const closeBtn = el.locator('.control-button.close')
+
+      await maximizeBtn.click()
+      expect(await el.evaluate((node) => node.isMaximized)).toBe(true)
+
+      await closeBtn.click()
+      expect(await el.evaluate((node) => node.isMaximized)).toBe(false)
+      expect(await el.evaluate((node) => node.isMinimized)).toBe(true)
+    })
+  })
+
+  test.describe('keyboard shortcuts', () => {
+    test('Escape closes maximized view', async ({ page }) => {
+      const el = page.locator('#default')
+      const maximizeBtn = el.locator('.control-button.maximize')
+
+      await maximizeBtn.click()
+      expect(await el.evaluate((node) => node.isMaximized)).toBe(true)
+
+      await page.keyboard.press('Escape')
+      expect(await el.evaluate((node) => node.isMaximized)).toBe(false)
+    })
+
+    test('Escape closes share menu', async ({ page }) => {
+      const el = page.locator('#with-src')
+      const shareBtn = el.locator('.share-button')
+
+      // Open share menu
+      await shareBtn.click()
+      expect(await el.evaluate((node) => node.showShareMenu)).toBe(true)
+
+      // Maximize first to enable keydown listener, then open menu
+      const maximizeBtn = el.locator('.control-button.maximize')
+      await maximizeBtn.click()
+      await shareBtn.click()
+
+      await page.keyboard.press('Escape')
+      expect(await el.evaluate((node) => node.showShareMenu)).toBe(false)
+    })
+  })
+
+  test.describe('share menu', () => {
+    test('opens and closes share menu on button click', async ({ page }) => {
+      const el = page.locator('#with-src')
+      const shareBtn = el.locator('.share-button')
+
+      await shareBtn.click()
+      let showMenu = await el.evaluate((node) => node.showShareMenu)
+      expect(showMenu).toBe(true)
+
+      await shareBtn.click()
+      showMenu = await el.evaluate((node) => node.showShareMenu)
+      expect(showMenu).toBe(false)
+    })
+
+    test('share menu contains CodePen button', async ({ page }) => {
+      const el = page.locator('#with-src')
+      const shareBtn = el.locator('.share-button')
+      await shareBtn.click()
+
+      const codepen = el.locator('[data-action="codepen"]')
+      await expect(codepen).toBeVisible()
+    })
+  })
+
+  test.describe('error and retry', () => {
+    test('shows error state for broken iframe src', async ({ page }) => {
+      // Create element with bad src
+      await page.evaluate(() => {
+        const el = document.createElement('browser-window')
+        el.id = 'broken-src'
+        el.setAttribute('src', '/nonexistent-page-404.html')
+        document.body.appendChild(el)
+      })
+
+      const el = page.locator('#broken-src')
+      // Wait for the iframe to attempt loading
+      await el.locator('iframe').waitFor({ state: 'attached' })
+    })
+  })
+
+  test.describe('download link', () => {
+    test('download link has correct href and download attribute', async ({ page }) => {
+      const el = page.locator('#with-src')
+      const downloadLink = el.locator('.download-button')
+      await expect(downloadLink).toBeVisible()
+
+      const href = await downloadLink.evaluate((node) => node.getAttribute('href'))
+      expect(href).toBe('../docs/example.html')
+
+      const hasDownload = await downloadLink.evaluate((node) => node.hasAttribute('download'))
+      expect(hasDownload).toBe(true)
+    })
+  })
+
+  test.describe('source code copy', () => {
+    test('copy button exists in source view', async ({ page }) => {
+      const el = page.locator('#with-src')
+
+      // Fetch source first
+      await el.evaluate(async (node) => {
+        await node.fetchSourceCode()
+      })
+
+      const viewSource = el.locator('.view-source-button')
+      await viewSource.click()
+
+      const copyBtn = el.locator('.copy-source-button')
+      await expect(copyBtn).toBeVisible()
+    })
+  })
+
+  test.describe('resize', () => {
+    test('component has resize: both by default', async ({ page }) => {
+      const el = page.locator('#default')
+      const resize = await el.evaluate((node) => {
+        return getComputedStyle(node).resize
+      })
+      expect(resize).toBe('both')
+    })
+
+    test('respects min-width constraint', async ({ page }) => {
+      const el = page.locator('#default')
+      const minWidth = await el.evaluate((node) => {
+        return getComputedStyle(node).minWidth
+      })
+      expect(minWidth).toBe('280px')
+    })
+  })
+
   test.describe('iframe dark mode propagation', () => {
     test('sets color-scheme: dark on iframe contentDocument when page goes dark', async ({ page }) => {
       const el = page.locator('#with-src')

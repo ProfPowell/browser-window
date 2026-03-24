@@ -275,8 +275,8 @@ export class BrowserWindow extends HTMLElement {
     this.showSource = false;
     this.sourceCode = '';
     this.showShareMenu = false;
-    this.handleKeydown = this.handleKeydown.bind(this);
-    this.handleOutsideClick = this.handleOutsideClick.bind(this);
+    this._handleKeydown = this._handleKeydown.bind(this);
+    this._handleOutsideClick = this._handleOutsideClick.bind(this);
     this._resizeObserver = null;
     this._currentScale = 1;
     this._outsideClickTimer = null;
@@ -286,7 +286,7 @@ export class BrowserWindow extends HTMLElement {
 
   async connectedCallback() {
     this.render();
-    this.attachEventListeners();
+    this._attachEventListeners();
 
     // Fetch source code if a src attribute is present
     if (this.src) {
@@ -302,13 +302,13 @@ export class BrowserWindow extends HTMLElement {
 
   disconnectedCallback() {
     _unregisterInstance(this);
-    this.removeOverlay();
+    this._removeOverlay();
     this._teardownDeviceScaling();
     clearTimeout(this._outsideClickTimer);
     clearTimeout(this._copyFeedbackTimer);
     this._fetchController?.abort();
-    document.removeEventListener('keydown', this.handleKeydown);
-    document.removeEventListener('click', this.handleOutsideClick);
+    document.removeEventListener('keydown', this._handleKeydown);
+    document.removeEventListener('click', this._handleOutsideClick);
   }
 
   static get observedAttributes() {
@@ -328,7 +328,7 @@ export class BrowserWindow extends HTMLElement {
   attributeChangedCallback(name) {
     if (this.shadowRoot) {
       this.render();
-      this.attachEventListeners();
+      this._attachEventListeners();
     }
 
     if (name === 'src') {
@@ -473,7 +473,7 @@ export class BrowserWindow extends HTMLElement {
         doc.documentElement.style.colorScheme = isDark ? 'dark' : 'light';
       }
     } catch (_e) {
-      // Cross-origin iframe — silently ignore
+      // Cross-origin iframe — cannot sync color scheme
     }
   }
 
@@ -520,7 +520,7 @@ export class BrowserWindow extends HTMLElement {
     }
   }
 
-  attachEventListeners() {
+  _attachEventListeners() {
     const closeBtn = this.shadowRoot.querySelector('.control-button.close');
     const minimizeBtn = this.shadowRoot.querySelector('.control-button.minimize');
     const maximizeBtn = this.shadowRoot.querySelector('.control-button.maximize');
@@ -529,7 +529,7 @@ export class BrowserWindow extends HTMLElement {
     const shareBtn = this.shadowRoot.querySelector('.share-button');
     const header = this.shadowRoot.querySelector('.browser-header');
 
-    closeBtn?.addEventListener('click', () => this.handleClose());
+    closeBtn?.addEventListener('click', () => this._handleClose());
     minimizeBtn?.addEventListener('click', () => this.toggleMinimize());
     maximizeBtn?.addEventListener('click', () => this.toggleMaximize());
     viewSourceBtn?.addEventListener('click', () => this.toggleViewSource());
@@ -548,13 +548,20 @@ export class BrowserWindow extends HTMLElement {
 
     // Handle iframe load errors and sync color scheme
     const iframe = this.shadowRoot.querySelector('iframe');
-    iframe?.addEventListener('error', () => this.handleIframeError());
-    iframe?.addEventListener('load', () => {
-      this._syncIframeColorScheme();
-      if (this._getDevicePreset()) {
-        this._injectSafeAreas(iframe);
+    if (iframe) {
+      const onLoad = () => {
+        this._syncIframeColorScheme();
+        if (this._getDevicePreset()) {
+          this._injectSafeAreas(iframe);
+        }
+      };
+      iframe.addEventListener('error', () => this._handleIframeError());
+      iframe.addEventListener('load', onLoad);
+      // Handle already-loaded (cached) iframes
+      if (iframe.contentDocument?.readyState === 'complete' && iframe.src) {
+        onLoad();
       }
-    });
+    }
 
     // Share menu actions (CSP-safe — no inline onclick)
     this.shadowRoot.querySelector('[data-action="share"]')
@@ -564,10 +571,10 @@ export class BrowserWindow extends HTMLElement {
 
     // Retry button in error state
     this.shadowRoot.querySelector('.retry-button')
-      ?.addEventListener('click', () => this.retryLoad());
+      ?.addEventListener('click', () => this._retryLoad());
   }
 
-  handleIframeError() {
+  _handleIframeError() {
     const content = this.shadowRoot.querySelector('.browser-content');
     if (!content) return;
 
@@ -583,18 +590,18 @@ export class BrowserWindow extends HTMLElement {
       </div>
     `;
     content.querySelector('.retry-button')
-      ?.addEventListener('click', () => this.retryLoad());
+      ?.addEventListener('click', () => this._retryLoad());
   }
 
-  retryLoad() {
+  _retryLoad() {
     const content = this.shadowRoot.querySelector('.browser-content');
     if (!content || !this.src) return;
 
-    content.innerHTML = `<iframe src="${this.escapeHtml(this.src)}" loading="lazy"></iframe>`;
+    content.innerHTML = `<iframe src="${this._escapeHtml(this.src)}" loading="lazy"></iframe>`;
 
     // Re-attach error handler and sync color scheme
     const iframe = content.querySelector('iframe');
-    iframe?.addEventListener('error', () => this.handleIframeError());
+    iframe?.addEventListener('error', () => this._handleIframeError());
     iframe?.addEventListener('load', () => {
       this._syncIframeColorScheme();
       if (this._getDevicePreset()) {
@@ -624,10 +631,10 @@ export class BrowserWindow extends HTMLElement {
 
   toggleViewSource() {
     this.showSource = !this.showSource;
-    this.updateContentView();
+    this._updateContentView();
   }
 
-  updateContentView() {
+  _updateContentView() {
     const viewSourceBtn = this.shadowRoot.querySelector('.view-source-button');
     const isDeviceMode = !!this._getDevicePreset();
 
@@ -649,7 +656,7 @@ export class BrowserWindow extends HTMLElement {
         ?.addEventListener('click', () => this.copySourceCode());
     } else {
       if (this.src) {
-        content.innerHTML = `<iframe src="${this.escapeHtml(this.src)}" loading="lazy"></iframe>`;
+        content.innerHTML = `<iframe src="${this._escapeHtml(this.src)}" loading="lazy"></iframe>`;
         const newIframe = content.querySelector('iframe');
         newIframe?.addEventListener('load', () => this._syncIframeColorScheme());
       } else {
@@ -671,7 +678,7 @@ export class BrowserWindow extends HTMLElement {
         ?.addEventListener('click', () => this.copySourceCode());
     } else {
       if (this.src) {
-        content.innerHTML = `<iframe src="${this.escapeHtml(this.src)}" loading="lazy"></iframe>`;
+        content.innerHTML = `<iframe src="${this._escapeHtml(this.src)}" loading="lazy"></iframe>`;
         const newIframe = content.querySelector('iframe');
         newIframe?.addEventListener('load', () => {
           this._syncIframeColorScheme();
@@ -699,7 +706,7 @@ export class BrowserWindow extends HTMLElement {
             Copy
           </button>
         </div>
-        <pre><code>${this.escapeHtml(this.sourceCode)}</code></pre>
+        <pre><code>${this._escapeHtml(this.sourceCode)}</code></pre>
       </div>
     `;
   }
@@ -745,17 +752,17 @@ export class BrowserWindow extends HTMLElement {
       shareBtn.classList.add('active');
       clearTimeout(this._outsideClickTimer);
       this._outsideClickTimer = setTimeout(() => {
-        document.addEventListener('click', this.handleOutsideClick);
+        document.addEventListener('click', this._handleOutsideClick);
       }, 0);
     } else {
       menu.style.display = 'none';
       shareBtn.classList.remove('active');
       clearTimeout(this._outsideClickTimer);
-      document.removeEventListener('click', this.handleOutsideClick);
+      document.removeEventListener('click', this._handleOutsideClick);
     }
   }
 
-  handleOutsideClick(e) {
+  _handleOutsideClick(e) {
     const menu = this.shadowRoot.querySelector('.share-menu');
     if (menu && !menu.contains(e.target)) {
       this.toggleShareMenu();
@@ -845,7 +852,7 @@ export class BrowserWindow extends HTMLElement {
     this.toggleShareMenu();
   }
 
-  handleClose() {
+  _handleClose() {
     if (this.isMaximized) {
       this.toggleMaximize();
     }
@@ -855,7 +862,7 @@ export class BrowserWindow extends HTMLElement {
     }
   }
 
-  handleKeydown(event) {
+  _handleKeydown(event) {
     if (event.key === 'Escape') {
       if (this.showShareMenu) {
         this.toggleShareMenu();
@@ -865,7 +872,7 @@ export class BrowserWindow extends HTMLElement {
     }
   }
 
-  createOverlay() {
+  _createOverlay() {
     if (this.overlay) return;
 
     this.overlay = document.createElement('div');
@@ -896,15 +903,15 @@ export class BrowserWindow extends HTMLElement {
 
     this.overlay.addEventListener('click', () => this.toggleMaximize());
     document.body.appendChild(this.overlay);
-    document.addEventListener('keydown', this.handleKeydown);
+    document.addEventListener('keydown', this._handleKeydown);
   }
 
-  removeOverlay() {
+  _removeOverlay() {
     if (this.overlay) {
       this.overlay.remove();
       this.overlay = null;
     }
-    document.removeEventListener('keydown', this.handleKeydown);
+    document.removeEventListener('keydown', this._handleKeydown);
   }
 
   toggleMinimize() {
@@ -941,7 +948,7 @@ export class BrowserWindow extends HTMLElement {
       }
 
       // Remove overlay
-      this.removeOverlay();
+      this._removeOverlay();
 
       this.isMaximized = false;
 
@@ -963,7 +970,7 @@ export class BrowserWindow extends HTMLElement {
       }
 
       // Create an overlay backdrop
-      this.createOverlay();
+      this._createOverlay();
 
       // Add maximized class for styling
       this.classList.add('browser-window-maximized');
@@ -1060,7 +1067,7 @@ export class BrowserWindow extends HTMLElement {
 
           display: flex;
           flex-direction: column;
-          margin: 1rem 0;
+          margin: var(--browser-window-margin, 1rem 0);
           border-radius: var(--browser-window-border-radius);
           overflow: hidden;
           border-width: var(--browser-window-border-width, 1px);
@@ -1588,7 +1595,7 @@ export class BrowserWindow extends HTMLElement {
         </div>
         <div class="url-bar">
           ${this.url.startsWith('https') ? '<span class="lock-icon">🔒</span>' : ''}
-          <span class="url-text" title="${this.escapeHtml(this.url)}">${this.escapeHtml(this.browserTitle)}</span>
+          <span class="url-text" title="${this._escapeHtml(this.url)}">${this._escapeHtml(this.browserTitle)}</span>
           ${
             this.src
               ? `
@@ -1630,7 +1637,7 @@ export class BrowserWindow extends HTMLElement {
                 </button>
               </div>
             </div>
-            <a href="${this.escapeHtml(this.src)}" download class="download-button" title="Download demo HTML file">
+            <a href="${this._escapeHtml(this.src)}" download class="download-button" title="Download demo HTML file">
               <svg class="download-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M8 1v10M8 11l-3-3M8 11l3-3"/>
                 <path d="M2 12v2a1 1 0 001 1h10a1 1 0 001-1v-2"/>
@@ -1647,7 +1654,7 @@ export class BrowserWindow extends HTMLElement {
   _contentHTML() {
     return `
       <div class="browser-content" part="content">
-        ${this.src ? `<iframe src="${this.escapeHtml(this.src)}" loading="lazy"></iframe>` : '<slot></slot>'}
+        ${this.src ? `<iframe src="${this._escapeHtml(this.src)}" loading="lazy"></iframe>` : '<slot></slot>'}
       </div>
     `;
   }
@@ -2216,7 +2223,7 @@ export class BrowserWindow extends HTMLElement {
             </button>
           </div>
         </div>
-        <a href="${this.escapeHtml(this.src)}" download class="download-button" title="Download demo HTML file">
+        <a href="${this._escapeHtml(this.src)}" download class="download-button" title="Download demo HTML file">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M8 1v10M8 11l-3-3M8 11l3-3"/>
             <path d="M2 12v2a1 1 0 001 1h10a1 1 0 001-1v-2"/>
@@ -2247,7 +2254,7 @@ export class BrowserWindow extends HTMLElement {
 
     const dims = this._getEffectiveDimensions(preset);
     const deviceTotalWidth = dims.width + preset.bezel * 2;
-    const scale = Math.min(1, hostWidth / deviceTotalWidth);
+    const scale = Math.max(0.5, Math.min(1, hostWidth / deviceTotalWidth));
     this._currentScale = scale;
 
     frame.style.transform = `scale(${scale})`;
@@ -2265,7 +2272,7 @@ export class BrowserWindow extends HTMLElement {
     this._currentScale = 1;
   }
 
-  escapeHtml(text) {
+  _escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
