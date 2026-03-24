@@ -36,50 +36,6 @@
               "name": "deviceColor"
             },
             {
-              "kind": "method",
-              "name": "_getDevicePreset"
-            },
-            {
-              "kind": "method",
-              "name": "_getEffectiveDimensions",
-              "parameters": [
-                {
-                  "name": "preset"
-                }
-              ]
-            },
-            {
-              "kind": "method",
-              "name": "_getEffectiveSafeInsets",
-              "parameters": [
-                {
-                  "name": "preset"
-                }
-              ]
-            },
-            {
-              "kind": "method",
-              "name": "_onPageModeChange",
-              "parameters": [
-                {
-                  "name": "isDark"
-                }
-              ]
-            },
-            {
-              "kind": "method",
-              "name": "_syncIframeColorScheme"
-            },
-            {
-              "kind": "method",
-              "name": "_injectSafeAreas",
-              "parameters": [
-                {
-                  "name": "iframe"
-                }
-              ]
-            },
-            {
               "kind": "field",
               "name": "hasShadow",
               "readonly": true
@@ -111,28 +67,6 @@
             {
               "kind": "method",
               "name": "updateContentView"
-            },
-            {
-              "kind": "method",
-              "name": "_updateBrowserSourceView",
-              "parameters": [
-                {
-                  "name": "viewSourceBtn"
-                }
-              ]
-            },
-            {
-              "kind": "method",
-              "name": "_updateDeviceSourceView",
-              "parameters": [
-                {
-                  "name": "viewSourceBtn"
-                }
-              ]
-            },
-            {
-              "kind": "method",
-              "name": "_sourceViewHTML"
             },
             {
               "kind": "method",
@@ -194,61 +128,7 @@
             },
             {
               "kind": "method",
-              "name": "_darkPalette"
-            },
-            {
-              "kind": "method",
-              "name": "_lightPalette"
-            },
-            {
-              "kind": "method",
-              "name": "_sharedCSS"
-            },
-            {
-              "kind": "method",
-              "name": "_browserCSS"
-            },
-            {
-              "kind": "method",
-              "name": "_browserChrome"
-            },
-            {
-              "kind": "method",
-              "name": "_contentHTML"
-            },
-            {
-              "kind": "method",
-              "name": "_deviceCSS",
-              "parameters": [
-                {
-                  "name": "preset"
-                }
-              ]
-            },
-            {
-              "kind": "method",
-              "name": "_deviceChrome",
-              "parameters": [
-                {
-                  "name": "preset"
-                }
-              ]
-            },
-            {
-              "kind": "method",
-              "name": "_deviceToolbar"
-            },
-            {
-              "kind": "method",
-              "name": "_setupDeviceScaling"
-            },
-            {
-              "kind": "method",
-              "name": "_updateDeviceScale"
-            },
-            {
-              "kind": "method",
-              "name": "_teardownDeviceScaling"
+              "name": "render"
             },
             {
               "kind": "method",
@@ -306,38 +186,6 @@
                 "text": "boolean"
               },
               "default": "false"
-            },
-            {
-              "kind": "field",
-              "name": "_resizeObserver",
-              "type": {
-                "text": "null"
-              },
-              "default": "null"
-            },
-            {
-              "kind": "field",
-              "name": "_currentScale",
-              "type": {
-                "text": "number"
-              },
-              "default": "1"
-            },
-            {
-              "kind": "field",
-              "name": "_outsideClickTimer",
-              "type": {
-                "text": "null"
-              },
-              "default": "null"
-            },
-            {
-              "kind": "field",
-              "name": "_copyFeedbackTimer",
-              "type": {
-                "text": "null"
-              },
-              "default": "null"
             }
           ],
           "attributes": [

@@ -249,7 +249,11 @@ test.describe('browser-window', () => {
       // Wait for iframe to load
       const iframe = el.locator('iframe')
       await iframe.waitFor({ state: 'attached' })
-      await page.waitForTimeout(500) // wait for iframe load event
+      await page.waitForFunction(() => {
+        const el = document.querySelector('#with-src')
+        const iframe = el?.shadowRoot?.querySelector('iframe')
+        return iframe?.contentDocument?.readyState === 'complete'
+      }, { timeout: 5000 })
 
       // Trigger dark mode via body class
       await page.evaluate(() => document.body.classList.add('dark'))
@@ -272,7 +276,11 @@ test.describe('browser-window', () => {
       // Wait for iframe to load
       const iframe = el.locator('iframe')
       await iframe.waitFor({ state: 'attached' })
-      await page.waitForTimeout(500)
+      await page.waitForFunction(() => {
+        const el = document.querySelector('#with-src')
+        const iframe = el?.shadowRoot?.querySelector('iframe')
+        return iframe?.contentDocument?.readyState === 'complete'
+      }, { timeout: 5000 })
 
       // Go dark first
       await page.evaluate(() => document.body.classList.add('dark'))
@@ -426,8 +434,12 @@ test.describe('browser-window', () => {
         await el.evaluate((node) => {
           node.style.width = '200px'
         })
-        // Wait for ResizeObserver to fire
-        await page.waitForTimeout(100)
+        // Wait for ResizeObserver to update the scale
+        await page.waitForFunction(() => {
+          const el = document.querySelector('#device-iphone')
+          const frame = el?.shadowRoot?.querySelector('.device-frame')
+          return frame?.style.transform && frame.style.transform !== 'scale(1)'
+        }, { timeout: 5000 })
 
         const newTransform = await frame.evaluate((node) => node.style.transform)
         expect(newTransform).toMatch(/scale\(/)
@@ -651,7 +663,11 @@ test.describe('browser-window', () => {
         const el = page.locator('#device-iphone')
         const iframe = el.locator('iframe')
         await iframe.waitFor({ state: 'attached' })
-        await page.waitForTimeout(500) // wait for iframe load
+        await page.waitForFunction(() => {
+          const el = document.querySelector('#device-iphone')
+          const iframe = el?.shadowRoot?.querySelector('iframe')
+          return iframe?.contentDocument?.querySelector('style[data-browser-window-safe-areas]') !== null
+        }, { timeout: 5000 })
 
         const vars = await el.evaluate((node) => {
           const iframe = node.shadowRoot.querySelector('iframe')
@@ -791,8 +807,12 @@ test.describe('browser-window', () => {
 
       // Add dark class to body — should not affect element with explicit mode
       await page.evaluate(() => document.body.classList.add('dark'))
-      // Give observer time to fire
-      await page.waitForTimeout(50)
+      // Wait for MutationObserver to process
+      await page.waitForFunction(() => {
+        // Wait for the no-mode element to react (proves observer ran)
+        const noMode = document.querySelector('#no-mode')
+        return noMode?.getAttribute('data-page-mode') === 'dark'
+      }, { timeout: 5000 })
 
       const pageMode = await el.evaluate((node) => node.getAttribute('data-page-mode'))
       expect(pageMode).toBeNull()

@@ -45,7 +45,8 @@ export default [
         CSSStyleSheet: 'readonly',
         ShadowRoot: 'readonly',
         getComputedStyle: 'readonly',
-        matchMedia: 'readonly'
+        matchMedia: 'readonly',
+        AbortController: 'readonly'
       }
     },
     rules: {

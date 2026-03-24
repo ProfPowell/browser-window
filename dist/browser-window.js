@@ -153,13 +153,13 @@ const g = {
 let k = !1;
 class E extends HTMLElement {
   constructor() {
-    super(), this.attachShadow({ mode: "open" }), this.isMinimized = !1, this.isMaximized = !1, this.overlay = null, this.showSource = !1, this.sourceCode = "", this.showShareMenu = !1, this.handleKeydown = this.handleKeydown.bind(this), this.handleOutsideClick = this.handleOutsideClick.bind(this), this._resizeObserver = null, this._currentScale = 1, this._outsideClickTimer = null, this._copyFeedbackTimer = null;
+    super(), this.attachShadow({ mode: "open" }), this.isMinimized = !1, this.isMaximized = !1, this.overlay = null, this.showSource = !1, this.sourceCode = "", this.showShareMenu = !1, this.handleKeydown = this.handleKeydown.bind(this), this.handleOutsideClick = this.handleOutsideClick.bind(this), this._resizeObserver = null, this._currentScale = 1, this._outsideClickTimer = null, this._copyFeedbackTimer = null, this._fetchController = null;
   }
   async connectedCallback() {
     this.render(), this.attachEventListeners(), this.src && await this.fetchSourceCode(), C(this), this._getDevicePreset() && this._setupDeviceScaling();
   }
   disconnectedCallback() {
-    M(this), this.removeOverlay(), this._teardownDeviceScaling(), clearTimeout(this._outsideClickTimer), clearTimeout(this._copyFeedbackTimer), document.removeEventListener("keydown", this.handleKeydown), document.removeEventListener("click", this.handleOutsideClick);
+    M(this), this.removeOverlay(), this._teardownDeviceScaling(), clearTimeout(this._outsideClickTimer), clearTimeout(this._copyFeedbackTimer), this._fetchController?.abort(), document.removeEventListener("keydown", this.handleKeydown), document.removeEventListener("click", this.handleOutsideClick);
   }
   static get observedAttributes() {
     return [
@@ -311,16 +311,20 @@ class E extends HTMLElement {
     if (!e || !this.src) return;
     e.innerHTML = `<iframe src="${this.escapeHtml(this.src)}" loading="lazy"></iframe>`;
     const t = e.querySelector("iframe");
-    t?.addEventListener("error", () => this.handleIframeError()), t?.addEventListener("load", () => this._syncIframeColorScheme());
+    t?.addEventListener("error", () => this.handleIframeError()), t?.addEventListener("load", () => {
+      this._syncIframeColorScheme(), this._getDevicePreset() && this._injectSafeAreas(t);
+    });
   }
   async fetchSourceCode() {
-    if (this.src)
+    if (this.src) {
+      this._fetchController?.abort(), this._fetchController = new AbortController();
       try {
-        const e = await fetch(this.src);
+        const e = await fetch(this.src, { signal: this._fetchController.signal });
         e.ok && (this.sourceCode = await e.text());
       } catch (e) {
-        console.error("Failed to fetch source code:", e), this.sourceCode = "// Failed to load source code";
+        e.name !== "AbortError" && (console.error("Failed to fetch source code:", e), this.sourceCode = "// Failed to load source code");
       }
+    }
   }
   toggleViewSource() {
     this.showSource = !this.showSource, this.updateContentView();
@@ -1072,7 +1076,7 @@ class E extends HTMLElement {
     return `
       <div class="browser-header" part="header" role="toolbar" aria-label="Window controls">
         <div class="controls">
-          <button class="control-button close" aria-label="Minimize window" tabindex="0"></button>
+          <button class="control-button close" aria-label="Close window" tabindex="0"></button>
           <button class="control-button minimize" aria-label="Minimize window" tabindex="0"></button>
           <button class="control-button maximize" aria-label="${this.isMaximized ? "Restore window" : "Maximize window"}" aria-expanded="${this.isMaximized}" tabindex="0"></button>
         </div>
@@ -1518,7 +1522,7 @@ class E extends HTMLElement {
           gap: 2px;
           padding: 3px;
           margin-top: 0.5rem;
-          border-radius: var(--browser-window-border-radius, 20px);
+          border-radius: var(--browser-window-border-radius);
           background: var(--browser-window-header-bg, var(--_bw-header-bg));
           border: 1px solid var(--browser-window-border-color, var(--_bw-border-color));
         }

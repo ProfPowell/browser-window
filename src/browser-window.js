@@ -281,6 +281,7 @@ export class BrowserWindow extends HTMLElement {
     this._currentScale = 1;
     this._outsideClickTimer = null;
     this._copyFeedbackTimer = null;
+    this._fetchController = null;
   }
 
   async connectedCallback() {
@@ -305,6 +306,7 @@ export class BrowserWindow extends HTMLElement {
     this._teardownDeviceScaling();
     clearTimeout(this._outsideClickTimer);
     clearTimeout(this._copyFeedbackTimer);
+    this._fetchController?.abort();
     document.removeEventListener('keydown', this.handleKeydown);
     document.removeEventListener('click', this.handleOutsideClick);
   }
@@ -593,20 +595,30 @@ export class BrowserWindow extends HTMLElement {
     // Re-attach error handler and sync color scheme
     const iframe = content.querySelector('iframe');
     iframe?.addEventListener('error', () => this.handleIframeError());
-    iframe?.addEventListener('load', () => this._syncIframeColorScheme());
+    iframe?.addEventListener('load', () => {
+      this._syncIframeColorScheme();
+      if (this._getDevicePreset()) {
+        this._injectSafeAreas(iframe);
+      }
+    });
   }
 
   async fetchSourceCode() {
     if (!this.src) return;
 
+    this._fetchController?.abort();
+    this._fetchController = new AbortController();
+
     try {
-      const response = await fetch(this.src);
+      const response = await fetch(this.src, { signal: this._fetchController.signal });
       if (response.ok) {
         this.sourceCode = await response.text();
       }
-    } catch (error) {
-      console.error('Failed to fetch source code:', error);
-      this.sourceCode = '// Failed to load source code';
+    } catch (_e) {
+      if (_e.name !== 'AbortError') {
+        console.error('Failed to fetch source code:', _e);
+        this.sourceCode = '// Failed to load source code';
+      }
     }
   }
 
@@ -1570,7 +1582,7 @@ export class BrowserWindow extends HTMLElement {
     return `
       <div class="browser-header" part="header" role="toolbar" aria-label="Window controls">
         <div class="controls">
-          <button class="control-button close" aria-label="Minimize window" tabindex="0"></button>
+          <button class="control-button close" aria-label="Close window" tabindex="0"></button>
           <button class="control-button minimize" aria-label="Minimize window" tabindex="0"></button>
           <button class="control-button maximize" aria-label="${this.isMaximized ? 'Restore window' : 'Maximize window'}" aria-expanded="${this.isMaximized}" tabindex="0"></button>
         </div>
@@ -2035,7 +2047,7 @@ export class BrowserWindow extends HTMLElement {
           gap: 2px;
           padding: 3px;
           margin-top: 0.5rem;
-          border-radius: var(--browser-window-border-radius, 20px);
+          border-radius: var(--browser-window-border-radius);
           background: var(--browser-window-header-bg, var(--_bw-header-bg));
           border: 1px solid var(--browser-window-border-color, var(--_bw-border-color));
         }

@@ -8,22 +8,26 @@ export class BrowserWindow extends HTMLElement {
   /** URL to display in the address bar */
   url: string
 
-  /** Title shown in the URL bar (defaults to hostname from url) */
+  /** Title shown in the URL bar (defaults to hostname from url attribute) */
   browserTitle: string
 
   /** Path to HTML file to load in iframe */
   src: string
 
-  /** Color scheme - 'light', 'dark', or resolved from system/page signals */
-  mode: string
+  /** Color scheme. Omit for auto-detection from page/system preference. */
+  mode: 'light' | 'dark' | string
 
-  /** Named device preset (e.g., 'iphone-16', 'pixel-9', 'ipad-air') */
+  /**
+   * Named device preset for phone/tablet bezel mode.
+   * Available presets: 'iphone-16', 'iphone-16-pro-max', 'iphone-se',
+   * 'pixel-9', 'pixel-9-pro-xl', 'galaxy-s24', 'ipad-air', 'ipad-pro-13', 'ipad-mini'
+   */
   device: string
 
-  /** Device bezel color preset ('midnight', 'silver', 'gold', 'blue', 'white') */
-  deviceColor: string
+  /** Device bezel color preset */
+  deviceColor: 'midnight' | 'silver' | 'gold' | 'blue' | 'white'
 
-  /** Whether the window has a drop shadow */
+  /** Whether the window has a drop shadow (reflects `shadow` attribute) */
   readonly hasShadow: boolean
 
   /** Whether the window is currently minimized */

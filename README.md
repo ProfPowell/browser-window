@@ -162,7 +162,10 @@ browser-window {
   --browser-window-bg: #ffffff;
   --browser-window-header-bg: #f6f8fa;
   --browser-window-border-color: #d1d5da;
-  --browser-window-border-radius: 8px;
+  --browser-window-border-radius: 8px;  /* or var(--radius-m) for Vanilla Breeze */
+  --browser-window-inner-radius: 6px;  /* URL bar, buttons */
+  --browser-window-border-width: 1px;
+  --browser-window-border-style: solid;
   --browser-window-text-color: #24292e;
   --browser-window-text-muted: #586069;
   --browser-window-url-bg: #ffffff;
