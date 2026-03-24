@@ -114,6 +114,28 @@
             },
             {
               "kind": "method",
+              "name": "_updateBrowserSourceView",
+              "parameters": [
+                {
+                  "name": "viewSourceBtn"
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_updateDeviceSourceView",
+              "parameters": [
+                {
+                  "name": "viewSourceBtn"
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "_sourceViewHTML"
+            },
+            {
+              "kind": "method",
               "name": "copySourceCode"
             },
             {
@@ -211,6 +233,10 @@
                   "name": "preset"
                 }
               ]
+            },
+            {
+              "kind": "method",
+              "name": "_deviceToolbar"
             },
             {
               "kind": "method",

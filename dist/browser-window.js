@@ -1178,7 +1178,7 @@ class E extends HTMLElement {
           background: var(--browser-window-bezel-color);
           flex-shrink: 0;
           transform-origin: top center;
-          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+          box-shadow: none;
         }
 
         .device-frame.home-button {
@@ -1453,12 +1453,14 @@ class E extends HTMLElement {
 
         :host([device][mode="dark"]) .device-frame,
         :host([device][data-page-mode="dark"]:not([mode])) .device-frame {
-          box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1), 0 8px 24px rgba(0, 0, 0, 0.5);
+          outline: 1px solid rgba(255, 255, 255, 0.12);
+          outline-offset: -1px;
         }
 
         @media (prefers-color-scheme: dark) {
           :host([device]:not([mode])) .device-frame {
-            box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1), 0 8px 24px rgba(0, 0, 0, 0.5);
+            outline: 1px solid rgba(255, 255, 255, 0.12);
+            outline-offset: -1px;
           }
         }
 
