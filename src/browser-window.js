@@ -648,29 +648,28 @@ export class BrowserWindow extends HTMLElement {
   }
 
   _updateDeviceSourceView(viewSourceBtn) {
-    const wrapper = this.shadowRoot.querySelector('.device-wrapper');
-    let sourcePanel = this.shadowRoot.querySelector('.device-source-panel');
+    // Render source inside the device frame, replacing the iframe
+    const content = this.shadowRoot.querySelector('.browser-content');
+    if (!content) return;
 
     if (this.showSource) {
-      if (wrapper) wrapper.style.display = 'none';
-      if (!sourcePanel) {
-        sourcePanel = document.createElement('div');
-        sourcePanel.className = 'device-source-panel';
-        const toolbar = this.shadowRoot.querySelector('.device-toolbar');
-        if (toolbar) {
-          this.shadowRoot.insertBefore(sourcePanel, toolbar);
-        } else {
-          this.shadowRoot.appendChild(sourcePanel);
-        }
-      }
-      sourcePanel.innerHTML = this._sourceViewHTML();
-      sourcePanel.style.display = '';
+      content.innerHTML = this._sourceViewHTML();
       viewSourceBtn?.classList.add('active');
-      sourcePanel.querySelector('.copy-source-button')
+      content.querySelector('.copy-source-button')
         ?.addEventListener('click', () => this.copySourceCode());
     } else {
-      if (wrapper) wrapper.style.display = '';
-      if (sourcePanel) sourcePanel.style.display = 'none';
+      if (this.src) {
+        content.innerHTML = `<iframe src="${this.escapeHtml(this.src)}" loading="lazy"></iframe>`;
+        const newIframe = content.querySelector('iframe');
+        newIframe?.addEventListener('load', () => {
+          this._syncIframeColorScheme();
+          if (this._getDevicePreset()) {
+            this._injectSafeAreas(newIframe);
+          }
+        });
+      } else {
+        content.innerHTML = '<slot></slot>';
+      }
       viewSourceBtn?.classList.remove('active');
     }
   }
@@ -1694,7 +1693,7 @@ export class BrowserWindow extends HTMLElement {
           background: #000;
           flex-shrink: 0;
           transform-origin: top center;
-          box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 8px 24px rgba(0, 0, 0, 0.4);
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
         }
 
         .device-frame.home-button {
@@ -1967,6 +1966,17 @@ export class BrowserWindow extends HTMLElement {
           background: #000000;
         }
 
+        :host([device][mode="dark"]) .device-frame,
+        :host([device][data-page-mode="dark"]:not([mode])) .device-frame {
+          box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1), 0 8px 24px rgba(0, 0, 0, 0.5);
+        }
+
+        @media (prefers-color-scheme: dark) {
+          :host([device]:not([mode])) .device-frame {
+            box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1), 0 8px 24px rgba(0, 0, 0, 0.5);
+          }
+        }
+
         /* Safe area overlays */
         .safe-area-overlays {
           position: absolute;
@@ -2009,20 +2019,6 @@ export class BrowserWindow extends HTMLElement {
           left: 0;
           bottom: 0;
           width: var(--safe-left);
-        }
-
-        .device-source-panel {
-          flex: 1;
-          min-height: 200px;
-          max-height: 60vh;
-          overflow: auto;
-          border-radius: 8px;
-          border: 1px solid var(--browser-window-border-color, var(--_bw-border-color));
-          background: var(--browser-window-content-bg, var(--_bw-content-bg));
-        }
-
-        .device-source-panel .source-view {
-          min-height: 100%;
         }
 
         .device-toolbar {

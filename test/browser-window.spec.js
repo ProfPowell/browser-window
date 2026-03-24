@@ -552,18 +552,18 @@ test.describe('browser-window', () => {
       const viewSource = el.locator('.device-toolbar .view-source-button')
       await viewSource.click()
 
-      // Device wrapper should be hidden
-      const wrapper = el.locator('.device-wrapper')
-      await expect(wrapper).toBeHidden()
+      // Source view should be visible inside the device frame
+      const sourceView = el.locator('.source-view')
+      await expect(sourceView).toBeVisible()
 
-      // Source panel should be visible
-      const sourcePanel = el.locator('.device-source-panel')
-      await expect(sourcePanel).toBeVisible()
+      // Iframe should be gone (replaced by source)
+      const iframe = el.locator('iframe')
+      await expect(iframe).toHaveCount(0)
 
-      // Toggle back
+      // Toggle back — iframe should return
       await viewSource.click()
-      await expect(wrapper).toBeVisible()
-      await expect(sourcePanel).toBeHidden()
+      await expect(el.locator('iframe')).toBeVisible()
+      await expect(el.locator('.source-view')).toHaveCount(0)
     })
   })
 

@@ -1,52 +1,52 @@
 if (typeof document < "u") {
-  const i = document.createElement("style");
-  i.textContent = "browser-window:not(:defined){display:block;opacity:0}", document.head.appendChild(i);
+  const r = document.createElement("style");
+  r.textContent = "browser-window:not(:defined){display:block;opacity:0}", document.head.appendChild(r);
 }
 const h = /* @__PURE__ */ new Set();
 let l = null, w = null;
 function v() {
-  const i = document.documentElement, e = document.body;
-  if (!i || !e) return null;
-  if (i.classList.contains("dark") || e.classList.contains("dark") || i.getAttribute("data-theme") === "dark" || e.getAttribute("data-theme") === "dark")
+  const r = document.documentElement, e = document.body;
+  if (!r || !e) return null;
+  if (r.classList.contains("dark") || e.classList.contains("dark") || r.getAttribute("data-theme") === "dark" || e.getAttribute("data-theme") === "dark")
     return !0;
-  if (i.getAttribute("data-theme") === "light" || e.getAttribute("data-theme") === "light")
+  if (r.getAttribute("data-theme") === "light" || e.getAttribute("data-theme") === "light")
     return !1;
-  if (i.getAttribute("data-bs-theme") === "dark" || e.getAttribute("data-bs-theme") === "dark")
+  if (r.getAttribute("data-bs-theme") === "dark" || e.getAttribute("data-bs-theme") === "dark")
     return !0;
-  if (i.getAttribute("data-bs-theme") === "light" || e.getAttribute("data-bs-theme") === "light")
+  if (r.getAttribute("data-bs-theme") === "light" || e.getAttribute("data-bs-theme") === "light")
     return !1;
-  if (i.getAttribute("data-mode") === "dark") return !0;
-  if (i.getAttribute("data-mode") === "light") return !1;
-  const t = getComputedStyle(i).colorScheme;
+  if (r.getAttribute("data-mode") === "dark") return !0;
+  if (r.getAttribute("data-mode") === "light") return !1;
+  const t = getComputedStyle(r).colorScheme;
   return t === "dark" ? !0 : t === "light" ? !1 : null;
 }
 function _() {
-  const i = v();
-  if (i !== w) {
-    w = i;
+  const r = v();
+  if (r !== w) {
+    w = r;
     for (const e of h)
-      e._onPageModeChange(i);
+      e._onPageModeChange(r);
   }
 }
 function S() {
   if (l) return;
   l = new MutationObserver(_);
-  const i = {
+  const r = {
     attributes: !0,
     attributeFilter: ["class", "data-theme", "data-bs-theme", "data-mode", "style"]
   };
-  l.observe(document.documentElement, i), document.body && l.observe(document.body, i);
+  l.observe(document.documentElement, r), document.body && l.observe(document.body, r);
 }
 function z() {
   l && (l.disconnect(), l = null);
 }
-function C(i) {
-  h.add(i), h.size === 1 && S();
+function C(r) {
+  h.add(r), h.size === 1 && S();
   const e = v();
-  w = e, i._onPageModeChange(e);
+  w = e, r._onPageModeChange(e);
 }
-function M(i) {
-  h.delete(i), h.size === 0 && (z(), w = null);
+function M(r) {
+  h.delete(r), h.size === 0 && (z(), w = null);
 }
 const g = {
   "iphone-16": {
@@ -229,8 +229,8 @@ class E extends HTMLElement {
     };
   }
   _getEffectiveSafeInsets(e) {
-    const [t, o, r, n] = e.safeInsets;
-    return this.getAttribute("orientation") === "landscape" ? [n, t, o, r] : [t, o, r, n];
+    const [t, o, i, n] = e.safeInsets;
+    return this.getAttribute("orientation") === "landscape" ? [n, t, o, i] : [t, o, i, n];
   }
   _onPageModeChange(e) {
     if (this.hasAttribute("mode")) {
@@ -255,8 +255,8 @@ class E extends HTMLElement {
       try {
         const o = e.contentDocument;
         if (!o) return;
-        const r = o.querySelector("style[data-browser-window-safe-areas]");
-        r && r.remove();
+        const i = o.querySelector("style[data-browser-window-safe-areas]");
+        i && i.remove();
         const [n, c, s, d] = this._getEffectiveSafeInsets(t), a = o.createElement("style");
         a.setAttribute("data-browser-window-safe-areas", ""), a.textContent = `
         :root {
@@ -281,8 +281,8 @@ class E extends HTMLElement {
     }
   }
   attachEventListeners() {
-    const e = this.shadowRoot.querySelector(".control-button.close"), t = this.shadowRoot.querySelector(".control-button.minimize"), o = this.shadowRoot.querySelector(".control-button.maximize"), r = this.shadowRoot.querySelector(".view-source-button"), n = this.shadowRoot.querySelector(".copy-source-button"), c = this.shadowRoot.querySelector(".share-button"), s = this.shadowRoot.querySelector(".browser-header");
-    e?.addEventListener("click", () => this.handleClose()), t?.addEventListener("click", () => this.toggleMinimize()), o?.addEventListener("click", () => this.toggleMaximize()), r?.addEventListener("click", () => this.toggleViewSource()), n?.addEventListener("click", () => this.copySourceCode()), c?.addEventListener("click", (a) => {
+    const e = this.shadowRoot.querySelector(".control-button.close"), t = this.shadowRoot.querySelector(".control-button.minimize"), o = this.shadowRoot.querySelector(".control-button.maximize"), i = this.shadowRoot.querySelector(".view-source-button"), n = this.shadowRoot.querySelector(".copy-source-button"), c = this.shadowRoot.querySelector(".share-button"), s = this.shadowRoot.querySelector(".browser-header");
+    e?.addEventListener("click", () => this.handleClose()), t?.addEventListener("click", () => this.toggleMinimize()), o?.addEventListener("click", () => this.toggleMaximize()), i?.addEventListener("click", () => this.toggleViewSource()), n?.addEventListener("click", () => this.copySourceCode()), c?.addEventListener("click", (a) => {
       a.stopPropagation(), this.toggleShareMenu();
     }), s?.addEventListener("dblclick", (a) => {
       a.target.closest("button, a, .share-menu") || this.toggleMaximize();
@@ -334,17 +334,21 @@ class E extends HTMLElement {
     t && (this.showSource ? (t.innerHTML = this._sourceViewHTML(), e?.classList.add("active"), t.querySelector(".copy-source-button")?.addEventListener("click", () => this.copySourceCode())) : (this.src ? (t.innerHTML = `<iframe src="${this.escapeHtml(this.src)}" loading="lazy"></iframe>`, t.querySelector("iframe")?.addEventListener("load", () => this._syncIframeColorScheme())) : t.innerHTML = "<slot></slot>", e?.classList.remove("active")));
   }
   _updateDeviceSourceView(e) {
-    const t = this.shadowRoot.querySelector(".device-wrapper");
-    let o = this.shadowRoot.querySelector(".device-source-panel");
-    if (this.showSource) {
-      if (t && (t.style.display = "none"), !o) {
-        o = document.createElement("div"), o.className = "device-source-panel";
-        const r = this.shadowRoot.querySelector(".device-toolbar");
-        r ? this.shadowRoot.insertBefore(o, r) : this.shadowRoot.appendChild(o);
+    const t = this.shadowRoot.querySelector(".browser-content");
+    if (t)
+      if (this.showSource)
+        t.innerHTML = this._sourceViewHTML(), e?.classList.add("active"), t.querySelector(".copy-source-button")?.addEventListener("click", () => this.copySourceCode());
+      else {
+        if (this.src) {
+          t.innerHTML = `<iframe src="${this.escapeHtml(this.src)}" loading="lazy"></iframe>`;
+          const o = t.querySelector("iframe");
+          o?.addEventListener("load", () => {
+            this._syncIframeColorScheme(), this._getDevicePreset() && this._injectSafeAreas(o);
+          });
+        } else
+          t.innerHTML = "<slot></slot>";
+        e?.classList.remove("active");
       }
-      o.innerHTML = this._sourceViewHTML(), o.style.display = "", e?.classList.add("active"), o.querySelector(".copy-source-button")?.addEventListener("click", () => this.copySourceCode());
-    } else
-      t && (t.style.display = ""), o && (o.style.display = "none"), e?.classList.remove("active");
   }
   _sourceViewHTML() {
     return `
@@ -414,13 +418,13 @@ class E extends HTMLElement {
     if (!this.sourceCode) return null;
     const t = new DOMParser().parseFromString(this.sourceCode, "text/html"), o = Array.from(t.querySelectorAll("style")).map((s) => s.textContent).join(`
 
-`), r = Array.from(t.querySelectorAll("script")).filter((s) => !s.src && s.type !== "module").map((s) => s.textContent).join(`
+`), i = Array.from(t.querySelectorAll("script")).filter((s) => !s.src && s.type !== "module").map((s) => s.textContent).join(`
 
 `), n = t.body.cloneNode(!0);
     return n.querySelectorAll("script, style").forEach((s) => s.remove()), {
       html: n.innerHTML.trim(),
       css: o.trim(),
-      js: r.trim()
+      js: i.trim()
     };
   }
   openInCodePen() {
@@ -436,8 +440,8 @@ class E extends HTMLElement {
       // Show HTML and CSS editors, hide JS if empty
     }, o = document.createElement("form");
     o.action = "https://codepen.io/pen/define", o.method = "POST", o.target = "_blank";
-    const r = document.createElement("input");
-    r.type = "hidden", r.name = "data", r.value = JSON.stringify(t), o.appendChild(r), document.body.appendChild(o), o.submit(), document.body.removeChild(o), this.toggleShareMenu();
+    const i = document.createElement("input");
+    i.type = "hidden", i.name = "data", i.value = JSON.stringify(t), o.appendChild(i), document.body.appendChild(o), o.submit(), document.body.removeChild(o), this.toggleShareMenu();
   }
   handleClose() {
     this.isMaximized && this.toggleMaximize(), this.isMinimized || this.toggleMinimize();
@@ -1127,11 +1131,11 @@ class E extends HTMLElement {
   }
   // --- Device mode ---
   _deviceCSS(e) {
-    const t = x[this.deviceColor] || x.midnight, o = this.getAttribute("orientation") === "landscape", r = this._getEffectiveDimensions(e), [n, c, s, d] = this._getEffectiveSafeInsets(e), a = L[e.notch] || 24, m = e.homeIndicator && !e.homeButton ? A : 0, u = e.homeButton ? y : 0, b = e.notch !== "none";
+    const t = x[this.deviceColor] || x.midnight, o = this.getAttribute("orientation") === "landscape", i = this._getEffectiveDimensions(e), [n, c, s, d] = this._getEffectiveSafeInsets(e), a = L[e.notch] || 24, m = e.homeIndicator && !e.homeButton ? A : 0, u = e.homeButton ? y : 0, b = e.notch !== "none";
     return `
         :host([device]) {
-          --device-width: ${r.width}px;
-          --device-height: ${r.height}px;
+          --device-width: ${i.width}px;
+          --device-height: ${i.height}px;
           --device-bezel: ${e.bezel}px;
           --device-corner-radius: ${e.cornerRadius}px;
           --browser-window-bezel-color: ${t};
@@ -1172,7 +1176,7 @@ class E extends HTMLElement {
           background: #000;
           flex-shrink: 0;
           transform-origin: top center;
-          box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 8px 24px rgba(0, 0, 0, 0.4);
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
         }
 
         .device-frame.home-button {
@@ -1445,6 +1449,17 @@ class E extends HTMLElement {
           background: #000000;
         }
 
+        :host([device][mode="dark"]) .device-frame,
+        :host([device][data-page-mode="dark"]:not([mode])) .device-frame {
+          box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1), 0 8px 24px rgba(0, 0, 0, 0.5);
+        }
+
+        @media (prefers-color-scheme: dark) {
+          :host([device]:not([mode])) .device-frame {
+            box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1), 0 8px 24px rgba(0, 0, 0, 0.5);
+          }
+        }
+
         /* Safe area overlays */
         .safe-area-overlays {
           position: absolute;
@@ -1487,20 +1502,6 @@ class E extends HTMLElement {
           left: 0;
           bottom: 0;
           width: var(--safe-left);
-        }
-
-        .device-source-panel {
-          flex: 1;
-          min-height: 200px;
-          max-height: 60vh;
-          overflow: auto;
-          border-radius: 8px;
-          border: 1px solid var(--browser-window-border-color, var(--_bw-border-color));
-          background: var(--browser-window-content-bg, var(--_bw-content-bg));
-        }
-
-        .device-source-panel .source-view {
-          min-height: 100%;
         }
 
         .device-toolbar {
@@ -1563,8 +1564,8 @@ class E extends HTMLElement {
     `;
   }
   _deviceChrome(e) {
-    const t = this.getAttribute("orientation") === "landscape", o = e.notch !== "none", r = o ? e.notch : "", n = e.homeButton ? "home-button" : "", s = ["silver", "gold", "white"].includes(this.deviceColor) ? "light-bezel" : "", a = ["device-frame", r, n, s, t ? "landscape" : ""].filter(Boolean).join(" "), u = `
-      <div class="status-bar ${t && o ? "" : r}">
+    const t = this.getAttribute("orientation") === "landscape", o = e.notch !== "none", i = o ? e.notch : "", n = e.homeButton ? "home-button" : "", s = ["silver", "gold", "white"].includes(this.deviceColor) ? "light-bezel" : "", a = ["device-frame", i, n, s, t ? "landscape" : ""].filter(Boolean).join(" "), u = `
+      <div class="status-bar ${t && o ? "" : i}">
         <span class="status-time">9:41</span>
         <div class="status-icons">
           <span class="signal-bars" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
@@ -1581,7 +1582,7 @@ class E extends HTMLElement {
     return t && o ? `
         <div class="device-wrapper">
           <div class="${a}">
-            <div class="notch-sidebar ${r}"></div>
+            <div class="notch-sidebar ${i}"></div>
             <div class="device-main">
               ${u}
               ${this._contentHTML()}
@@ -1658,9 +1659,9 @@ class E extends HTMLElement {
     if (!e) return;
     const t = this.shadowRoot.querySelector(".device-wrapper"), o = this.shadowRoot.querySelector(".device-frame");
     if (!t || !o) return;
-    const r = this.clientWidth;
-    if (r === 0) return;
-    const n = this._getEffectiveDimensions(e), c = n.width + e.bezel * 2, s = Math.min(1, r / c);
+    const i = this.clientWidth;
+    if (i === 0) return;
+    const n = this._getEffectiveDimensions(e), c = n.width + e.bezel * 2, s = Math.min(1, i / c);
     this._currentScale = s, o.style.transform = `scale(${s})`;
     const d = e.homeButton ? y : 0, a = n.height + e.bezel * 2 + d;
     t.style.height = `${a * s}px`;
