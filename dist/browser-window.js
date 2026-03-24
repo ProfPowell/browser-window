@@ -1169,11 +1169,13 @@ class E extends HTMLElement {
           flex-direction: column;
           width: var(--device-width);
           height: var(--device-height);
-          border: var(--device-bezel) solid var(--browser-window-bezel-color);
+          padding: var(--device-bezel);
+          border: none;
+          box-sizing: content-box;
           border-radius: var(--device-corner-radius);
           overflow: hidden;
           position: relative;
-          background: #000;
+          background: var(--browser-window-bezel-color);
           flex-shrink: 0;
           transform-origin: top center;
           box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
