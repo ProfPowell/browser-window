@@ -149,9 +149,9 @@ const g = {
   "dynamic-island": 54,
   "punch-hole": 36,
   none: 24
-}, A = 28, y = 80;
+}, E = 28, y = 80;
 let _ = !1;
-class E extends HTMLElement {
+class A extends HTMLElement {
   constructor() {
     super(), this.attachShadow({ mode: "open" }), this.isMinimized = !1, this.isMaximized = !1, this.overlay = null, this.showSource = !1, this.sourceCode = "", this.showShareMenu = !1, this._handleKeydown = this._handleKeydown.bind(this), this._handleOutsideClick = this._handleOutsideClick.bind(this), this._resizeObserver = null, this._currentScale = 1, this._outsideClickTimer = null, this._copyFeedbackTimer = null, this._fetchController = null;
   }
@@ -339,7 +339,18 @@ class E extends HTMLElement {
   }
   _updateBrowserSourceView(e) {
     const t = this.shadowRoot.querySelector(".browser-content");
-    t && (this.showSource ? (t.innerHTML = this._sourceViewHTML(), e?.classList.add("active"), t.querySelector(".copy-source-button")?.addEventListener("click", () => this.copySourceCode())) : (this.src ? (t.innerHTML = `<iframe src="${this._escapeHtml(this.src)}" loading="lazy"></iframe>`, t.querySelector("iframe")?.addEventListener("load", () => this._syncIframeColorScheme())) : t.innerHTML = "<slot></slot>", e?.classList.remove("active")));
+    if (t)
+      if (this.showSource)
+        t.innerHTML = this._sourceViewHTML(), e?.classList.add("active"), t.querySelector(".copy-source-button")?.addEventListener("click", () => this.copySourceCode());
+      else {
+        if (this.src) {
+          t.innerHTML = `<iframe src="${this._escapeHtml(this.src)}" loading="lazy"></iframe>`;
+          const o = t.querySelector("iframe");
+          o?.addEventListener("error", () => this._handleIframeError()), o?.addEventListener("load", () => this._syncIframeColorScheme());
+        } else
+          t.innerHTML = "<slot></slot>";
+        e?.classList.remove("active");
+      }
   }
   _updateDeviceSourceView(e) {
     const t = this.shadowRoot.querySelector(".browser-content");
@@ -350,7 +361,7 @@ class E extends HTMLElement {
         if (this.src) {
           t.innerHTML = `<iframe src="${this._escapeHtml(this.src)}" loading="lazy"></iframe>`;
           const o = t.querySelector("iframe");
-          o?.addEventListener("load", () => {
+          o?.addEventListener("error", () => this._handleIframeError()), o?.addEventListener("load", () => {
             this._syncIframeColorScheme(), this._getDevicePreset() && this._injectSafeAreas(o);
           });
         } else
@@ -403,8 +414,9 @@ class E extends HTMLElement {
     }, 0)) : (e.style.display = "none", t.classList.remove("active"), clearTimeout(this._outsideClickTimer), document.removeEventListener("click", this._handleOutsideClick)));
   }
   _handleOutsideClick(e) {
-    const t = this.shadowRoot.querySelector(".share-menu");
-    t && !t.contains(e.target) && this.toggleShareMenu();
+    const t = this.shadowRoot?.querySelector(".share-menu");
+    if (!t) return;
+    e.composedPath().includes(t) || this.toggleShareMenu();
   }
   async shareViaWebAPI() {
     if (!navigator.share) {
@@ -1142,7 +1154,7 @@ class E extends HTMLElement {
   }
   // --- Device mode ---
   _deviceCSS(e) {
-    const t = x[this.deviceColor] || x.midnight, o = this.getAttribute("orientation") === "landscape", i = this._getEffectiveDimensions(e), [a, c, s, d] = this._getEffectiveSafeInsets(e), n = L[e.notch] || 24, m = e.homeIndicator && !e.homeButton ? A : 0, u = e.homeButton ? y : 0, b = e.notch !== "none";
+    const t = x[this.deviceColor] || x.midnight, o = this.getAttribute("orientation") === "landscape", i = this._getEffectiveDimensions(e), [a, c, s, d] = this._getEffectiveSafeInsets(e), n = L[e.notch] || 24, m = e.homeIndicator && !e.homeButton ? E : 0, u = e.homeButton ? y : 0, b = e.notch !== "none";
     return `
         :host([device]) {
           --device-width: ${i.width}px;
@@ -1689,7 +1701,7 @@ class E extends HTMLElement {
     return t.textContent = e, t.innerHTML;
   }
 }
-customElements.get("browser-window") || customElements.define("browser-window", E);
+customElements.get("browser-window") || customElements.define("browser-window", A);
 export {
-  E as BrowserWindow
+  A as BrowserWindow
 };

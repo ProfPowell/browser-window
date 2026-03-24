@@ -166,7 +166,17 @@
             "name": "HTMLElement"
           },
           "tagName": "browser-window",
-          "customElement": true
+          "customElement": true,
+          "cssParts": [
+            {
+              "name": "header",
+              "description": "The browser header/toolbar containing controls and URL bar"
+            },
+            {
+              "name": "content",
+              "description": "The content area containing the iframe or slotted content"
+            }
+          ]
         }
       ],
       "exports": [

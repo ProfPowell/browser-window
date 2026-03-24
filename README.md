@@ -102,9 +102,9 @@ The component is resizable by default. Drag the bottom-right corner to resize:
 | `iphone-se` | iPhone SE | 375 x 667 |
 | `pixel-9` | Pixel 9 | 412 x 923 |
 | `pixel-9-pro-xl` | Pixel 9 Pro XL | 448 x 998 |
-| `galaxy-s24` | Galaxy S24 | 412 x 915 |
+| `galaxy-s24` | Galaxy S24 | 360 x 780 |
 | `ipad-air` | iPad Air | 820 x 1180 |
-| `ipad-pro-13` | iPad Pro 13" | 1024 x 1366 |
+| `ipad-pro-13` | iPad Pro 13" | 1032 x 1376 |
 | `ipad-mini` | iPad mini | 744 x 1133 |
 
 ### Device Mode
@@ -126,7 +126,7 @@ Render content inside a realistic phone or tablet bezel:
 ## Features
 
 ### Source Code Viewing
-When `src` is set, a code icon appears in the URL bar. Click to toggle between the rendered content and syntax-highlighted source code.
+When `src` is set, a code icon appears in the URL bar. Click to toggle between the rendered content and the source code.
 
 ### Maximize Mode
 - **Double-click** the title bar to maximize/restore
@@ -184,6 +184,9 @@ browser-window {
   --browser-window-status-bar-color: rgba(255,255,255,0.9);
   --browser-window-home-indicator-color: rgba(255,255,255,0.3);
   --browser-window-safe-area-color: oklch(0.65 0.2 250 / 0.25);
+
+  /* Layout */
+  --browser-window-margin: 1rem 0;
 
   /* Z-index (for stacking context control) */
   --browser-window-z-index: 9999;

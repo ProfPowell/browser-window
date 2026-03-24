@@ -658,6 +658,7 @@ export class BrowserWindow extends HTMLElement {
       if (this.src) {
         content.innerHTML = `<iframe src="${this._escapeHtml(this.src)}" loading="lazy"></iframe>`;
         const newIframe = content.querySelector('iframe');
+        newIframe?.addEventListener('error', () => this._handleIframeError());
         newIframe?.addEventListener('load', () => this._syncIframeColorScheme());
       } else {
         content.innerHTML = '<slot></slot>';
@@ -680,6 +681,7 @@ export class BrowserWindow extends HTMLElement {
       if (this.src) {
         content.innerHTML = `<iframe src="${this._escapeHtml(this.src)}" loading="lazy"></iframe>`;
         const newIframe = content.querySelector('iframe');
+        newIframe?.addEventListener('error', () => this._handleIframeError());
         newIframe?.addEventListener('load', () => {
           this._syncIframeColorScheme();
           if (this._getDevicePreset()) {
@@ -763,8 +765,10 @@ export class BrowserWindow extends HTMLElement {
   }
 
   _handleOutsideClick(e) {
-    const menu = this.shadowRoot.querySelector('.share-menu');
-    if (menu && !menu.contains(e.target)) {
+    const menu = this.shadowRoot?.querySelector('.share-menu');
+    if (!menu) return;
+    const path = e.composedPath();
+    if (!path.includes(menu)) {
       this.toggleShareMenu();
     }
   }
