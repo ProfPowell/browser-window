@@ -1035,7 +1035,8 @@ export class BrowserWindow extends HTMLElement {
           --_bw-content-bg: var(--color-surface, #ffffff);
 
           /* Non-structural properties */
-          --browser-window-border-radius: 8px;
+          --browser-window-border-radius: var(--radius-m, 8px);
+          --browser-window-inner-radius: var(--radius-s, 6px);
           --browser-window-shadow: ${this.hasShadow ? '0 4px 12px rgba(0, 0, 0, 0.15)' : 'none'};
           --browser-window-close-color: #ff5f57;
           --browser-window-minimize-color: #febc2e;
@@ -1050,7 +1051,9 @@ export class BrowserWindow extends HTMLElement {
           margin: 1rem 0;
           border-radius: var(--browser-window-border-radius);
           overflow: hidden;
-          border: 1px solid var(--browser-window-border-color, var(--_bw-border-color));
+          border-width: var(--browser-window-border-width, 1px);
+          border-style: var(--browser-window-border-style, solid);
+          border-color: var(--browser-window-border-color, var(--_bw-border-color));
           background: var(--browser-window-bg, var(--_bw-bg));
           box-shadow: var(--browser-window-shadow);
           transition: all 250ms ease-out;
@@ -1186,7 +1189,7 @@ export class BrowserWindow extends HTMLElement {
           padding: 0.375rem 0.75rem;
           background: var(--browser-window-bg, var(--_bw-bg));
           border: 1px solid var(--browser-window-border-color, var(--_bw-border-color));
-          border-radius: 6px;
+          border-radius: var(--browser-window-inner-radius);
           color: var(--browser-window-text-color, var(--_bw-text-color));
           font-size: 0.875rem;
           font-weight: 500;
@@ -1253,7 +1256,7 @@ export class BrowserWindow extends HTMLElement {
           background: var(--browser-window-accent-color);
           color: white;
           border: none;
-          border-radius: 6px;
+          border-radius: var(--browser-window-inner-radius);
           font-size: 0.875rem;
           font-weight: 500;
           cursor: pointer;
@@ -1280,7 +1283,7 @@ export class BrowserWindow extends HTMLElement {
           right: 0;
           background: var(--browser-window-header-bg, var(--_bw-header-bg));
           border: 1px solid var(--browser-window-border-color, var(--_bw-border-color));
-          border-radius: 8px;
+          border-radius: var(--browser-window-border-radius);
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
           min-width: 180px;
           z-index: var(--browser-window-menu-z-index, 1000);
@@ -1428,7 +1431,7 @@ export class BrowserWindow extends HTMLElement {
           padding: 0.375rem 0.75rem;
           background: var(--browser-window-url-bg, var(--_bw-url-bg));
           border: 1px solid var(--browser-window-border-color, var(--_bw-border-color));
-          border-radius: 6px;
+          border-radius: var(--browser-window-inner-radius);
           font-size: 0.875rem;
           color: var(--browser-window-text-muted, var(--_bw-text-muted));
           cursor: default !important;
@@ -2032,7 +2035,7 @@ export class BrowserWindow extends HTMLElement {
           gap: 2px;
           padding: 3px;
           margin-top: 0.5rem;
-          border-radius: 20px;
+          border-radius: var(--browser-window-border-radius, 20px);
           background: var(--browser-window-header-bg, var(--_bw-header-bg));
           border: 1px solid var(--browser-window-border-color, var(--_bw-border-color));
         }
