@@ -166,11 +166,11 @@ test.describe('browser-window', () => {
       const minimizeBtn = el.locator('.control-button.minimize')
 
       await minimizeBtn.click()
-      const contentDisplay = await el.evaluate((node) => {
+      const contentHeight = await el.evaluate((node) => {
         const content = node.shadowRoot.querySelector('.browser-content')
-        return content?.style.display
+        return content?.style.height
       })
-      expect(contentDisplay).toBe('none')
+      expect(contentHeight).toBe('0px')
     })
   })
 
@@ -251,14 +251,14 @@ test.describe('browser-window', () => {
       const isMinimized = await el.evaluate((node) => node.isMinimized)
       expect(isMinimized).toBe(true)
 
-      const contentDisplay = await el.evaluate((node) => {
+      const contentHeight = await el.evaluate((node) => {
         const content = node.shadowRoot.querySelector('.browser-content')
-        return content?.style.display
+        return content?.style.height
       })
-      expect(contentDisplay).toBe('none')
+      expect(contentHeight).toBe('0px')
     })
 
-    test('clicking close while maximized restores then minimizes', async ({ page }) => {
+    test('clicking close while maximized restores without minimizing', async ({ page }) => {
       const el = page.locator('#default')
       const maximizeBtn = el.locator('.control-button.maximize')
       const closeBtn = el.locator('.control-button.close')
@@ -268,7 +268,7 @@ test.describe('browser-window', () => {
 
       await closeBtn.click()
       expect(await el.evaluate((node) => node.isMaximized)).toBe(false)
-      expect(await el.evaluate((node) => node.isMinimized)).toBe(true)
+      expect(await el.evaluate((node) => node.isMinimized)).toBe(false)
     })
   })
 

@@ -610,6 +610,25 @@ export class BrowserWindow extends HTMLElement {
     });
   }
 
+  _reloadIframeIfNeeded(iframe) {
+    // Safari/WebKit may blank iframe content when an ancestor's CSS position
+    // changes (e.g. static ↔ fixed during maximize/restore). Wait for layout
+    // to settle, then reload the iframe if its content was lost.
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        try {
+          const body = iframe.contentDocument?.body;
+          if (body && body.children.length === 0 && body.textContent.trim() === '') {
+            const src = iframe.getAttribute('src');
+            if (src) iframe.src = src;
+          }
+        } catch (_e) {
+          // Cross-origin iframe — cannot inspect content
+        }
+      });
+    });
+  }
+
   async fetchSourceCode() {
     if (!this.src) return;
 
@@ -859,11 +878,9 @@ export class BrowserWindow extends HTMLElement {
   _handleClose() {
     if (this.isMaximized) {
       this.toggleMaximize();
+      return;
     }
-    // Minimize (collapse) the content area
-    if (!this.isMinimized) {
-      this.toggleMinimize();
-    }
+    this.toggleMinimize();
   }
 
   _handleKeydown(event) {
@@ -919,19 +936,23 @@ export class BrowserWindow extends HTMLElement {
   }
 
   toggleMinimize() {
+    // If maximized, just restore to normal size without collapsing content
+    if (this.isMaximized) {
+      this.toggleMaximize();
+      return;
+    }
+
     const content = this.shadowRoot.querySelector('.browser-content');
     if (!content) return;
 
     this.isMinimized = !this.isMinimized;
 
     if (this.isMinimized) {
-      // Restore from maximized if needed
-      if (this.isMaximized) {
-        this.toggleMaximize();
-      }
-      content.style.display = 'none';
+      content.style.height = '0';
+      content.style.overflow = 'hidden';
     } else {
-      content.style.display = '';
+      content.style.height = '';
+      content.style.overflow = '';
     }
   }
 
@@ -949,6 +970,7 @@ export class BrowserWindow extends HTMLElement {
       const iframe = this.shadowRoot.querySelector('iframe');
       if (iframe) {
         iframe.style.minHeight = '';
+        this._reloadIframeIfNeeded(iframe);
       }
 
       // Remove overlay
@@ -985,6 +1007,7 @@ export class BrowserWindow extends HTMLElement {
       const iframe = this.shadowRoot.querySelector('iframe');
       if (iframe) {
         iframe.style.minHeight = 'calc(90vh - 50px)';
+        this._reloadIframeIfNeeded(iframe);
       }
 
       this.isMaximized = true;
