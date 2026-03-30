@@ -288,11 +288,6 @@ export class BrowserWindow extends HTMLElement {
     this.render();
     this._attachEventListeners();
 
-    // Fetch source code if a src attribute is present
-    if (this.src) {
-      await this.fetchSourceCode();
-    }
-
     _registerInstance(this);
 
     if (this._getDevicePreset()) {
@@ -334,9 +329,6 @@ export class BrowserWindow extends HTMLElement {
     if (name === 'src') {
       this.showSource = false;
       this.sourceCode = '';
-      if (this.src) {
-        this.fetchSourceCode();
-      }
     }
 
     if (name === 'device' || name === 'orientation') {
@@ -648,8 +640,11 @@ export class BrowserWindow extends HTMLElement {
     }
   }
 
-  toggleViewSource() {
+  async toggleViewSource() {
     this.showSource = !this.showSource;
+    if (this.showSource && !this.sourceCode && this.src) {
+      await this.fetchSourceCode();
+    }
     this._updateContentView();
   }
 
@@ -843,7 +838,10 @@ export class BrowserWindow extends HTMLElement {
     };
   }
 
-  openInCodePen() {
+  async openInCodePen() {
+    if (!this.sourceCode && this.src) {
+      await this.fetchSourceCode();
+    }
     const parsed = this.parseHTMLForCodePen();
     if (!parsed) return;
 
