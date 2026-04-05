@@ -1,52 +1,52 @@
 if (typeof document < "u") {
-  const r = document.createElement("style");
-  r.textContent = "browser-window:not(:defined){display:block;opacity:0}", document.head.appendChild(r);
+  const i = document.createElement("style");
+  i.textContent = "browser-window:not(:defined){display:block;opacity:0}", document.head.appendChild(i);
 }
 const h = /* @__PURE__ */ new Set();
-let l = null, w = null;
-function v() {
-  const r = document.documentElement, e = document.body;
-  if (!r || !e) return null;
-  if (r.classList.contains("dark") || e.classList.contains("dark") || r.getAttribute("data-theme") === "dark" || e.getAttribute("data-theme") === "dark")
+let l = null, b = null;
+function m() {
+  const i = document.documentElement, e = document.body;
+  if (!i || !e) return null;
+  if (i.classList.contains("dark") || e.classList.contains("dark") || i.getAttribute("data-theme") === "dark" || e.getAttribute("data-theme") === "dark")
     return !0;
-  if (r.getAttribute("data-theme") === "light" || e.getAttribute("data-theme") === "light")
+  if (i.getAttribute("data-theme") === "light" || e.getAttribute("data-theme") === "light")
     return !1;
-  if (r.getAttribute("data-bs-theme") === "dark" || e.getAttribute("data-bs-theme") === "dark")
+  if (i.getAttribute("data-bs-theme") === "dark" || e.getAttribute("data-bs-theme") === "dark")
     return !0;
-  if (r.getAttribute("data-bs-theme") === "light" || e.getAttribute("data-bs-theme") === "light")
+  if (i.getAttribute("data-bs-theme") === "light" || e.getAttribute("data-bs-theme") === "light")
     return !1;
-  if (r.getAttribute("data-mode") === "dark") return !0;
-  if (r.getAttribute("data-mode") === "light") return !1;
-  const t = getComputedStyle(r).colorScheme;
+  if (i.getAttribute("data-mode") === "dark") return !0;
+  if (i.getAttribute("data-mode") === "light") return !1;
+  const t = getComputedStyle(i).colorScheme;
   return t === "dark" ? !0 : t === "light" ? !1 : null;
 }
 function k() {
-  const r = v();
-  if (r !== w) {
-    w = r;
+  const i = m();
+  if (i !== b) {
+    b = i;
     for (const e of h)
-      e._onPageModeChange(r);
+      e._onPageModeChange(i);
   }
 }
 function S() {
   if (l) return;
   l = new MutationObserver(k);
-  const r = {
+  const i = {
     attributes: !0,
     attributeFilter: ["class", "data-theme", "data-bs-theme", "data-mode", "style"]
   };
-  l.observe(document.documentElement, r), document.body && l.observe(document.body, r);
+  l.observe(document.documentElement, i), document.body && l.observe(document.body, i);
 }
 function C() {
   l && (l.disconnect(), l = null);
 }
-function z(r) {
-  h.add(r), h.size === 1 && S();
-  const e = v();
-  w = e, r._onPageModeChange(e);
+function z(i) {
+  h.add(i), h.size === 1 && S();
+  const e = m();
+  b = e, i._onPageModeChange(e);
 }
-function M(r) {
-  h.delete(r), h.size === 0 && (C(), w = null);
+function M(i) {
+  h.delete(i), h.size === 0 && (C(), b = null);
 }
 const g = {
   "iphone-16": {
@@ -153,7 +153,7 @@ const g = {
 let _ = !1;
 class E extends HTMLElement {
   constructor() {
-    super(), this.attachShadow({ mode: "open" }), this.isMinimized = !1, this.isMaximized = !1, this.overlay = null, this.showSource = !1, this.sourceCode = "", this.showShareMenu = !1, this._handleKeydown = this._handleKeydown.bind(this), this._handleOutsideClick = this._handleOutsideClick.bind(this), this._resizeObserver = null, this._currentScale = 1, this._outsideClickTimer = null, this._copyFeedbackTimer = null, this._fetchController = null;
+    super(), this.attachShadow({ mode: "open" }), this.isMinimized = !1, this.isMaximized = !1, this.overlay = null, this.showSource = !1, this.sourceCode = "", this.showShareMenu = !1, this._handleKeydown = this._handleKeydown.bind(this), this._handleOutsideClick = this._handleOutsideClick.bind(this), this._resizeObserver = null, this._currentScale = 1, this._outsideClickTimer = null, this._copyFeedbackTimer = null, this._fetchController = null, this._sourceCodeSrc = "";
   }
   async connectedCallback() {
     this.render(), this._attachEventListeners(), z(this), this._getDevicePreset() && this._setupDeviceScaling();
@@ -174,8 +174,34 @@ class E extends HTMLElement {
       "show-safe-areas"
     ];
   }
-  attributeChangedCallback(e) {
-    this.shadowRoot && (this.render(), this._attachEventListeners()), e === "src" && (this.showSource = !1, this.sourceCode = ""), (e === "device" || e === "orientation") && (this._teardownDeviceScaling(), this._getDevicePreset() && this._setupDeviceScaling()), e === "mode" && (this.hasAttribute("mode") ? this.removeAttribute("data-page-mode") : this._onPageModeChange(v()));
+  attributeChangedCallback(e, t, r) {
+    if (!(!this.shadowRoot || t === r)) {
+      if (e === "src") {
+        this._handleSrcChange(t, r);
+        return;
+      }
+      if (e === "device" || e === "orientation") {
+        this._teardownDeviceScaling(), this._renderStructure(), this._getDevicePreset() && this._setupDeviceScaling();
+        return;
+      }
+      if (e === "show-safe-areas") {
+        this._updateSafeAreaOverlays();
+        return;
+      }
+      if (e === "device-color") {
+        this._updateDynamicStyles(), this._applyDeviceColorClass();
+        return;
+      }
+      if (e === "url" || e === "title") {
+        this._updateBrowserUrlBar();
+        return;
+      }
+      if (e === "shadow") {
+        this._updateDynamicStyles();
+        return;
+      }
+      e === "mode" && (this.hasAttribute("mode") ? this.removeAttribute("data-page-mode") : this._onPageModeChange(m()), this._syncIframeColorScheme());
+    }
   }
   get url() {
     return this.getAttribute("url") || "";
@@ -213,6 +239,18 @@ class E extends HTMLElement {
   set deviceColor(e) {
     this.setAttribute("device-color", e);
   }
+  get orientation() {
+    return this.getAttribute("orientation") || "portrait";
+  }
+  set orientation(e) {
+    e && e !== "portrait" ? this.setAttribute("orientation", e) : this.removeAttribute("orientation");
+  }
+  get showSafeAreas() {
+    return this.hasAttribute("show-safe-areas");
+  }
+  set showSafeAreas(e) {
+    this.toggleAttribute("show-safe-areas", !!e);
+  }
   _getDevicePreset() {
     const e = this.getAttribute("device");
     if (!e) return null;
@@ -229,8 +267,8 @@ class E extends HTMLElement {
     };
   }
   _getEffectiveSafeInsets(e) {
-    const [t, o, i, a] = e.safeInsets;
-    return this.getAttribute("orientation") === "landscape" ? [a, t, o, i] : [t, o, i, a];
+    const [t, r, o, s] = e.safeInsets;
+    return this.getAttribute("orientation") === "landscape" ? [s, t, r, o] : [t, r, o, s];
   }
   _onPageModeChange(e) {
     if (this.hasAttribute("mode")) {
@@ -244,28 +282,89 @@ class E extends HTMLElement {
     if (!e) return;
     const t = this.mode === "dark";
     try {
-      const o = e.contentDocument;
-      o?.documentElement && (o.documentElement.style.colorScheme = t ? "dark" : "light");
+      const r = e.contentDocument;
+      r?.documentElement && (r.documentElement.style.colorScheme = t ? "dark" : "light");
     } catch {
+    }
+  }
+  _renderStructure() {
+    this._setShareMenuOpen(!1), this.render(), this._attachEventListeners(), this._updateDynamicStyles(), this._applyDeviceColorClass();
+  }
+  _handleSrcChange(e, t) {
+    if (this._fetchController?.abort(), this._fetchController = null, this.showSource = !1, this.sourceCode = "", this._sourceCodeSrc = "", this._setShareMenuOpen(!1), !!e !== !!t) {
+      this._renderStructure();
+      return;
+    }
+    this._updateContentView(), this._updateDownloadLinks();
+  }
+  _updateDynamicStyles() {
+    const e = this.shadowRoot?.querySelector("style[data-browser-window-dynamic]");
+    e && (e.textContent = this._dynamicCSS());
+  }
+  _getBezelColor() {
+    return x[this.deviceColor] || x.midnight;
+  }
+  _applyDeviceColorClass() {
+    const e = this.shadowRoot?.querySelector(".device-frame");
+    if (!e) return;
+    const t = ["silver", "gold", "white"];
+    e.classList.toggle("light-bezel", t.includes(this.deviceColor));
+  }
+  _updateBrowserUrlBar() {
+    const e = this.shadowRoot?.querySelector(".url-bar");
+    if (!e) return;
+    const t = e.querySelector(".url-text");
+    t && (t.textContent = this.browserTitle, t.setAttribute("title", this.url));
+    const r = e.querySelector(".lock-icon"), o = this.url.startsWith("https");
+    if (o && !r && t) {
+      const s = document.createElement("span");
+      s.className = "lock-icon", s.textContent = "🔒", e.insertBefore(s, t);
+    } else !o && r && r.remove();
+  }
+  _updateDownloadLinks() {
+    for (const e of this.shadowRoot?.querySelectorAll(".download-button") || [])
+      e.setAttribute("href", this.src);
+  }
+  _createSafeAreaOverlays() {
+    const e = document.createElement("div");
+    return e.className = "safe-area-overlays", e.innerHTML = `
+      <div class="safe-area-overlay safe-area-top"></div>
+      <div class="safe-area-overlay safe-area-right"></div>
+      <div class="safe-area-overlay safe-area-bottom"></div>
+      <div class="safe-area-overlay safe-area-left"></div>
+    `, e;
+  }
+  _updateSafeAreaOverlays() {
+    const e = this.shadowRoot?.querySelector(".device-frame");
+    if (!e) return;
+    const t = e.querySelector(".safe-area-overlays");
+    this.showSafeAreas ? t || e.appendChild(this._createSafeAreaOverlays()) : t?.remove();
+  }
+  _resolveURL(e) {
+    if (!e) return "";
+    try {
+      return new URL(e, document.baseURI).href;
+    } catch {
+      return e;
     }
   }
   _injectSafeAreas(e) {
     const t = this._getDevicePreset();
     if (t)
       try {
-        const o = e.contentDocument;
-        if (!o) return;
-        const i = o.querySelector("style[data-browser-window-safe-areas]");
-        i && i.remove();
-        const [a, c, s, d] = this._getEffectiveSafeInsets(t), n = o.createElement("style");
-        n.setAttribute("data-browser-window-safe-areas", ""), n.textContent = `
+        const r = e.contentDocument;
+        if (!r) return;
+        const o = r.querySelector("style[data-browser-window-safe-areas]");
+        o && o.remove();
+        const [s, d, n, c] = this._getEffectiveSafeInsets(t), a = r.createElement("style");
+        a.setAttribute("data-browser-window-safe-areas", ""), a.textContent = `
         :root {
-          --safe-top: ${a}px;
-          --safe-right: ${c}px;
-          --safe-bottom: ${s}px;
-          --safe-left: ${d}px;
+          --safe-top: ${s}px;
+          --safe-right: ${d}px;
+          --safe-bottom: ${n}px;
+          --safe-left: ${c}px;
         }
-      `, o.head.appendChild(n);
+      `, r.head.appendChild(a);
       } catch {
         console.info("<browser-window>: Cannot inject safe areas into cross-origin iframe");
       }
@@ -281,18 +380,18 @@ class E extends HTMLElement {
     }
   }
   _attachEventListeners() {
-    const e = this.shadowRoot.querySelector(".control-button.close"), t = this.shadowRoot.querySelector(".control-button.minimize"), o = this.shadowRoot.querySelector(".control-button.maximize"), i = this.shadowRoot.querySelector(".view-source-button"), a = this.shadowRoot.querySelector(".copy-source-button"), c = this.shadowRoot.querySelector(".share-button"), s = this.shadowRoot.querySelector(".browser-header");
-    e?.addEventListener("click", () => this._handleClose()), t?.addEventListener("click", () => this.toggleMinimize()), o?.addEventListener("click", () => this.toggleMaximize()), i?.addEventListener("click", () => this.toggleViewSource()), a?.addEventListener("click", () => this.copySourceCode()), c?.addEventListener("click", (n) => {
-      n.stopPropagation(), this.toggleShareMenu();
-    }), s?.addEventListener("dblclick", (n) => {
-      n.target.closest("button, a, .share-menu") || this.toggleMaximize();
+    const e = this.shadowRoot.querySelector(".control-button.close"), t = this.shadowRoot.querySelector(".control-button.minimize"), r = this.shadowRoot.querySelector(".control-button.maximize"), o = this.shadowRoot.querySelector(".view-source-button"), s = this.shadowRoot.querySelector(".copy-source-button"), d = this.shadowRoot.querySelector(".share-button"), n = this.shadowRoot.querySelector(".browser-header");
+    e?.addEventListener("click", () => this._handleClose()), t?.addEventListener("click", () => this.toggleMinimize()), r?.addEventListener("click", () => this.toggleMaximize()), o?.addEventListener("click", () => this.toggleViewSource()), s?.addEventListener("click", () => this.copySourceCode()), d?.addEventListener("click", (a) => {
+      a.stopPropagation(), this.toggleShareMenu();
+    }), n?.addEventListener("dblclick", (a) => {
+      a.target.closest("button, a, .share-menu") || this.toggleMaximize();
     });
-    const d = this.shadowRoot.querySelector("iframe");
-    if (d) {
-      const n = () => {
-        this._syncIframeColorScheme(), this._getDevicePreset() && this._injectSafeAreas(d);
+    const c = this.shadowRoot.querySelector("iframe");
+    if (c) {
+      const a = () => {
+        this._syncIframeColorScheme(), this._getDevicePreset() && this._injectSafeAreas(c);
       };
-      d.addEventListener("error", () => this._handleIframeError()), d.addEventListener("load", n), d.contentDocument?.readyState === "complete" && d.src && n();
+      c.addEventListener("error", () => this._handleIframeError()), c.addEventListener("load", a), c.contentDocument?.readyState === "complete" && c.src && a();
     }
     this.shadowRoot.querySelector('[data-action="share"]')?.addEventListener("click", () => this.shareViaWebAPI()), this.shadowRoot.querySelector('[data-action="codepen"]')?.addEventListener("click", () => this.openInCodePen()), this.shadowRoot.querySelector(".retry-button")?.addEventListener("click", () => this._retryLoad());
   }
@@ -325,8 +424,8 @@ class E extends HTMLElement {
         try {
           const t = e.contentDocument?.body;
           if (t && t.children.length === 0 && t.textContent.trim() === "") {
-            const o = e.getAttribute("src");
-            o && (e.src = o);
+            const r = e.getAttribute("src");
+            r && (e.src = r);
           }
         } catch {
         }
@@ -334,14 +433,26 @@ class E extends HTMLElement {
     });
   }
   async fetchSourceCode() {
-    if (this.src) {
-      this._fetchController?.abort(), this._fetchController = new AbortController();
-      try {
-        const e = await fetch(this.src, { signal: this._fetchController.signal });
-        e.ok && (this.sourceCode = await e.text());
-      } catch (e) {
-        e.name !== "AbortError" && (console.error("Failed to fetch source code:", e), this.sourceCode = "// Failed to load source code");
+    if (!this.src || this._sourceCodeSrc === this.src && this.sourceCode) return;
+    const e = this.src;
+    this._fetchController?.abort();
+    const t = new AbortController();
+    this._fetchController = t;
+    try {
+      const r = await fetch(this._resolveURL(e), { signal: t.signal });
+      if (!r.ok) {
+        if (this.src === e) {
+          const s = [r.status, r.statusText].filter(Boolean).join(" ");
+          this.sourceCode = `// Failed to load source code${s ? ` (${s})` : ""}`, this._sourceCodeSrc = e;
+        }
+        return;
       }
+      const o = await r.text();
+      this._fetchController === t && this.src === e && (this.sourceCode = o, this._sourceCodeSrc = e);
+    } catch (r) {
+      r.name !== "AbortError" && (console.error("Failed to fetch source code:", r), this.src === e && (this.sourceCode = "// Failed to load source code", this._sourceCodeSrc = e));
+    } finally {
+      this._fetchController === t && (this._fetchController = null);
     }
   }
   async toggleViewSource() {
@@ -359,8 +470,8 @@ class E extends HTMLElement {
       else {
         if (this.src) {
           t.innerHTML = `<iframe src="${this._escapeHtml(this.src)}" loading="lazy"></iframe>`;
-          const o = t.querySelector("iframe");
-          o?.addEventListener("error", () => this._handleIframeError()), o?.addEventListener("load", () => this._syncIframeColorScheme());
+          const r = t.querySelector("iframe");
+          r?.addEventListener("error", () => this._handleIframeError()), r?.addEventListener("load", () => this._syncIframeColorScheme());
         } else
           t.innerHTML = "<slot></slot>";
         e?.classList.remove("active");
@@ -374,9 +485,9 @@ class E extends HTMLElement {
       else {
         if (this.src) {
           t.innerHTML = `<iframe src="${this._escapeHtml(this.src)}" loading="lazy"></iframe>`;
-          const o = t.querySelector("iframe");
-          o?.addEventListener("error", () => this._handleIframeError()), o?.addEventListener("load", () => {
-            this._syncIframeColorScheme(), this._getDevicePreset() && this._injectSafeAreas(o);
+          const r = t.querySelector("iframe");
+          r?.addEventListener("error", () => this._handleIframeError()), r?.addEventListener("load", () => {
+            this._syncIframeColorScheme(), this._getDevicePreset() && this._injectSafeAreas(r);
           });
         } else
           t.innerHTML = "<slot></slot>";
@@ -421,16 +532,22 @@ class E extends HTMLElement {
       }
   }
   toggleShareMenu() {
-    this.showShareMenu = !this.showShareMenu;
-    const e = this.shadowRoot?.querySelector(".share-menu"), t = this.shadowRoot?.querySelector(".share-button");
-    !e || !t || (this.showShareMenu ? (e.style.display = "block", t.classList.add("active"), clearTimeout(this._outsideClickTimer), this._outsideClickTimer = setTimeout(() => {
+    this._setShareMenuOpen(!this.showShareMenu);
+  }
+  _setShareMenuOpen(e) {
+    const t = this.shadowRoot?.querySelector(".share-menu"), r = this.shadowRoot?.querySelector(".share-button");
+    if (!t || !r) {
+      this.showShareMenu = !1, clearTimeout(this._outsideClickTimer), document.removeEventListener("click", this._handleOutsideClick);
+      return;
+    }
+    this.showShareMenu = e, this.showShareMenu ? (t.style.display = "block", r.classList.add("active"), clearTimeout(this._outsideClickTimer), this._outsideClickTimer = setTimeout(() => {
       document.addEventListener("click", this._handleOutsideClick);
-    }, 0)) : (e.style.display = "none", t.classList.remove("active"), clearTimeout(this._outsideClickTimer), document.removeEventListener("click", this._handleOutsideClick)));
+    }, 0)) : (t.style.display = "none", r.classList.remove("active"), clearTimeout(this._outsideClickTimer), document.removeEventListener("click", this._handleOutsideClick));
   }
   _handleOutsideClick(e) {
     const t = this.shadowRoot?.querySelector(".share-menu");
     if (!t) return;
-    e.composedPath().includes(t) || this.toggleShareMenu();
+    e.composedPath().includes(t) || this._setShareMenuOpen(!1);
   }
   async shareViaWebAPI() {
     if (!navigator.share) {
@@ -440,25 +557,25 @@ class E extends HTMLElement {
     const e = {
       title: this.browserTitle || "CSS Demo",
       text: `Check out this CSS demo: ${this.browserTitle}`,
-      url: this.src || this.url
+      url: this._resolveURL(this.src || this.url)
     };
     try {
-      await navigator.share(e), this.toggleShareMenu();
+      await navigator.share(e), this._setShareMenuOpen(!1);
     } catch (t) {
       t.name !== "AbortError" && console.error("Error sharing:", t);
     }
   }
   parseHTMLForCodePen() {
     if (!this.sourceCode) return null;
-    const t = new DOMParser().parseFromString(this.sourceCode, "text/html"), o = Array.from(t.querySelectorAll("style")).map((s) => s.textContent).join(`
+    const t = new DOMParser().parseFromString(this.sourceCode, "text/html"), r = Array.from(t.querySelectorAll("style")).map((n) => n.textContent).join(`
 
-`), i = Array.from(t.querySelectorAll("script")).filter((s) => !s.src && s.type !== "module").map((s) => s.textContent).join(`
+`), o = Array.from(t.querySelectorAll("script")).filter((n) => !n.src && n.type !== "module").map((n) => n.textContent).join(`
 
-`), a = t.body.cloneNode(!0);
-    return a.querySelectorAll("script, style").forEach((s) => s.remove()), {
-      html: a.innerHTML.trim(),
-      css: o.trim(),
-      js: i.trim()
+`), s = t.body.cloneNode(!0);
+    return s.querySelectorAll("script, style").forEach((n) => n.remove()), {
+      html: s.innerHTML.trim(),
+      css: r.trim(),
+      js: o.trim()
     };
   }
   async openInCodePen() {
@@ -473,10 +590,10 @@ class E extends HTMLElement {
       js: e.js,
       editors: "110"
       // Show HTML and CSS editors, hide JS if empty
-    }, o = document.createElement("form");
-    o.action = "https://codepen.io/pen/define", o.method = "POST", o.target = "_blank";
-    const i = document.createElement("input");
-    i.type = "hidden", i.name = "data", i.value = JSON.stringify(t), o.appendChild(i), document.body.appendChild(o), o.submit(), document.body.removeChild(o), this.toggleShareMenu();
+    }, r = document.createElement("form");
+    r.action = "https://codepen.io/pen/define", r.method = "POST", r.target = "_blank";
+    const o = document.createElement("input");
+    o.type = "hidden", o.name = "data", o.value = JSON.stringify(t), r.appendChild(o), document.body.appendChild(r), r.submit(), document.body.removeChild(r), this._setShareMenuOpen(!1);
   }
   _handleClose() {
     if (this.isMaximized) {
@@ -537,10 +654,11 @@ class E extends HTMLElement {
   }
   // --- Render pipeline ---
   render() {
-    const e = this._getDevicePreset(), t = e ? this._deviceCSS(e) : this._browserCSS(), o = e ? this._deviceChrome(e) : this._browserChrome();
+    const e = this._getDevicePreset(), t = e ? this._deviceCSS(e) : this._browserCSS(), r = e ? this._deviceChrome(e) : this._browserChrome();
     this.shadowRoot.innerHTML = `
       <style>${this._sharedCSS()}${t}</style>
-      ${o}
+      <style data-browser-window-dynamic>${this._dynamicCSS()}</style>
+      ${r}
       ${e ? "" : this._contentHTML()}
     `, e && this._updateDeviceScale();
   }
@@ -584,7 +702,6 @@ class E extends HTMLElement {
           /* Non-structural properties */
           --browser-window-border-radius: var(--radius-m, 8px);
           --browser-window-inner-radius: var(--radius-s, 6px);
-          --browser-window-shadow: ${this.hasShadow ? "0 4px 12px rgba(0, 0, 0, 0.15)" : "none"};
           --browser-window-close-color: #ff5f57;
           --browser-window-minimize-color: #febc2e;
           --browser-window-maximize-color: #28c840;
@@ -871,6 +988,14 @@ class E extends HTMLElement {
           height: 16px;
           flex-shrink: 0;
         }
+    `;
+  }
+  _dynamicCSS() {
+    return `
+      :host {
+        --browser-window-shadow: ${this.hasShadow ? "0 4px 12px rgba(0, 0, 0, 0.15)" : "none"};
+        --browser-window-bezel-color: ${this._getBezelColor()};
+      }
     `;
   }
   _browserCSS() {
@@ -1177,21 +1302,20 @@ class E extends HTMLElement {
   }
   // --- Device mode ---
   _deviceCSS(e) {
-    const t = x[this.deviceColor] || x.midnight, o = this.getAttribute("orientation") === "landscape", i = this._getEffectiveDimensions(e), [a, c, s, d] = this._getEffectiveSafeInsets(e), n = L[e.notch] || 24, m = e.homeIndicator && !e.homeButton ? A : 0, u = e.homeButton ? y : 0, b = e.notch !== "none";
+    const t = this.getAttribute("orientation") === "landscape", r = this._getEffectiveDimensions(e), [o, s, d, n] = this._getEffectiveSafeInsets(e), c = L[e.notch] || 24, a = e.homeIndicator && !e.homeButton ? A : 0, w = e.homeButton ? y : 0, u = e.notch !== "none";
     return `
         :host([device]) {
-          --device-width: ${i.width}px;
-          --device-height: ${i.height}px;
+          --device-width: ${r.width}px;
+          --device-height: ${r.height}px;
           --device-bezel: ${e.bezel}px;
           --device-corner-radius: ${e.cornerRadius}px;
-          --browser-window-bezel-color: ${t};
-          --status-bar-height: ${o && b ? 24 : n}px;
-          --home-indicator-height: ${m}px;
-          --home-button-area: ${u}px;
-          --safe-top: ${a}px;
-          --safe-right: ${c}px;
-          --safe-bottom: ${s}px;
-          --safe-left: ${d}px;
+          --status-bar-height: ${t && u ? 24 : c}px;
+          --home-indicator-height: ${a}px;
+          --home-button-area: ${w}px;
+          --safe-top: ${o}px;
+          --safe-right: ${s}px;
+          --safe-bottom: ${d}px;
+          --safe-left: ${n}px;
 
           border: none;
           border-radius: 0;
@@ -1614,8 +1738,8 @@ class E extends HTMLElement {
     `;
   }
   _deviceChrome(e) {
-    const t = this.getAttribute("orientation") === "landscape", o = e.notch !== "none", i = o ? e.notch : "", a = e.homeButton ? "home-button" : "", s = ["silver", "gold", "white"].includes(this.deviceColor) ? "light-bezel" : "", n = ["device-frame", i, a, s, t ? "landscape" : ""].filter(Boolean).join(" "), u = `
-      <div class="status-bar ${t && o ? "" : i}">
+    const t = this.getAttribute("orientation") === "landscape", r = e.notch !== "none", o = r ? e.notch : "", s = e.homeButton ? "home-button" : "", n = ["silver", "gold", "white"].includes(this.deviceColor) ? "light-bezel" : "", a = ["device-frame", o, s, n, t ? "landscape" : ""].filter(Boolean).join(" "), u = `
+      <div class="status-bar ${t && r ? "" : o}">
         <span class="status-time">9:41</span>
         <div class="status-icons">
           <span class="signal-bars" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
@@ -1623,32 +1747,32 @@ class E extends HTMLElement {
           <span class="battery-icon" aria-hidden="true"></span>
         </div>
       </div>
-    `, b = e.homeIndicator && !e.homeButton ? '<div class="home-indicator"><div class="home-indicator-pill"></div></div>' : "", f = this.hasAttribute("show-safe-areas") ? `<div class="safe-area-overlays">
+    `, f = e.homeIndicator && !e.homeButton ? '<div class="home-indicator"><div class="home-indicator-pill"></div></div>' : "", v = this.hasAttribute("show-safe-areas") ? `<div class="safe-area-overlays">
           <div class="safe-area-overlay safe-area-top"></div>
           <div class="safe-area-overlay safe-area-right"></div>
           <div class="safe-area-overlay safe-area-bottom"></div>
           <div class="safe-area-overlay safe-area-left"></div>
         </div>` : "", p = this._deviceToolbar();
-    return t && o ? `
+    return t && r ? `
         <div class="device-wrapper">
-          <div class="${n}">
-            <div class="notch-sidebar ${i}"></div>
+          <div class="${a}">
+            <div class="notch-sidebar ${o}"></div>
             <div class="device-main">
               ${u}
               ${this._contentHTML()}
-              ${b}
+              ${f}
             </div>
-            ${f}
+            ${v}
           </div>
         </div>
         ${p}
       ` : `
       <div class="device-wrapper">
-        <div class="${n}">
+        <div class="${a}">
           ${u}
           ${this._contentHTML()}
-          ${b}
           ${f}
+          ${v}
         </div>
       </div>
       ${p}
@@ -1707,14 +1831,14 @@ class E extends HTMLElement {
   _updateDeviceScale() {
     const e = this._getDevicePreset();
     if (!e) return;
-    const t = this.shadowRoot.querySelector(".device-wrapper"), o = this.shadowRoot.querySelector(".device-frame");
-    if (!t || !o) return;
-    const i = this.clientWidth;
-    if (i === 0) return;
-    const a = this._getEffectiveDimensions(e), c = a.width + e.bezel * 2, s = Math.max(0.5, Math.min(1, i / c));
-    this._currentScale = s, o.style.transform = `scale(${s})`;
-    const d = e.homeButton ? y : 0, n = a.height + e.bezel * 2 + d;
-    t.style.height = `${n * s}px`;
+    const t = this.shadowRoot.querySelector(".device-wrapper"), r = this.shadowRoot.querySelector(".device-frame");
+    if (!t || !r) return;
+    const o = this.clientWidth;
+    if (o === 0) return;
+    const s = this._getEffectiveDimensions(e), d = s.width + e.bezel * 2, n = Math.max(0.5, Math.min(1, o / d));
+    this._currentScale = n, r.style.transform = `scale(${n})`;
+    const c = e.homeButton ? y : 0, a = s.height + e.bezel * 2 + c;
+    t.style.height = `${a * n}px`;
   }
   _teardownDeviceScaling() {
     this._resizeObserver && (this._resizeObserver.disconnect(), this._resizeObserver = null), this._currentScale = 1;

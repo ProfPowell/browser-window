@@ -27,6 +27,12 @@ export class BrowserWindow extends HTMLElement {
   /** Device bezel color preset */
   deviceColor: 'midnight' | 'silver' | 'gold' | 'blue' | 'white'
 
+  /** Device orientation. Defaults to portrait when omitted. */
+  orientation: 'portrait' | 'landscape' | string
+
+  /** Whether safe area overlays are shown in device mode */
+  showSafeAreas: boolean
+
   /** Whether the window has a drop shadow (reflects `shadow` attribute) */
   readonly hasShadow: boolean
 
@@ -55,7 +61,7 @@ export class BrowserWindow extends HTMLElement {
   fetchSourceCode(): Promise<void>
 
   /** Toggle between rendered content and source code view */
-  toggleViewSource(): void
+  toggleViewSource(): Promise<void>
 
   /** Copy source code to clipboard */
   copySourceCode(): Promise<void>
@@ -70,7 +76,7 @@ export class BrowserWindow extends HTMLElement {
   parseHTMLForCodePen(): { html: string; css: string; js: string } | null
 
   /** Open demo in CodePen */
-  openInCodePen(): void
+  openInCodePen(): Promise<void>
 
   /** Toggle minimize state */
   toggleMinimize(): void

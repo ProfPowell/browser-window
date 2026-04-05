@@ -73,11 +73,69 @@ test.describe('browser-window', () => {
     })
   })
 
+  test.describe('attribute updates', () => {
+    test('title changes preserve the existing iframe instance', async ({ page }) => {
+      const result = await page.evaluate(async () => {
+        const el = document.querySelector('#with-src')
+        const iframe = el.shadowRoot.querySelector('iframe')
+
+        if (iframe.contentDocument?.readyState !== 'complete') {
+          await new Promise((resolve) => iframe.addEventListener('load', resolve, { once: true }))
+        }
+
+        iframe.contentWindow.__reviewMarker = 'kept-alive'
+        el.setAttribute('title', 'Updated Title')
+
+        const nextIframe = el.shadowRoot.querySelector('iframe')
+        return {
+          sameNode: iframe === nextIframe,
+          marker: nextIframe.contentWindow.__reviewMarker,
+          title: el.shadowRoot.querySelector('.url-text')?.textContent,
+        }
+      })
+
+      expect(result.sameNode).toBe(true)
+      expect(result.marker).toBe('kept-alive')
+      expect(result.title).toBe('Updated Title')
+    })
+
+    test('device-color changes preserve the device iframe instance', async ({ page }) => {
+      const el = page.locator('#device-iphone')
+      await el.scrollIntoViewIfNeeded()
+
+      const result = await page.evaluate(async () => {
+        const el = document.querySelector('#device-iphone')
+        const iframe = el.shadowRoot.querySelector('iframe')
+
+        if (iframe.contentDocument?.readyState !== 'complete') {
+          await new Promise((resolve) => iframe.addEventListener('load', resolve, { once: true }))
+        }
+
+        iframe.contentWindow.__reviewMarker = 'device-kept-alive'
+        el.setAttribute('device-color', 'silver')
+
+        const nextIframe = el.shadowRoot.querySelector('iframe')
+        const frame = el.shadowRoot.querySelector('.device-frame')
+        return {
+          sameNode: iframe === nextIframe,
+          marker: nextIframe.contentWindow.__reviewMarker,
+          isLightBezel: frame.classList.contains('light-bezel'),
+          bezelColor: getComputedStyle(el).getPropertyValue('--browser-window-bezel-color').trim(),
+        }
+      })
+
+      expect(result.sameNode).toBe(true)
+      expect(result.marker).toBe('device-kept-alive')
+      expect(result.isLightBezel).toBe(true)
+      expect(result.bezelColor).toBe('#c0c0c0')
+    })
+  })
+
   test.describe('light/dark mode', () => {
     test('applies light mode styles by default', async ({ page }) => {
       const el = page.locator('#default')
       const style = await el.evaluate((node) => {
-        const styleEl = node.shadowRoot.querySelector('style')
+        const styleEl = node.shadowRoot.querySelector('style:not([data-browser-window-dynamic])')
         return styleEl?.textContent || ''
       })
       expect(style).toContain('--_bw-bg: var(--color-surface, #ffffff)')
@@ -86,7 +144,7 @@ test.describe('browser-window', () => {
     test('applies dark mode styles when mode="dark"', async ({ page }) => {
       const el = page.locator('#dark-mode')
       const style = await el.evaluate((node) => {
-        const styleEl = node.shadowRoot.querySelector('style')
+        const styleEl = node.shadowRoot.querySelector('style:not([data-browser-window-dynamic])')
         return styleEl?.textContent || ''
       })
       expect(style).toContain(':host([mode="dark"])')
@@ -96,7 +154,7 @@ test.describe('browser-window', () => {
     test('includes prefers-color-scheme media query for auto detection', async ({ page }) => {
       const el = page.locator('#default')
       const style = await el.evaluate((node) => {
-        const styleEl = node.shadowRoot.querySelector('style')
+        const styleEl = node.shadowRoot.querySelector('style:not([data-browser-window-dynamic])')
         return styleEl?.textContent || ''
       })
       expect(style).toContain('@media (prefers-color-scheme: dark)')
@@ -106,7 +164,7 @@ test.describe('browser-window', () => {
     test('base :host sets color from custom property', async ({ page }) => {
       const el = page.locator('#default')
       const style = await el.evaluate((node) => {
-        const styleEl = node.shadowRoot.querySelector('style')
+        const styleEl = node.shadowRoot.querySelector('style:not([data-browser-window-dynamic])')
         return styleEl?.textContent || ''
       })
       expect(style).toContain('color: var(--browser-window-text-color, var(--_bw-text-color))')
@@ -115,7 +173,7 @@ test.describe('browser-window', () => {
     test('base :host sets color-scheme: light', async ({ page }) => {
       const el = page.locator('#default')
       const style = await el.evaluate((node) => {
-        const styleEl = node.shadowRoot.querySelector('style')
+        const styleEl = node.shadowRoot.querySelector('style:not([data-browser-window-dynamic])')
         return styleEl?.textContent || ''
       })
       expect(style).toMatch(/color-scheme:\s*light/)
@@ -124,7 +182,7 @@ test.describe('browser-window', () => {
     test('dark mode blocks include color-scheme: dark', async ({ page }) => {
       const el = page.locator('#dark-mode')
       const style = await el.evaluate((node) => {
-        const styleEl = node.shadowRoot.querySelector('style')
+        const styleEl = node.shadowRoot.querySelector('style:not([data-browser-window-dynamic])')
         return styleEl?.textContent || ''
       })
       // The :host([mode="dark"]) block should contain color-scheme: dark
@@ -135,7 +193,7 @@ test.describe('browser-window', () => {
     test('explicit mode="light" overrides system preference', async ({ page }) => {
       const el = page.locator('#light-mode')
       const style = await el.evaluate((node) => {
-        const styleEl = node.shadowRoot.querySelector('style')
+        const styleEl = node.shadowRoot.querySelector('style:not([data-browser-window-dynamic])')
         return styleEl?.textContent || ''
       })
       expect(style).toContain(':host([mode="light"])')
@@ -230,6 +288,70 @@ test.describe('browser-window', () => {
       const viewSourceBtn = el.locator('.view-source-button')
       await expect(viewSourceBtn).toBeVisible()
     })
+
+    test('keeps the latest source when src changes during a fetch', async ({ page }) => {
+      const result = await page.evaluate(async () => {
+        const originalFetch = window.fetch
+
+        window.fetch = (input, init = {}) => {
+          const url = String(input)
+          const body = url.includes('old-demo') ? '<main>old source</main>' : '<main>new source</main>'
+          const delay = url.includes('old-demo') ? 75 : 0
+
+          return new Promise((resolve, reject) => {
+            const timer = setTimeout(() => {
+              resolve(new Response(body, { status: 200 }))
+            }, delay)
+
+            init.signal?.addEventListener('abort', () => {
+              clearTimeout(timer)
+              reject(new DOMException('The operation was aborted.', 'AbortError'))
+            }, { once: true })
+          })
+        }
+
+        const el = document.createElement('browser-window')
+        el.setAttribute('src', '/old-demo.html')
+        document.body.appendChild(el)
+
+        void el.fetchSourceCode()
+        el.setAttribute('src', '/new-demo.html')
+        await el.fetchSourceCode()
+        await new Promise((resolve) => setTimeout(resolve, 100))
+
+        const result = {
+          src: el.getAttribute('src'),
+          sourceCode: el.sourceCode,
+        }
+
+        window.fetch = originalFetch
+        el.remove()
+        return result
+      })
+
+      expect(result.src).toBe('/new-demo.html')
+      expect(result.sourceCode).toContain('new source')
+      expect(result.sourceCode).not.toContain('old source')
+    })
+
+    test('stores an error message when source fetch is not ok', async ({ page }) => {
+      const sourceCode = await page.evaluate(async () => {
+        const originalFetch = window.fetch
+        window.fetch = async () => new Response('missing', { status: 404, statusText: 'Not Found' })
+
+        const el = document.createElement('browser-window')
+        el.setAttribute('src', '/missing-demo.html')
+        document.body.appendChild(el)
+        await el.fetchSourceCode()
+
+        const result = el.sourceCode
+        window.fetch = originalFetch
+        el.remove()
+        return result
+      })
+
+      expect(sourceCode).toContain('404 Not Found')
+    })
   })
 
   test.describe('slotted content', () => {
@@ -323,6 +445,36 @@ test.describe('browser-window', () => {
 
       const codepen = el.locator('[data-action="codepen"]')
       await expect(codepen).toBeVisible()
+    })
+
+    test('share resolves relative src values to absolute URLs', async ({ page }) => {
+      const result = await page.evaluate(async () => {
+        const originalShare = navigator.share
+        let shareData = null
+
+        Object.defineProperty(navigator, 'share', {
+          configurable: true,
+          value: async (data) => {
+            shareData = data
+          },
+        })
+
+        const el = document.querySelector('#with-src')
+        await el.shareViaWebAPI()
+
+        if (originalShare) {
+          Object.defineProperty(navigator, 'share', {
+            configurable: true,
+            value: originalShare,
+          })
+        } else {
+          delete navigator.share
+        }
+
+        return shareData
+      })
+
+      expect(result.url).toBe('http://localhost:5174/docs/example.html')
     })
   })
 

@@ -220,7 +220,9 @@ browser-window.purple-theme {
 Works in all modern browsers that support Web Components:
 - Chrome/Edge 67+
 - Firefox 63+
-- Safari 10.1+
+- Safari 13.1+
+
+Note: device scaling relies on `ResizeObserver`, and source fetching uses `AbortController`.
 
 ## Development
 
@@ -248,7 +250,7 @@ npm run analyze
 
 | Script | Description |
 |--------|-------------|
-| `npm run dev` | Start local dev server on port 3456 |
+| `npm run dev` | Start the local Vite dev server (default: port 5173) |
 | `npm run build` | Build for production (JS + types) |
 | `npm run lint` | Run ESLint |
 | `npm run lint:fix` | Run ESLint with auto-fix |

@@ -37,6 +37,14 @@
             },
             {
               "kind": "field",
+              "name": "orientation"
+            },
+            {
+              "kind": "field",
+              "name": "showSafeAreas"
+            },
+            {
+              "kind": "field",
               "name": "hasShadow",
               "readonly": true
             },

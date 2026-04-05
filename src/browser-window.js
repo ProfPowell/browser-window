@@ -282,6 +282,7 @@ export class BrowserWindow extends HTMLElement {
     this._outsideClickTimer = null;
     this._copyFeedbackTimer = null;
     this._fetchController = null;
+    this._sourceCodeSrc = '';
   }
 
   async connectedCallback() {
@@ -320,22 +321,42 @@ export class BrowserWindow extends HTMLElement {
     ];
   }
 
-  attributeChangedCallback(name) {
-    if (this.shadowRoot) {
-      this.render();
-      this._attachEventListeners();
-    }
+  attributeChangedCallback(name, oldValue, newValue) {
+    if (!this.shadowRoot || oldValue === newValue) return;
 
     if (name === 'src') {
-      this.showSource = false;
-      this.sourceCode = '';
+      this._handleSrcChange(oldValue, newValue);
+      return;
     }
 
     if (name === 'device' || name === 'orientation') {
       this._teardownDeviceScaling();
+      this._renderStructure();
       if (this._getDevicePreset()) {
         this._setupDeviceScaling();
       }
+      return;
+    }
+
+    if (name === 'show-safe-areas') {
+      this._updateSafeAreaOverlays();
+      return;
+    }
+
+    if (name === 'device-color') {
+      this._updateDynamicStyles();
+      this._applyDeviceColorClass();
+      return;
+    }
+
+    if (name === 'url' || name === 'title') {
+      this._updateBrowserUrlBar();
+      return;
+    }
+
+    if (name === 'shadow') {
+      this._updateDynamicStyles();
+      return;
     }
 
     if (name === 'mode') {
@@ -346,6 +367,7 @@ export class BrowserWindow extends HTMLElement {
         // Mode removed — re-detect page-level signal
         this._onPageModeChange(_detectPageDarkMode());
       }
+      this._syncIframeColorScheme();
     }
   }
 
@@ -411,6 +433,26 @@ export class BrowserWindow extends HTMLElement {
     this.setAttribute('device-color', value);
   }
 
+  get orientation() {
+    return this.getAttribute('orientation') || 'portrait';
+  }
+
+  set orientation(value) {
+    if (value && value !== 'portrait') {
+      this.setAttribute('orientation', value);
+    } else {
+      this.removeAttribute('orientation');
+    }
+  }
+
+  get showSafeAreas() {
+    return this.hasAttribute('show-safe-areas');
+  }
+
+  set showSafeAreas(value) {
+    this.toggleAttribute('show-safe-areas', Boolean(value));
+  }
+
   _getDevicePreset() {
     const device = this.getAttribute('device');
     if (!device) return null;
@@ -466,6 +508,118 @@ export class BrowserWindow extends HTMLElement {
       }
     } catch (_e) {
       // Cross-origin iframe — cannot sync color scheme
+    }
+  }
+
+  _renderStructure() {
+    this._setShareMenuOpen(false);
+    this.render();
+    this._attachEventListeners();
+    this._updateDynamicStyles();
+    this._applyDeviceColorClass();
+  }
+
+  _handleSrcChange(oldValue, newValue) {
+    this._fetchController?.abort();
+    this._fetchController = null;
+    this.showSource = false;
+    this.sourceCode = '';
+    this._sourceCodeSrc = '';
+    this._setShareMenuOpen(false);
+
+    const hadSrc = Boolean(oldValue);
+    const hasSrc = Boolean(newValue);
+
+    if (hadSrc !== hasSrc) {
+      this._renderStructure();
+      return;
+    }
+
+    this._updateContentView();
+    this._updateDownloadLinks();
+  }
+
+  _updateDynamicStyles() {
+    const styleEl = this.shadowRoot?.querySelector('style[data-browser-window-dynamic]');
+    if (styleEl) {
+      styleEl.textContent = this._dynamicCSS();
+    }
+  }
+
+  _getBezelColor() {
+    return DEVICE_COLORS[this.deviceColor] || DEVICE_COLORS.midnight;
+  }
+
+  _applyDeviceColorClass() {
+    const frame = this.shadowRoot?.querySelector('.device-frame');
+    if (!frame) return;
+
+    const lightBezels = ['silver', 'gold', 'white'];
+    frame.classList.toggle('light-bezel', lightBezels.includes(this.deviceColor));
+  }
+
+  _updateBrowserUrlBar() {
+    const urlBar = this.shadowRoot?.querySelector('.url-bar');
+    if (!urlBar) return;
+
+    const urlText = urlBar.querySelector('.url-text');
+    if (urlText) {
+      urlText.textContent = this.browserTitle;
+      urlText.setAttribute('title', this.url);
+    }
+
+    const existingLock = urlBar.querySelector('.lock-icon');
+    const needsLock = this.url.startsWith('https');
+
+    if (needsLock && !existingLock && urlText) {
+      const lock = document.createElement('span');
+      lock.className = 'lock-icon';
+      lock.textContent = '🔒';
+      urlBar.insertBefore(lock, urlText);
+    } else if (!needsLock && existingLock) {
+      existingLock.remove();
+    }
+  }
+
+  _updateDownloadLinks() {
+    for (const link of this.shadowRoot?.querySelectorAll('.download-button') || []) {
+      link.setAttribute('href', this.src);
+    }
+  }
+
+  _createSafeAreaOverlays() {
+    const overlays = document.createElement('div');
+    overlays.className = 'safe-area-overlays';
+    overlays.innerHTML = `
+      <div class="safe-area-overlay safe-area-top"></div>
+      <div class="safe-area-overlay safe-area-right"></div>
+      <div class="safe-area-overlay safe-area-bottom"></div>
+      <div class="safe-area-overlay safe-area-left"></div>
+    `;
+    return overlays;
+  }
+
+  _updateSafeAreaOverlays() {
+    const frame = this.shadowRoot?.querySelector('.device-frame');
+    if (!frame) return;
+
+    const existing = frame.querySelector('.safe-area-overlays');
+    if (this.showSafeAreas) {
+      if (!existing) {
+        frame.appendChild(this._createSafeAreaOverlays());
+      }
+    } else {
+      existing?.remove();
+    }
+  }
+
+  _resolveURL(candidate) {
+    if (!candidate) return '';
+
+    try {
+      return new URL(candidate, document.baseURI).href;
+    } catch {
+      return candidate;
     }
   }
 
@@ -624,18 +778,40 @@ export class BrowserWindow extends HTMLElement {
   async fetchSourceCode() {
     if (!this.src) return;
 
+    if (this._sourceCodeSrc === this.src && this.sourceCode) return;
+
+    const requestedSrc = this.src;
     this._fetchController?.abort();
-    this._fetchController = new AbortController();
+    const controller = new AbortController();
+    this._fetchController = controller;
 
     try {
-      const response = await fetch(this.src, { signal: this._fetchController.signal });
-      if (response.ok) {
-        this.sourceCode = await response.text();
+      const response = await fetch(this._resolveURL(requestedSrc), { signal: controller.signal });
+      if (!response.ok) {
+        if (this.src === requestedSrc) {
+          const status = [response.status, response.statusText].filter(Boolean).join(' ');
+          this.sourceCode = `// Failed to load source code${status ? ` (${status})` : ''}`;
+          this._sourceCodeSrc = requestedSrc;
+        }
+        return;
       }
-    } catch (_e) {
-      if (_e.name !== 'AbortError') {
-        console.error('Failed to fetch source code:', _e);
-        this.sourceCode = '// Failed to load source code';
+
+      const source = await response.text();
+      if (this._fetchController === controller && this.src === requestedSrc) {
+        this.sourceCode = source;
+        this._sourceCodeSrc = requestedSrc;
+      }
+    } catch (error) {
+      if (error.name !== 'AbortError') {
+        console.error('Failed to fetch source code:', error);
+        if (this.src === requestedSrc) {
+          this.sourceCode = '// Failed to load source code';
+          this._sourceCodeSrc = requestedSrc;
+        }
+      }
+    } finally {
+      if (this._fetchController === controller) {
+        this._fetchController = null;
       }
     }
   }
@@ -757,11 +933,21 @@ export class BrowserWindow extends HTMLElement {
   }
 
   toggleShareMenu() {
-    this.showShareMenu = !this.showShareMenu;
+    this._setShareMenuOpen(!this.showShareMenu);
+  }
+
+  _setShareMenuOpen(open) {
     const menu = this.shadowRoot?.querySelector('.share-menu');
     const shareBtn = this.shadowRoot?.querySelector('.share-button');
 
-    if (!menu || !shareBtn) return;
+    if (!menu || !shareBtn) {
+      this.showShareMenu = false;
+      clearTimeout(this._outsideClickTimer);
+      document.removeEventListener('click', this._handleOutsideClick);
+      return;
+    }
+
+    this.showShareMenu = open;
 
     if (this.showShareMenu) {
       menu.style.display = 'block';
@@ -783,7 +969,7 @@ export class BrowserWindow extends HTMLElement {
     if (!menu) return;
     const path = e.composedPath();
     if (!path.includes(menu)) {
-      this.toggleShareMenu();
+      this._setShareMenuOpen(false);
     }
   }
 
@@ -796,12 +982,12 @@ export class BrowserWindow extends HTMLElement {
     const shareData = {
       title: this.browserTitle || 'CSS Demo',
       text: `Check out this CSS demo: ${this.browserTitle}`,
-      url: this.src || this.url,
+      url: this._resolveURL(this.src || this.url),
     };
 
     try {
       await navigator.share(shareData);
-      this.toggleShareMenu();
+      this._setShareMenuOpen(false);
     } catch (error) {
       if (error.name !== 'AbortError') {
         console.error('Error sharing:', error);
@@ -870,7 +1056,7 @@ export class BrowserWindow extends HTMLElement {
     form.submit();
     document.body.removeChild(form);
 
-    this.toggleShareMenu();
+    this._setShareMenuOpen(false);
   }
 
   _handleClose() {
@@ -1030,6 +1216,7 @@ export class BrowserWindow extends HTMLElement {
 
     this.shadowRoot.innerHTML = `
       <style>${this._sharedCSS()}${css}</style>
+      <style data-browser-window-dynamic>${this._dynamicCSS()}</style>
       ${chrome}
       ${preset ? '' : this._contentHTML()}
     `;
@@ -1081,7 +1268,6 @@ export class BrowserWindow extends HTMLElement {
           /* Non-structural properties */
           --browser-window-border-radius: var(--radius-m, 8px);
           --browser-window-inner-radius: var(--radius-s, 6px);
-          --browser-window-shadow: ${this.hasShadow ? '0 4px 12px rgba(0, 0, 0, 0.15)' : 'none'};
           --browser-window-close-color: #ff5f57;
           --browser-window-minimize-color: #febc2e;
           --browser-window-maximize-color: #28c840;
@@ -1368,6 +1554,15 @@ export class BrowserWindow extends HTMLElement {
           height: 16px;
           flex-shrink: 0;
         }
+    `;
+  }
+
+  _dynamicCSS() {
+    return `
+      :host {
+        --browser-window-shadow: ${this.hasShadow ? '0 4px 12px rgba(0, 0, 0, 0.15)' : 'none'};
+        --browser-window-bezel-color: ${this._getBezelColor()};
+      }
     `;
   }
 
@@ -1687,7 +1882,6 @@ export class BrowserWindow extends HTMLElement {
   // --- Device mode ---
 
   _deviceCSS(preset) {
-    const bezelColor = DEVICE_COLORS[this.deviceColor] || DEVICE_COLORS.midnight;
     const isLandscape = this.getAttribute('orientation') === 'landscape';
     const dims = this._getEffectiveDimensions(preset);
     const [safeT, safeR, safeB, safeL] = this._getEffectiveSafeInsets(preset);
@@ -1702,7 +1896,6 @@ export class BrowserWindow extends HTMLElement {
           --device-height: ${dims.height}px;
           --device-bezel: ${preset.bezel}px;
           --device-corner-radius: ${preset.cornerRadius}px;
-          --browser-window-bezel-color: ${bezelColor};
           --status-bar-height: ${isLandscape && hasNotch ? 24 : statusBarH}px;
           --home-indicator-height: ${homeIndH}px;
           --home-button-area: ${homeBtnArea}px;
