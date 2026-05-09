@@ -145,11 +145,11 @@ const g = {
   gold: "#d4a574",
   blue: "#3a4f6f",
   white: "#f0f0f0"
-}, L = {
+}, A = {
   "dynamic-island": 54,
   "punch-hole": 36,
   none: 24
-}, A = 28, y = 80;
+}, L = 28, y = 80;
 let _ = !1;
 class E extends HTMLElement {
   constructor() {
@@ -171,7 +171,10 @@ class E extends HTMLElement {
       "device",
       "device-color",
       "orientation",
-      "show-safe-areas"
+      "show-safe-areas",
+      "allow",
+      "allowfullscreen",
+      "referrerpolicy"
     ];
   }
   attributeChangedCallback(e, t, r) {
@@ -200,8 +203,24 @@ class E extends HTMLElement {
         this._updateDynamicStyles();
         return;
       }
-      e === "mode" && (this.hasAttribute("mode") ? this.removeAttribute("data-page-mode") : this._onPageModeChange(m()), this._syncIframeColorScheme());
+      if (e === "mode") {
+        this.hasAttribute("mode") ? this.removeAttribute("data-page-mode") : this._onPageModeChange(m()), this._syncIframeColorScheme();
+        return;
+      }
+      (e === "allow" || e === "allowfullscreen" || e === "referrerpolicy") && this._syncIframePassthroughAttrs();
     }
+  }
+  // Build attribute string for inline iframe templates. Only emits attributes
+  // the host actually has, so we don't change rendered HTML for existing users.
+  _iframeAttrs() {
+    const e = [];
+    return this.hasAttribute("allow") && e.push(`allow="${this._escapeHtml(this.getAttribute("allow"))}"`), this.hasAttribute("allowfullscreen") && e.push("allowfullscreen"), this.hasAttribute("referrerpolicy") && e.push(`referrerpolicy="${this._escapeHtml(this.getAttribute("referrerpolicy"))}"`), e.length ? " " + e.join(" ") : "";
+  }
+  _syncIframePassthroughAttrs() {
+    const e = this.shadowRoot?.querySelector("iframe");
+    if (e)
+      for (const t of ["allow", "allowfullscreen", "referrerpolicy"])
+        this.hasAttribute(t) ? e.setAttribute(t, this.getAttribute(t) ?? "") : e.removeAttribute(t);
   }
   get url() {
     return this.getAttribute("url") || "";
@@ -412,7 +431,7 @@ class E extends HTMLElement {
   _retryLoad() {
     const e = this.shadowRoot.querySelector(".browser-content");
     if (!e || !this.src) return;
-    e.innerHTML = `<iframe src="${this._escapeHtml(this.src)}" loading="lazy"></iframe>`;
+    e.innerHTML = `<iframe src="${this._escapeHtml(this.src)}" loading="lazy"${this._iframeAttrs()}></iframe>`;
     const t = e.querySelector("iframe");
     t?.addEventListener("error", () => this._handleIframeError()), t?.addEventListener("load", () => {
       this._syncIframeColorScheme(), this._getDevicePreset() && this._injectSafeAreas(t);
@@ -469,7 +488,7 @@ class E extends HTMLElement {
         t.innerHTML = this._sourceViewHTML(), e?.classList.add("active"), t.querySelector(".copy-source-button")?.addEventListener("click", () => this.copySourceCode());
       else {
         if (this.src) {
-          t.innerHTML = `<iframe src="${this._escapeHtml(this.src)}" loading="lazy"></iframe>`;
+          t.innerHTML = `<iframe src="${this._escapeHtml(this.src)}" loading="lazy"${this._iframeAttrs()}></iframe>`;
           const r = t.querySelector("iframe");
           r?.addEventListener("error", () => this._handleIframeError()), r?.addEventListener("load", () => this._syncIframeColorScheme());
         } else
@@ -484,7 +503,7 @@ class E extends HTMLElement {
         t.innerHTML = this._sourceViewHTML(), e?.classList.add("active"), t.querySelector(".copy-source-button")?.addEventListener("click", () => this.copySourceCode());
       else {
         if (this.src) {
-          t.innerHTML = `<iframe src="${this._escapeHtml(this.src)}" loading="lazy"></iframe>`;
+          t.innerHTML = `<iframe src="${this._escapeHtml(this.src)}" loading="lazy"${this._iframeAttrs()}></iframe>`;
           const r = t.querySelector("iframe");
           r?.addEventListener("error", () => this._handleIframeError()), r?.addEventListener("load", () => {
             this._syncIframeColorScheme(), this._getDevicePreset() && this._injectSafeAreas(r);
@@ -1296,13 +1315,13 @@ class E extends HTMLElement {
   _contentHTML() {
     return `
       <div class="browser-content" part="content">
-        ${this.src ? `<iframe src="${this._escapeHtml(this.src)}" loading="lazy"></iframe>` : "<slot></slot>"}
+        ${this.src ? `<iframe src="${this._escapeHtml(this.src)}" loading="lazy"${this._iframeAttrs()}></iframe>` : "<slot></slot>"}
       </div>
     `;
   }
   // --- Device mode ---
   _deviceCSS(e) {
-    const t = this.getAttribute("orientation") === "landscape", r = this._getEffectiveDimensions(e), [o, s, d, n] = this._getEffectiveSafeInsets(e), c = L[e.notch] || 24, a = e.homeIndicator && !e.homeButton ? A : 0, w = e.homeButton ? y : 0, u = e.notch !== "none";
+    const t = this.getAttribute("orientation") === "landscape", r = this._getEffectiveDimensions(e), [o, s, d, n] = this._getEffectiveSafeInsets(e), c = A[e.notch] || 24, a = e.homeIndicator && !e.homeButton ? L : 0, w = e.homeButton ? y : 0, u = e.notch !== "none";
     return `
         :host([device]) {
           --device-width: ${r.width}px;

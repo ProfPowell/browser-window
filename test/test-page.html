@@ -72,6 +72,18 @@
   </div>
 
   <div class="test-section">
+    <h2>With iframe permissions passthrough</h2>
+    <browser-window
+      id="with-allow"
+      src="../docs/example.html"
+      url="https://example.com/ai"
+      allow="camera; microphone"
+      allowfullscreen
+      referrerpolicy="no-referrer">
+    </browser-window>
+  </div>
+
+  <div class="test-section">
     <h2>No mode attribute (for page-level dark mode tests)</h2>
     <browser-window id="no-mode" url="https://example.com" title="Auto Mode">
       <div style="padding: 2rem; text-align: center;">

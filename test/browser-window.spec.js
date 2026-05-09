@@ -71,6 +71,61 @@ test.describe('browser-window', () => {
       const hasShadow = await page.locator('#default').evaluate((node) => node.hasShadow)
       expect(hasShadow).toBe(false)
     })
+
+    test('passes allow/allowfullscreen/referrerpolicy through to inner iframe', async ({ page }) => {
+      const attrs = await page.locator('#with-allow').evaluate((node) => {
+        const iframe = node.shadowRoot.querySelector('iframe')
+        return {
+          allow: iframe.getAttribute('allow'),
+          allowfullscreen: iframe.hasAttribute('allowfullscreen'),
+          referrerpolicy: iframe.getAttribute('referrerpolicy'),
+        }
+      })
+      expect(attrs.allow).toBe('camera; microphone')
+      expect(attrs.allowfullscreen).toBe(true)
+      expect(attrs.referrerpolicy).toBe('no-referrer')
+    })
+
+    test('does not add passthrough attrs when host has none', async ({ page }) => {
+      const attrs = await page.locator('#with-src').evaluate((node) => {
+        const iframe = node.shadowRoot.querySelector('iframe')
+        return {
+          hasAllow: iframe.hasAttribute('allow'),
+          hasAllowFullscreen: iframe.hasAttribute('allowfullscreen'),
+          hasReferrerPolicy: iframe.hasAttribute('referrerpolicy'),
+        }
+      })
+      expect(attrs.hasAllow).toBe(false)
+      expect(attrs.hasAllowFullscreen).toBe(false)
+      expect(attrs.hasReferrerPolicy).toBe(false)
+    })
+
+    test('updates iframe allow attribute live without reloading the iframe', async ({ page }) => {
+      const result = await page.evaluate(async () => {
+        const el = document.querySelector('#with-allow')
+        const iframe = el.shadowRoot.querySelector('iframe')
+
+        if (iframe.contentDocument?.readyState !== 'complete') {
+          await new Promise((resolve) => iframe.addEventListener('load', resolve, { once: true }))
+        }
+
+        iframe.contentWindow.__reviewMarker = 'allow-kept-alive'
+        el.setAttribute('allow', 'geolocation')
+        el.removeAttribute('allowfullscreen')
+
+        const nextIframe = el.shadowRoot.querySelector('iframe')
+        return {
+          sameNode: iframe === nextIframe,
+          marker: nextIframe.contentWindow.__reviewMarker,
+          allow: nextIframe.getAttribute('allow'),
+          hasAllowFullscreen: nextIframe.hasAttribute('allowfullscreen'),
+        }
+      })
+      expect(result.sameNode).toBe(true)
+      expect(result.marker).toBe('allow-kept-alive')
+      expect(result.allow).toBe('geolocation')
+      expect(result.hasAllowFullscreen).toBe(false)
+    })
   })
 
   test.describe('attribute updates', () => {

@@ -13,6 +13,9 @@
  * @attr {string} device-color - Device bezel color preset (midnight, silver, gold, blue, white)
  * @attr {'portrait'|'landscape'} orientation - Device orientation. Swaps width/height and repositions chrome.
  * @attr {boolean} show-safe-areas - Draw translucent overlay bands showing safe area insets
+ * @attr {string} allow - Permissions Policy directives to pass through to the inner iframe (e.g. "camera; microphone"). Required by Chrome for some APIs (e.g. built-in AI) even on same-origin frames.
+ * @attr {boolean} allowfullscreen - Pass through to the inner iframe to permit Fullscreen API requests.
+ * @attr {string} referrerpolicy - Pass through to the inner iframe (e.g. "no-referrer", "origin").
  *
  * @csspart header - The browser header/toolbar
  * @csspart content - The content area
@@ -318,6 +321,9 @@ export class BrowserWindow extends HTMLElement {
       'device-color',
       'orientation',
       'show-safe-areas',
+      'allow',
+      'allowfullscreen',
+      'referrerpolicy',
     ];
   }
 
@@ -368,6 +374,39 @@ export class BrowserWindow extends HTMLElement {
         this._onPageModeChange(_detectPageDarkMode());
       }
       this._syncIframeColorScheme();
+      return;
+    }
+
+    if (name === 'allow' || name === 'allowfullscreen' || name === 'referrerpolicy') {
+      this._syncIframePassthroughAttrs();
+    }
+  }
+
+  // Build attribute string for inline iframe templates. Only emits attributes
+  // the host actually has, so we don't change rendered HTML for existing users.
+  _iframeAttrs() {
+    const parts = [];
+    if (this.hasAttribute('allow')) {
+      parts.push(`allow="${this._escapeHtml(this.getAttribute('allow'))}"`);
+    }
+    if (this.hasAttribute('allowfullscreen')) {
+      parts.push('allowfullscreen');
+    }
+    if (this.hasAttribute('referrerpolicy')) {
+      parts.push(`referrerpolicy="${this._escapeHtml(this.getAttribute('referrerpolicy'))}"`);
+    }
+    return parts.length ? ' ' + parts.join(' ') : '';
+  }
+
+  _syncIframePassthroughAttrs() {
+    const iframe = this.shadowRoot?.querySelector('iframe');
+    if (!iframe) return;
+    for (const name of ['allow', 'allowfullscreen', 'referrerpolicy']) {
+      if (this.hasAttribute(name)) {
+        iframe.setAttribute(name, this.getAttribute(name) ?? '');
+      } else {
+        iframe.removeAttribute(name);
+      }
     }
   }
 
@@ -743,7 +782,7 @@ export class BrowserWindow extends HTMLElement {
     const content = this.shadowRoot.querySelector('.browser-content');
     if (!content || !this.src) return;
 
-    content.innerHTML = `<iframe src="${this._escapeHtml(this.src)}" loading="lazy"></iframe>`;
+    content.innerHTML = `<iframe src="${this._escapeHtml(this.src)}" loading="lazy"${this._iframeAttrs()}></iframe>`;
 
     // Re-attach error handler and sync color scheme
     const iframe = content.querySelector('iframe');
@@ -846,7 +885,7 @@ export class BrowserWindow extends HTMLElement {
         ?.addEventListener('click', () => this.copySourceCode());
     } else {
       if (this.src) {
-        content.innerHTML = `<iframe src="${this._escapeHtml(this.src)}" loading="lazy"></iframe>`;
+        content.innerHTML = `<iframe src="${this._escapeHtml(this.src)}" loading="lazy"${this._iframeAttrs()}></iframe>`;
         const newIframe = content.querySelector('iframe');
         newIframe?.addEventListener('error', () => this._handleIframeError());
         newIframe?.addEventListener('load', () => this._syncIframeColorScheme());
@@ -869,7 +908,7 @@ export class BrowserWindow extends HTMLElement {
         ?.addEventListener('click', () => this.copySourceCode());
     } else {
       if (this.src) {
-        content.innerHTML = `<iframe src="${this._escapeHtml(this.src)}" loading="lazy"></iframe>`;
+        content.innerHTML = `<iframe src="${this._escapeHtml(this.src)}" loading="lazy"${this._iframeAttrs()}></iframe>`;
         const newIframe = content.querySelector('iframe');
         newIframe?.addEventListener('error', () => this._handleIframeError());
         newIframe?.addEventListener('load', () => {
@@ -1874,7 +1913,7 @@ export class BrowserWindow extends HTMLElement {
   _contentHTML() {
     return `
       <div class="browser-content" part="content">
-        ${this.src ? `<iframe src="${this._escapeHtml(this.src)}" loading="lazy"></iframe>` : '<slot></slot>'}
+        ${this.src ? `<iframe src="${this._escapeHtml(this.src)}" loading="lazy"${this._iframeAttrs()}></iframe>` : '<slot></slot>'}
       </div>
     `;
   }
