@@ -168,6 +168,15 @@
             },
             {
               "name": "show-safe-areas"
+            },
+            {
+              "name": "allow"
+            },
+            {
+              "name": "allowfullscreen"
+            },
+            {
+              "name": "referrerpolicy"
             }
           ],
           "superclass": {
